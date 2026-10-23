@@ -5,11 +5,11 @@ Read `PLAN.md` before doing anything. It has the scope, file ownership, data for
 ## The product in one line
 Mitra lets any woman entrepreneur, even with a basic phone, say what she sold in her own Malayalam and know her real monthly profit, and when she can afford the auto she's saving for.
 
-## Team
-- **Fathima (fathima-004): app screens + content + pitch.** `css/style.css`, `index.html`, `setup.html`, `daily.html`, `profit.html`, `money.html`, `schemes.html`, `support.html`, `bulk.html`, `js/money.js`, `js/app.js`, `manifest.webmanifest`, `sw.js`, `icons/`, `tools/`, everything in `data/` and `audio/`, slides.
+## Team (swapped 24 Oct, ~00:30 — see PLAN.md §2a)
+- **Fathima (fathima-004): the phone call + content + pitch.** The call agent, moving to **Exotel** (Indian number; Twilio stays as backup): `netlify/functions/*` (voice flow, parsing, call-me), `call.html`, `js/call.js`, `js/parse.js`. Plus everything in `data/` and `audio/` (Malayalam text, synonyms, schemes, voice clips), `tools/`, slides, pitch, backup video.
+- **Hiba (hibaNiz): the Flutter app + backend setup.** `app/` (Flutter: screens, data on the phone, Firestore link), the web screens (`*.html` except `call.html`, `css/`, `js/app.js`, `js/art.js`, `js/insights.js`, `js/money.js`, `manifest.webmanifest`, `sw.js`, `icons/`), `js/data.js`, `js/calc.js`, `package.json`, `netlify.toml`, Firebase and Netlify setup.
 
-Local testing: `python tools/serve.py` (no-cache server on port 8080; the phone on the same Wi-Fi can open `http://<laptop-ip>:8080`). Every page must load `js/app.js` (it registers the service worker that makes Mitra an installable phone app).
-- **Hiba (hibaNiz): call agent + backend.** `netlify/functions/*` (Twilio voice flow, Claude parsing, call-me), `call.html`, `js/call.js`, `js/data.js`, `js/calc.js`, `js/parse.js`, `package.json`, `netlify.toml`, Firebase and Netlify setup.
+Local testing (web): `python tools/serve.py` (no-cache server on port 8080). Flutter: `cd app && flutter run`; after changing `data/` or `audio/`, run `python tools/sync_app_assets.py`. Status and setup notes: `docs/fathima-status.md`.
 
 **Only edit files you own.** If you need a change in someone else's file, write it in `docs/requests.md` and tell your teammate. Shared contracts (data format, `data.js` function names) are frozen after hour 1; changing them needs both people to agree.
 

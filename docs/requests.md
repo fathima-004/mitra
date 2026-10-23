@@ -43,3 +43,6 @@ Also: call.html uses its own short Malayalam and English labels in js/call.js (t
 - Ask name → place → products with prices (speech, read back, 1 = right / 2 = wrong) → 4-digit PIN by keypad → save a user keyed by her phone number → SMS welcome.
 - Login next time: known `From` number → "Namaskaram <name>" → ask the PIN → menu.
 If there's no time, we keep it as the replay plus a pitch line. No change is needed in your files for the demo.
+
+**24 Oct ~00:30, both: work swapped (PLAN.md §2a, CLAUDE.md "Team")**
+Fathima → phone call (Exotel, Twilio as backup) + content + pitch. Hiba → Flutter app (`app/`) + Firebase/Netlify. For Hiba: the Flutter app's state and how to build it are in `docs/fathima-status.md`. The APK hasn't been built yet (network errors on Fathima's laptop), and the Firestore link is still to do. For Fathima: Hiba's call code is in `netlify/functions/` (voice, menu, ping) and `call.html` / `js/call.js` / `js/parse.js`.
