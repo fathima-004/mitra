@@ -1,4 +1,6 @@
-# Fathima's side: where things are (23 Oct, ~midnight)
+# Where things are (24 Oct, ~00:30)
+
+**Work swapped:** Fathima now owns the phone call (moving to Exotel) + content + pitch. Hiba now owns the Flutter app in `app/` (this file explains its state) and Firebase/Netlify. See docs/team-rules.md and PLAN.md §2a.
 
 Read this first on a new computer, together with docs/team-rules.md and PLAN.md.
 

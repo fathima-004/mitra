@@ -16,6 +16,12 @@ MakeHerHack 2026, CITTIC CUSAT. About 16 hours of building. Two people, one repo
 
 ## 2. Work division
 
+### 2a. Swap on 24 Oct (~00:30), this replaces the split below
+- **Fathima: the phone call.** Move the call agent to **Exotel** (Indian ExoPhone, so no Twilio "trial account" message; Twilio stays as the backup). Exotel credentials (API key, token, SID, subdomain) go in Netlify environment variables only. Also keeps content (`data/`, `audio/`), slides, pitch and backup video.
+- **Hiba: the Flutter app** in `app/` (built by Fathima up to 24 Oct: Home, Sales keypad, Call, Profit, Money Health, Join with voice-call replay; see `docs/fathima-status.md`), plus Firebase/Netlify setup and the Firestore link so the app updates live during a call.
+- The data contract in §5 does not change: the call still writes `users/demo1/sales` with `via:"call"`.
+
+
 ### Hiba: call agent + backend (the highlight)
 Everything that makes the phone call work, end to end, plus Firebase and deployment.
 - Twilio voice flow (Netlify Functions returning TwiML): greet → menu → sales → confirm → save → profit → schemes → support → goodbye
