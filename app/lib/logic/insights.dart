@@ -99,8 +99,8 @@ Insight? _pace(Map<String, List<Rec>> d, Rec? top, DateTime now) {
     final now1 = goalPlan(goal, avg), with1 = goalPlan({...goal, 'saved': _n(goal['saved']) + extra}, avg);
     final gain = (now1.months ?? 0) - (with1.months ?? 0);
     if (gain >= 1) {
-      soonerMl = ' ആ ${_rs(extra)} മാറ്റിവെച്ചാൽ ${goal['name_ml']} $gain മാസം നേരത്തെ കിട്ടും.';
-      soonerEn = ' Put that ${_rs(extra)} aside and your ${(goal['name_en'] as String).split(' (').first.toLowerCase()} comes $gain month${gain > 1 ? 's' : ''} sooner.';
+      soonerMl = ' ആ ${_rs(extra)} മാറ്റിവെച്ചാൽ സമ്പാദ്യ ലക്ഷ്യം $gain മാസം നേരത്തെ എത്തും.';
+      soonerEn = ' Put that ${_rs(extra)} aside and you reach your savings goal $gain month${gain > 1 ? 's' : ''} sooner.';
     }
   }
   return Insight('pace', 'up', InsightTone.leaf,

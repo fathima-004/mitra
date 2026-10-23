@@ -170,4 +170,26 @@ void main() {
     final income = tester.getTopLeft(find.text('Add income')).dy;
     expect(call > money && call < income, isTrue);
   });
+
+  testWidgets('schemes screen lists the checked schemes she can join now', (tester) async {
+    L.lang.value = 'en';
+    await show(tester, const SchemesScreen());
+    expect(find.text('Schemes you can join now'), findsOneWidget);
+    for (final t in ['PM Suraksha Bima Yojana (accident insurance)', 'Atal Pension Yojana (pension)', 'Udyam Registration (free business registration)']) {
+      await tester.scrollUntilVisible(find.text(t), 200);
+      expect(find.text(t), findsOneWidget);
+    }
+    expect(find.textContaining('No scheme news'), findsNothing);
+    expect(find.textContaining('Auto rickshaw'), findsNothing);
+  });
+
+  testWidgets('the savings goal is called "Savings goal", not the demo name', (tester) async {
+    L.lang.value = 'en';
+    await show(tester, const SavingsScreen());
+    expect(find.textContaining('Auto rickshaw'), findsNothing);
+    L.lang.value = 'ml';
+    await show(tester, const SavingsScreen());
+    expect(find.text('ഓട്ടോ'), findsNothing);
+    expect(find.text('സമ്പാദ്യ ലക്ഷ്യം'), findsWidgets);
+  });
 }

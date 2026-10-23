@@ -78,7 +78,7 @@ class _SavingsScreenState extends State<SavingsScreen> {
                       Row(children: [
                         const Bubble(Icons.flag_rounded, color: Colors.white, bg: K.purple, size: 46),
                         const SizedBox(width: 12),
-                        Expanded(child: Text(pick(goal, 'name').split(' (').first, style: ts(20, w: FontWeight.w800))),
+                        Expanded(child: Text(tr('savings'), style: ts(20, w: FontWeight.w800))),
                         Text('${g.pct}%', style: money(26, c: K.purple)),
                       ]),
                       const SizedBox(height: 14),
@@ -316,106 +316,128 @@ class SchemesScreen extends StatefulWidget {
 
 class _SchemesScreenState extends State<SchemesScreen> {
   late Future<NewsResult> news = governmentNews();
-  late final Future<List<Rec>> checked = _checkedSchemes();
+  late final Future<List<Rec>> open = openSchemes();
   bool all = false;
 
-  static Future<List<Rec>> _checkedSchemes() async {
+  /// Non-loan schemes she can join now (assets/data/schemes.json): only entries checked on the official page
+  /// (source_url + date_checked), and whose last date to apply (open_until) hasn't passed.
+  static Future<List<Rec>> openSchemes() async {
     try {
       final j = jsonDecode(await rootBundle.loadString('assets/data/schemes.json'));
       final list = j is List ? j : (j as Map)['schemes'] as List? ?? const [];
+      final day = today();
       return [
         for (final x in list)
-          if (x is Map && '${x['source_url'] ?? ''}'.startsWith('http') && '${x['date_checked'] ?? ''}'.isNotEmpty) Map<String, dynamic>.from(x),
+          if (x is Map &&
+              '${x['source_url'] ?? ''}'.startsWith('http') &&
+              '${x['date_checked'] ?? ''}'.isNotEmpty &&
+              x['loan'] != true &&
+              (x['open_until'] == null || '${x['open_until']}'.compareTo(day) >= 0))
+            Map<String, dynamic>.from(x),
       ];
     } catch (_) {
       return [];
     }
   }
 
+  Widget _line(IconData icon, String text) => Padding(
+        padding: const EdgeInsets.only(top: 8),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Icon(icon, size: 19, color: K.teal),
+          const SizedBox(width: 10),
+          Expanded(child: Text(text, style: ts(14.5, w: FontWeight.w500, h: 1.45))),
+        ]),
+      );
+
+  Widget _scheme(Rec s) => Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Box(
+          child: Theme(
+            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+            child: ExpansionTile(
+              tilePadding: EdgeInsets.zero,
+              childrenPadding: EdgeInsets.zero,
+              leading: const Bubble(Icons.verified_user_rounded, color: K.teal, bg: K.tealSoft, size: 44),
+              title: Text(pick(s, 'title'), style: ts(16.5, w: FontWeight.w800)),
+              subtitle: Padding(padding: const EdgeInsets.only(top: 4), child: Text(pick(s, 'about'), style: ts(14, w: FontWeight.w500, c: K.muted))),
+              expandedCrossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (pick(s, 'cost').isNotEmpty) _line(Icons.payments_outlined, pick(s, 'cost')),
+                if (pick(s, 'who').isNotEmpty) _line(Icons.person_outline_rounded, pick(s, 'who')),
+                if ((s['documents'] as List?)?.isNotEmpty ?? false) ...[
+                  const SizedBox(height: 10),
+                  Text(tr('documents'), style: ts(14.5, w: FontWeight.w800)),
+                  for (final d in s['documents'] as List)
+                    _line(Icons.check_box_outline_blank_rounded, d is Map ? '${(L.ml ? d['ml'] ?? d['en'] : d['en'] ?? d['ml']) ?? ''}' : '$d'),
+                ],
+                if (pick(s, 'how').isNotEmpty) _line(Icons.place_outlined, pick(s, 'how')),
+                const SizedBox(height: 10),
+                InkWell(
+                  onTap: () => openLink('${s['source_url']}'),
+                  child: Text('${tr('checked_on')}: ${dayName('${s['date_checked']}')} · ${Uri.tryParse('${s['source_url']}')?.host ?? ''}',
+                      style: ts(12.5, c: K.blue)),
+                ),
+                const SizedBox(height: 6),
+              ],
+            ),
+          ),
+        ),
+      );
+
   @override
   Widget build(BuildContext context) => Page2(
         title: tr('schemes'),
         info: 'info_schemes',
-        actions: [IconButton(onPressed: () => setState(() => news = governmentNews()), icon: const Icon(Icons.refresh_rounded))],
         children: [
           FutureBuilder<List<Rec>>(
-            future: checked,
+            future: open,
             builder: (context, snap) {
               final list = snap.data ?? const [];
               if (list.isEmpty) return const SizedBox();
               return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                Heading(tr('checked_schemes')),
-                for (final s in list) ...[
-                  Box(
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(pick(s, 'title'), style: ts(17, w: FontWeight.w800)),
-                      if (pick(s, 'about').isNotEmpty) Text(pick(s, 'about'), style: ts(14, w: FontWeight.w500, c: K.muted)),
-                      if ((s['documents'] as List?)?.isNotEmpty ?? false) ...[
-                        const SizedBox(height: 10),
-                        Text(tr('documents'), style: ts(14.5, w: FontWeight.w700)),
-                        for (final d in s['documents'] as List)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 4),
-                            child: Row(children: [
-                              const Icon(Icons.check_box_outline_blank_rounded, size: 18, color: K.green),
-                              const SizedBox(width: 8),
-                              Expanded(child: Text(d is Map ? '${(L.ml ? d['ml'] ?? d['en'] : d['en'] ?? d['ml']) ?? ''}' : '$d', style: ts(14))),
-                            ]),
-                          ),
-                      ],
-                      const SizedBox(height: 8),
-                      InkWell(
-                        onTap: () => openLink('${s['source_url']}'),
-                        child: Text('${tr('checked_on')}: ${s['date_checked']} · ${s['source_url']}', style: ts(12, c: K.blue)),
-                      ),
-                    ]),
-                  ),
-                  const SizedBox(height: 10),
-                ],
+                Heading(tr('open_schemes')),
+                for (final s in list) _scheme(s),
               ]);
             },
           ),
-          Heading(tr('from_govt')),
           FutureBuilder<NewsResult>(
             future: news,
             builder: (context, snap) {
-              if (snap.connectionState != ConnectionState.done) {
-                return const Padding(padding: EdgeInsets.all(30), child: Center(child: CircularProgressIndicator(color: K.green)));
-              }
+              if (snap.connectionState != ConnectionState.done) return const SizedBox();
               final r = snap.data!;
               final items = all ? r.items : r.items.where((n) => n.relevant).toList();
               return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                if (r.fromCache)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Text(r.fetched == null ? tr('cant_load') : '${tr('offline_saved')} ${dayName(isoDate(r.fetched!))}',
-                        style: ts(13, c: K.yellow)),
-                  ),
-                if (items.isEmpty && r.items.isNotEmpty)
-                  Tint(color: const Color(0xFFF3F5F3), child: Text(tr('no_scheme_news'), style: ts(15, c: K.muted))),
-                for (final n in items)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Box(
-                      onTap: () => openLink(n.link),
-                      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Bubble(n.relevant ? Icons.campaign_rounded : Icons.article_outlined, color: K.blue, bg: K.blueSoft, size: 42),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                            Text(n.title, style: const TextStyle(fontFamily: 'Jakarta', fontSize: 15, fontWeight: FontWeight.w700, height: 1.35)),
-                            const SizedBox(height: 4),
-                            Text(tr('pib_source'), style: ts(12.5, c: K.muted)),
-                          ]),
-                        ),
-                        const Icon(Icons.open_in_new_rounded, size: 18, color: K.muted),
-                      ]),
+                if (items.isNotEmpty) ...[
+                  Heading(tr('from_govt')),
+                  if (r.fromCache && r.fetched != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Text('${tr('offline_saved')} ${dayName(isoDate(r.fetched!))}', style: ts(13, c: K.yellow)),
                     ),
-                  ),
+                  for (final n in items)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Box(
+                        onTap: () => openLink(n.link),
+                        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Bubble(n.relevant ? Icons.campaign_rounded : Icons.article_outlined, color: K.blue, bg: K.blueSoft, size: 42),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                              Text(n.title, style: const TextStyle(fontFamily: 'Jakarta', fontSize: 15, fontWeight: FontWeight.w700, height: 1.35)),
+                              const SizedBox(height: 4),
+                              Text(tr('pib_source'), style: ts(12.5, c: K.muted)),
+                            ]),
+                          ),
+                          const Icon(Icons.open_in_new_rounded, size: 18, color: K.muted),
+                        ]),
+                      ),
+                    ),
+                ],
                 if (r.items.isNotEmpty)
                   TextButton(
                     onPressed: () => setState(() => all = !all),
-                    child: Text(all ? tr('schemes') : tr('show_all_news'), style: ts(15, w: FontWeight.w700, c: K.green)),
+                    child: Text(all ? tr('schemes_only') : tr('show_all_news'), style: ts(15, w: FontWeight.w700, c: K.green)),
                   ),
               ]);
             },

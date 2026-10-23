@@ -162,7 +162,7 @@ class _GoalStrip extends StatelessWidget {
         Row(children: [
           const Bubble(Icons.flag_rounded, color: K.purple, bg: K.purpleSoft, size: 42),
           const SizedBox(width: 12),
-          Expanded(child: Text(pick(goal, 'name').split(' (').first, style: ts(15.5, w: FontWeight.w700))),
+          Expanded(child: Text(tr('savings'), style: ts(15.5, w: FontWeight.w700))),
           Text('${g.pct}%', style: money(20, c: K.purple)),
         ]),
         const SizedBox(height: 10),
