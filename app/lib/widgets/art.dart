@@ -16,8 +16,26 @@ String _autoShape(Map<String, String> c) => '''
 <circle cx="30" cy="66" r="10" fill="${c['tyre']}"/><circle cx="30" cy="66" r="4" fill="${c['hub']}"/>
 <circle cx="100" cy="66" r="8.5" fill="${c['tyre']}"/><circle cx="100" cy="66" r="3.5" fill="${c['hub']}"/>''';
 
-const _grey = {'top': '#c9c3b5', 'body': '#e3ddcf', 'seat': '#bdb6a6', 'glass': '#ece7dc', 'stripe': '#d4cdbd', 'light': '#ece7dc', 'tyre': '#bdb6a6', 'hub': '#e3ddcf'};
-const _colour = {'top': '#1f2a27', 'body': '#f2c230', 'seat': '#b4334d', 'glass': '#cfe8f0', 'stripe': '#0d6b5c', 'light': '#fff7c2', 'tyre': '#1f2a27', 'hub': '#9aa59f'};
+const _grey = {
+  'top': '#c9c3b5',
+  'body': '#e3ddcf',
+  'seat': '#bdb6a6',
+  'glass': '#ece7dc',
+  'stripe': '#d4cdbd',
+  'light': '#ece7dc',
+  'tyre': '#bdb6a6',
+  'hub': '#e3ddcf'
+};
+const _colour = {
+  'top': '#1f2a27',
+  'body': '#f2c230',
+  'seat': '#b4334d',
+  'glass': '#cfe8f0',
+  'stripe': '#0d6b5c',
+  'light': '#fff7c2',
+  'tyre': '#1f2a27',
+  'hub': '#9aa59f'
+};
 
 /// Auto rickshaw in grey, with the coloured version revealed left to right up to [pct].
 class AutoArt extends StatelessWidget {
@@ -74,8 +92,7 @@ class FoodArt extends StatelessWidget {
   Widget build(BuildContext context) {
     final name = '${product?['name_en'] ?? ''} ${product?['name_ml'] ?? ''}';
     final key = _foodWords.where((w) => w.$1.hasMatch(name)).map((w) => w.$2).firstOrNull ?? 'plate';
-    return SvgPicture.string('<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">${_food[key]}</svg>',
-        width: size, height: size);
+    return SvgPicture.string('<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">${_food[key]}</svg>', width: size, height: size);
   }
 }
 

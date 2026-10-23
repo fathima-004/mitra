@@ -43,16 +43,25 @@ class FakeFirestore {
       final col = q['from'][0]['collectionId'];
       final want = q['where']['fieldFilter']['value']['stringValue'];
       final prefix = '${path.replaceFirst(':runQuery', '')}/$col/';
-      final hits = docs.keys
-          .where((n) => n.startsWith(prefix) && !n.substring(prefix.length).contains('/'))
-          .where((n) => docs[n]!['date']?['stringValue'] == want);
-      return _res(jsonEncode([for (final n in hits) {'document': _docJson(n)}]), 200);
+      final hits =
+          docs.keys.where((n) => n.startsWith(prefix) && !n.substring(prefix.length).contains('/')).where((n) => docs[n]!['date']?['stringValue'] == want);
+      return _res(
+          jsonEncode([
+            for (final n in hits) {'document': _docJson(n)}
+          ]),
+          200);
     }
     if (req.method == 'PATCH') {
       final fields = Map<String, dynamic>.from(jsonDecode(req.body)['fields']);
       final mask = req.url.queryParametersAll['updateMask.fieldPaths'];
       // With an update mask only those fields change, like real Firestore.
-      docs[path] = mask == null ? fields : {...?docs[path], for (final k in mask) if (fields.containsKey(k)) k: fields[k]};
+      docs[path] = mask == null
+          ? fields
+          : {
+              ...?docs[path],
+              for (final k in mask)
+                if (fields.containsKey(k)) k: fields[k]
+            };
       writes++;
       return _res(jsonEncode(_docJson(path)), 200);
     }
@@ -67,7 +76,11 @@ class FakeFirestore {
       final kids = docs.keys.where((n) => n.startsWith(prefix) && !n.substring(prefix.length).contains('/')).toList();
       final depth = path.split('/').length - root.split('/').length;
       if (depth.isEven) return _res('{"error":"not found"}', 404); // a document path
-      return _res(jsonEncode({'documents': [for (final n in kids) _docJson(n)]}), 200);
+      return _res(
+          jsonEncode({
+            'documents': [for (final n in kids) _docJson(n)]
+          }),
+          200);
     }
     return _res('unexpected', 500);
   }
@@ -128,7 +141,6 @@ void main() {
 
       expect(repo['sales'].length, before + 1);
       expect(repo['sales'].any((s) => s['id'] == 'call1' && s['qty'] == 12 && s['via'] == 'call'), isTrue);
-      expect(repo.lastCallSale, 'call1');
       expect(announced, 1);
 
       await repo.syncNow(); // nothing new: no second announcement
@@ -220,7 +232,9 @@ void main() {
       final repo = Repo();
       await repo.init();
       final before = repo['sales'].length;
-      await Future.wait([for (var i = 0; i < 20; i++) repo.add('sales', {'date': todayIso(), 'product': 'p1', 'qty': 1, 'via': 'app'})]);
+      await Future.wait([
+        for (var i = 0; i < 20; i++) repo.add('sales', {'date': todayIso(), 'product': 'p1', 'qty': 1, 'via': 'app'})
+      ]);
       expect(repo['sales'].length, before + 20);
       expect(repo['sales'].map((s) => s['id']).toSet().length, repo['sales'].length);
       repo.dispose();

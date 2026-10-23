@@ -58,6 +58,9 @@ List<(Cat, num)> spendByCat(List<Rec> bills, List<Rec> purchases, String month) 
     final k = catOfBill(b);
     sums[k] = (sums[k] ?? 0) + ((b['amount'] as num?) ?? 0);
   }
-  final list = [for (final e in sums.entries) if (e.value > 0) (catBy(e.key), e.value)]..sort((a, b) => b.$2.compareTo(a.$2));
+  final list = [
+    for (final e in sums.entries)
+      if (e.value > 0) (catBy(e.key), e.value)
+  ]..sort((a, b) => b.$2.compareTo(a.$2));
   return list;
 }

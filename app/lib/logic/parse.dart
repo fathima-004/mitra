@@ -11,23 +11,63 @@ const _productWords = {
 };
 
 const _numbers = {
-  'ഒന്ന്': 1, 'ഒന്നു': 1, 'ഒരു': 1, 'one': 1, 'oru': 1, 'onnu': 1,
-  'രണ്ട്': 2, 'രണ്ടു': 2, 'two': 2, 'randu': 2,
-  'മൂന്ന്': 3, 'മൂന്നു': 3, 'three': 3, 'moonnu': 3,
-  'നാല്': 4, 'നാലു': 4, 'four': 4, 'naalu': 4,
-  'അഞ്ച്': 5, 'അഞ്ചു': 5, 'five': 5, 'anchu': 5,
-  'ആറ്': 6, 'ആറു': 6, 'six': 6, 'aaru': 6,
-  'ഏഴ്': 7, 'ഏഴു': 7, 'seven': 7, 'ezhu': 7,
-  'എട്ട്': 8, 'എട്ടു': 8, 'eight': 8, 'ettu': 8,
-  'ഒമ്പത്': 9, 'ഒൻപത്': 9, 'nine': 9,
-  'പത്ത്': 10, 'പത്തു': 10, 'ten': 10, 'pathu': 10,
-  'പന്ത്രണ്ട്': 12, 'twelve': 12,
-  'പതിനഞ്ച്': 15, 'fifteen': 15,
-  'ഇരുപത്': 20, 'twenty': 20, 'irupathu': 20,
-  'മുപ്പത്': 30, 'thirty': 30, 'muppathu': 30,
-  'നാൽപ്പത്': 40, 'forty': 40,
-  'അമ്പത്': 50, 'fifty': 50,
-  'നൂറ്': 100, 'hundred': 100,
+  'ഒന്ന്': 1,
+  'ഒന്നു': 1,
+  'ഒരു': 1,
+  'one': 1,
+  'oru': 1,
+  'onnu': 1,
+  'രണ്ട്': 2,
+  'രണ്ടു': 2,
+  'two': 2,
+  'randu': 2,
+  'മൂന്ന്': 3,
+  'മൂന്നു': 3,
+  'three': 3,
+  'moonnu': 3,
+  'നാല്': 4,
+  'നാലു': 4,
+  'four': 4,
+  'naalu': 4,
+  'അഞ്ച്': 5,
+  'അഞ്ചു': 5,
+  'five': 5,
+  'anchu': 5,
+  'ആറ്': 6,
+  'ആറു': 6,
+  'six': 6,
+  'aaru': 6,
+  'ഏഴ്': 7,
+  'ഏഴു': 7,
+  'seven': 7,
+  'ezhu': 7,
+  'എട്ട്': 8,
+  'എട്ടു': 8,
+  'eight': 8,
+  'ettu': 8,
+  'ഒമ്പത്': 9,
+  'ഒൻപത്': 9,
+  'nine': 9,
+  'പത്ത്': 10,
+  'പത്തു': 10,
+  'ten': 10,
+  'pathu': 10,
+  'പന്ത്രണ്ട്': 12,
+  'twelve': 12,
+  'പതിനഞ്ച്': 15,
+  'fifteen': 15,
+  'ഇരുപത്': 20,
+  'twenty': 20,
+  'irupathu': 20,
+  'മുപ്പത്': 30,
+  'thirty': 30,
+  'muppathu': 30,
+  'നാൽപ്പത്': 40,
+  'forty': 40,
+  'അമ്പത്': 50,
+  'fifty': 50,
+  'നൂറ്': 100,
+  'hundred': 100,
 };
 
 // "Bought / spent" words, and words that name an expense.
@@ -120,13 +160,18 @@ Heard understand(String text, List<Rec> products, [List<Rec> words = const []]) 
     if (qty == null || qty < 1 || qty > 999) continue;
     totals[pid] = (totals[pid] ?? 0) + qty;
   }
-  final sales = [for (final e in totals.entries) <String, dynamic>{'product': e.key, 'qty': e.value}];
+  final sales = [
+    for (final e in totals.entries) <String, dynamic>{'product': e.key, 'qty': e.value}
+  ];
 
   // Expense: a spent word or an expense item, with an amount, and no product sold.
   Rec? expense;
   final lower = _clean(text);
   final item = _expenseItems.where((e) => e.$1.hasMatch(lower)).firstOrNull;
-  final amounts = [for (var i = 0; i < toks.length; i++) if (nums[i] != null && !used.contains(i)) nums[i]!];
+  final amounts = [
+    for (var i = 0; i < toks.length; i++)
+      if (nums[i] != null && !used.contains(i)) nums[i]!
+  ];
   if (sales.isEmpty && amounts.isNotEmpty && (item != null || _spentWords.hasMatch(lower))) {
     final amount = amounts.reduce((a, b) => a > b ? a : b);
     if (amount >= 1 && amount <= 999999) {
@@ -140,7 +185,11 @@ Heard understand(String text, List<Rec> products, [List<Rec> words = const []]) 
   }
 
   final missing = found.any((f) => f.$2 == null || f.$2! < 1 || f.$2! > 999);
-  final leftover = sales.isNotEmpty && [for (var j = 0; j < toks.length; j++) if (nums[j] != null && !used.contains(j)) j].isNotEmpty;
+  final leftover = sales.isNotEmpty &&
+      [
+        for (var j = 0; j < toks.length; j++)
+          if (nums[j] != null && !used.contains(j)) j
+      ].isNotEmpty;
   final sure = (sales.isNotEmpty && !missing && !leftover) || (sales.isEmpty && expense != null);
   return Heard(sales, expense, sure);
 }

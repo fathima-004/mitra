@@ -25,8 +25,16 @@ Map<String, dynamic> _enc(Object? v) {
   if (v is int) return {'integerValue': '$v'};
   if (v is num) return {'doubleValue': v};
   if (v is String) return {'stringValue': v};
-  if (v is List) return {'arrayValue': {'values': [for (final x in v) _enc(x)]}};
-  if (v is Map) return {'mapValue': {'fields': _fields(Map<String, dynamic>.from(v))}};
+  if (v is List)
+    return {
+      'arrayValue': {
+        'values': [for (final x in v) _enc(x)]
+      }
+    };
+  if (v is Map)
+    return {
+      'mapValue': {'fields': _fields(Map<String, dynamic>.from(v))}
+    };
   return {'stringValue': '$v'};
 }
 
@@ -90,9 +98,15 @@ Future<List<Rec>> salesOn(String date) async {
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'structuredQuery': {
-              'from': [{'collectionId': 'sales'}],
+              'from': [
+                {'collectionId': 'sales'}
+              ],
               'where': {
-                'fieldFilter': {'field': {'fieldPath': 'date'}, 'op': 'EQUAL', 'value': {'stringValue': date}},
+                'fieldFilter': {
+                  'field': {'fieldPath': 'date'},
+                  'op': 'EQUAL',
+                  'value': {'stringValue': date}
+                },
               },
             },
           }))
@@ -116,9 +130,7 @@ Future<void> set(String col, String id, Rec row) async {
 Future<void> setUser(Rec row) async {
   final mask = [for (final k in row.keys) 'updateMask.fieldPaths=${Uri.encodeQueryComponent(k)}'].join('&');
   final url = Uri.parse('${_uri('/users/$user')}&$mask');
-  final r = await http
-      .patch(url, headers: {'Content-Type': 'application/json'}, body: jsonEncode({'fields': _fields(row)}))
-      .timeout(_timeout);
+  final r = await http.patch(url, headers: {'Content-Type': 'application/json'}, body: jsonEncode({'fields': _fields(row)})).timeout(_timeout);
   _check(r);
 }
 
@@ -135,20 +147,22 @@ Future<void> resetTo(Map<String, dynamic> demo, List<String> collections) async 
       writes.add({'delete': '$_root${_colPath(c)}/${d['id']}'});
     }
   }
-  writes.add({'update': {'name': '$_root/users/$user', 'fields': _fields(Map<String, dynamic>.from(demo['user'] ?? {}))}});
+  writes.add({
+    'update': {'name': '$_root/users/$user', 'fields': _fields(Map<String, dynamic>.from(demo['user'] ?? {}))}
+  });
   for (final c in [...collections, 'bulk_requests']) {
     for (final row in (demo[c] as List? ?? const [])) {
       final r = Map<String, dynamic>.from(row as Map);
-      writes.add({'update': {'name': '$_root${_colPath(c)}/${r['id']}', 'fields': _fields(r)}});
+      writes.add({
+        'update': {'name': '$_root${_colPath(c)}/${r['id']}', 'fields': _fields(r)}
+      });
     }
   }
   // Firestore takes up to 500 writes per commit.
   for (var i = 0; i < writes.length; i += 400) {
     final r = await http
-        .post(Uri.parse('https://firestore.googleapis.com/v1/$_root:commit')
-                .replace(queryParameters: {if (firebaseApiKey.isNotEmpty) 'key': firebaseApiKey}),
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({'writes': writes.sublist(i, i + 400 > writes.length ? writes.length : i + 400)}))
+        .post(Uri.parse('https://firestore.googleapis.com/v1/$_root:commit').replace(queryParameters: {if (firebaseApiKey.isNotEmpty) 'key': firebaseApiKey}),
+            headers: {'Content-Type': 'application/json'}, body: jsonEncode({'writes': writes.sublist(i, i + 400 > writes.length ? writes.length : i + 400)}))
         .timeout(const Duration(seconds: 20));
     _check(r);
   }

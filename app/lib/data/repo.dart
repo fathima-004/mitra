@@ -28,9 +28,6 @@ class Repo extends ChangeNotifier with WidgetsBindingObserver {
   final Map<String, List<Rec>> data = {for (final c in collections) c: <Rec>[]};
   List<Rec> bulk = [];
 
-  /// The id of the newest sale saved by a phone call, so screens can flash it.
-  String? lastCallSale;
-
   /// Goes up by one each time a sale from the phone call arrives from Firestore.
   final callSales = ValueNotifier<int>(0);
 
@@ -96,12 +93,10 @@ class Repo extends ChangeNotifier with WidgetsBindingObserver {
     if (!_disposed) notifyListeners();
   }
 
-  Future<Map<String, dynamic>> _demo() async =>
-      jsonDecode(await rootBundle.loadString('assets/data/demo.json')) as Map<String, dynamic>;
+  Future<Map<String, dynamic>> _demo() async => jsonDecode(await rootBundle.loadString('assets/data/demo.json')) as Map<String, dynamic>;
 
   Future<void> _loadDemoLocal() async {
     _read(await _demo());
-    lastCallSale = null;
     await _save();
   }
 
@@ -109,7 +104,6 @@ class Repo extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> loadDemo() async {
     final demo = await _demo();
     _read(demo);
-    lastCallSale = null;
     _outbox = [];
     await _saveOutbox();
     await _save();
@@ -136,7 +130,6 @@ class Repo extends ChangeNotifier with WidgetsBindingObserver {
     final id = (obj['id'] as String?) ?? _newId(col);
     final row = {...obj, 'id': id};
     data[col] = [...this[col], row];
-    if (col == 'sales' && _byCall(row)) lastCallSale = id;
     await _save();
     _queue({'op': 'set', 'col': col, 'id': id, 'row': row});
     return id;
@@ -305,8 +298,7 @@ class Repo extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> _apply(Map<String, dynamic> next, Set<Object?> salesBefore) async {
     // Same order every time, so comparing the JSON tells us if anything really changed.
     for (final c in [...collections, 'bulk_requests']) {
-      final rows = [for (final r in (next[c] as List? ?? const [])) Map<String, dynamic>.from(r as Map)]
-        ..sort((a, b) => '${a['id']}'.compareTo('${b['id']}'));
+      final rows = [for (final r in (next[c] as List? ?? const [])) Map<String, dynamic>.from(r as Map)]..sort((a, b) => '${a['id']}'.compareTo('${b['id']}'));
       next[c] = rows;
     }
     final current = _snapshot();
@@ -317,10 +309,7 @@ class Repo extends ChangeNotifier with WidgetsBindingObserver {
 
     final fromCall = (next['sales'] as List).cast<Rec>().where((s) => !salesBefore.contains(s['id']) && _byCall(s) && s['date'] == today()).toList();
     _read(next);
-    if (fromCall.isNotEmpty) {
-      lastCallSale = fromCall.last['id'] as String?;
-      callSales.value++;
-    }
+    if (fromCall.isNotEmpty) callSales.value++;
     await _save();
   }
 }
