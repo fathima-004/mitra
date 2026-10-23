@@ -15,7 +15,7 @@ Replace `<site>` with the Netlify site name. If you set `EXOTEL_HOOK_KEY` in Net
 |---|---|
 | `EXOTEL_API_KEY`, `EXOTEL_API_TOKEN` | from Exotel → API Credentials (tick "secret") |
 | `EXOTEL_SID` | Account SID |
-| `EXOTEL_SUBDOMAIN` | `api.exotel.com` or `api.in.exotel.com` |
+| `EXOTEL_SUBDOMAIN` | the "Subdomain" on Exotel's API settings page, without the `@` (not secret) |
 | `EXOPHONE` | your ExoPhone number |
 | `DEMO_PHONE` | the phone that should ring for "Call me" |
 | `EXOTEL_APP_ID` | the flow's id from step 2 (add after making the flow) |
