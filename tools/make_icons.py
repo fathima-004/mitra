@@ -4,8 +4,8 @@ from PIL import Image, ImageDraw, ImageFont
 
 OUT = Path("icons")
 OUT.mkdir(exist_ok=True)
-BRAND = (194, 65, 12)      # --brand
-CREAM = (251, 246, 239)    # --bg
+BRAND = (15, 118, 110)     # --brand (teal)
+CREAM = (255, 255, 255)
 
 
 def malayalam_font(size):

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#c2410c">
+  <meta name="theme-color" content="#0f766e">
   <title>Mitra · Products & bills</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/icon-192.png">
@@ -70,7 +70,7 @@
   <script type="module">
     import { get, add, update, remove, listen } from './js/data.js';
     import { thisMonth, today, monthOf } from './js/calc.js';
-    import { ml, en, label, rupees, esc, topbar, renderNav, toast } from './js/app.js';
+    import { ml, en, label, rupees, esc, icon, topbar, renderNav, toast } from './js/app.js';
 
     const $ = (id) => document.getElementById(id);
     renderNav();
@@ -80,7 +80,7 @@
     document.querySelectorAll('[data-btn]').forEach((el) => { el.innerHTML = label(el.dataset.btn); });
 
     const say = (key) => toast(`${ml(key)} · ${en(key)}`);
-    const delBtn = (col, id) => `<button class="icon-btn danger" data-del="${col}" data-id="${esc(id)}" aria-label="${en('delete')}">✕</button>`;
+    const delBtn = (col, id) => `<button class="icon-btn danger" data-del="${col}" data-id="${esc(id)}" aria-label="${en('delete')}">${icon('x', 18)}</button>`;
 
     // Tabs
     const TABS = ['products', 'bills', 'purchases'];
@@ -111,7 +111,7 @@
         <div class="item">
           <div class="grow"><span class="ml">${esc(p.name_ml)}</span><span class="en">${esc(p.name_en)}</span></div>
           <span class="amount">${rupees(p.price)}</span>
-          <button class="icon-btn" data-edit="${esc(p.id)}" aria-label="${en('edit')}">✎</button>
+          <button class="icon-btn" data-edit="${esc(p.id)}" aria-label="${en('edit')}">${icon('pencil', 18)}</button>
           ${delBtn('products', p.id)}
         </div>`).join('') || `<p class="muted">${ml('nothing_yet')}</p>`;
       $('product-list').querySelectorAll('[data-edit]').forEach((b) => b.addEventListener('click', () => {

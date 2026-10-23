@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#c2410c">
+  <meta name="theme-color" content="#0f766e">
   <title>Mitra</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/icon-192.png">
@@ -13,32 +13,37 @@
 <body>
   <main>
     <header class="hello">
-      <h1 id="hello">നമസ്കാരം</h1>
+      <h1 id="hello"></h1>
       <div class="place" id="place"></div>
     </header>
 
-    <section class="card" id="today-card" aria-live="polite">
-      <h2 id="today-title"></h2>
-      <div class="big-number" id="today-total">₹0</div>
+    <section class="card summary" aria-live="polite">
+      <a href="daily.html" id="today-card">
+        <h2 id="today-title"></h2>
+        <div class="big-number" id="today-total">₹0</div>
+        <div class="sub" id="today-sub"></div>
+      </a>
+      <a href="profit.html" id="month-card">
+        <h2 id="month-title"></h2>
+        <div class="big-number" id="month-profit">₹0</div>
+        <div class="sub" id="month-sub"></div>
+      </a>
+    </section>
+
+    <section class="card" id="today-list-card" hidden>
       <div id="today-list"></div>
     </section>
 
-    <a class="card" id="month-card" href="profit.html" style="text-decoration:none;color:inherit">
-      <h2 id="month-title"></h2>
-      <div class="big-number" id="month-profit">₹0</div>
-      <div class="row"><span id="income-label"></span><span class="amount" id="month-income"></span></div>
-      <div class="row"><span id="spend-label"></span><span class="amount" id="month-spend"></span></div>
-    </a>
-
     <section>
       <button class="btn call" id="call-me" type="button">
-        <span aria-hidden="true">📞</span>
+        <span class="ic-wrap" id="call-icon"></span>
         <span id="call-me-label"></span>
       </button>
       <p class="note" id="call-hint" style="text-align:center;margin:8px 0 0"></p>
     </section>
 
-    <nav class="tiles" id="tiles" aria-label="Sections"></nav>
+    <h2 class="section-title" id="all-title"></h2>
+    <nav class="card menu" id="menu" aria-label="Sections"></nav>
 
     <button class="btn small" id="reset" type="button"></button>
   </main>
@@ -46,32 +51,36 @@
   <script type="module">
     import { listen, get, getUser, loadDemo } from './js/data.js';
     import { monthProfit, thisMonth, today, salesIncome } from './js/calc.js';
-    import { ml, en, label, rupees, renderNav, toast } from './js/app.js';
+    import { ml, en, label, rupees, esc, icon, renderNav, toast } from './js/app.js';
 
     const $ = (id) => document.getElementById(id);
     renderNav();
 
     const user = await getUser();
-    $('hello').innerHTML = `${ml('hello')}, ${user.name_ml ?? user.name ?? ''} 👋<span class="en">${en('hello')}, ${user.name ?? ''}</span>`;
-    $('place').textContent = `${user.place_ml ?? ''} · ${user.place ?? ''}`;
+    $('hello').innerHTML = `<span class="ml">${ml('hello')}, ${esc(user.name_ml ?? user.name ?? '')}</span><span class="en">${en('hello')}, ${esc(user.name ?? '')}</span>`;
+    $('place').textContent = [user.place_ml, user.place].filter(Boolean).join(' · ');
     $('today-title').innerHTML = label('today_sales');
-    $('month-title').innerHTML = `${label('month_profit')}`;
-    $('income-label').innerHTML = label('income');
-    $('spend-label').innerHTML = label('spending');
+    $('month-title').innerHTML = label('month_profit');
+    $('call-icon').innerHTML = icon('phone', 20);
     $('call-me-label').innerHTML = label('call_me');
-    $('call-hint').innerHTML = `${ml('call_me_hint')}<br><span class="en">${en('call_me_hint')}</span>`;
-    $('reset').textContent = `${ml('reset_demo')} · ${en('reset_demo')}`;
+    $('call-hint').innerHTML = `${ml('call_me_hint')}<br>${en('call_me_hint')}`;
+    $('all-title').innerHTML = label('everything');
+    $('reset').innerHTML = `${icon('reset', 16)} ${ml('reset_demo')} · ${en('reset_demo')}`;
 
-    const TILES = [
-      ['daily.html', '🧾', 'tile_daily'],
-      ['setup.html', '🧺', 'tile_setup'],
-      ['money.html', '🪙', 'tile_money'],
-      ['schemes.html', '📜', 'tile_schemes'],
-      ['bulk.html', '🤝', 'tile_bulk'],
-      ['support.html', '💛', 'tile_support'],
+    const MENU = [
+      ['daily.html', 'receipt', 'tile_daily', 'tile_daily_sub'],
+      ['setup.html', 'box', 'tile_setup', 'tile_setup_sub'],
+      ['money.html', 'wallet', 'tile_money', 'tile_money_sub'],
+      ['schemes.html', 'file', 'tile_schemes', 'tile_schemes_sub'],
+      ['bulk.html', 'users', 'tile_bulk', 'tile_bulk_sub'],
+      ['support.html', 'heart', 'tile_support', 'tile_support_sub'],
     ];
-    $('tiles').innerHTML = TILES.map(([href, icon, key]) =>
-      `<a class="tile" href="${href}"><span class="icon" aria-hidden="true">${icon}</span>${label(key)}</a>`).join('');
+    $('menu').innerHTML = MENU.map(([href, ic, key, sub]) => `
+      <a href="${href}">
+        <span class="badge">${icon(ic)}</span>
+        <span class="grow"><span class="ml">${ml(key)}</span><span class="en">${en(sub)}</span></span>
+        <span class="chev">${icon('chevron', 20)}</span>
+      </a>`).join('');
 
     let products = await get('products');
     let bills = await get('bills');
@@ -80,32 +89,32 @@
 
     function render(sales) {
       const day = today();
-      const month = thisMonth();
       const todays = sales.filter((s) => s.date === day);
 
-      // Today: one row per product
       $('today-total').textContent = rupees(salesIncome(todays, products));
+      const count = todays.reduce((n, s) => n + s.qty, 0);
+      $('today-sub').textContent = count ? `${count} ${en('items_sold')}` : en('no_sales_today');
+
       const rows = products.map((p) => {
         const qty = todays.filter((s) => s.product === p.id).reduce((n, s) => n + s.qty, 0);
-        return qty ? `<div class="row"><span><span class="ml">${p.name_ml}</span><span class="en">${p.name_en}</span></span><span class="amount">${qty} × ${rupees(p.price)}</span></div>` : '';
+        return qty ? `<div class="item"><span class="grow"><span class="ml">${esc(p.name_ml)}</span><span class="en">${esc(p.name_en)}</span></span><span class="amount">${qty} × ${rupees(p.price)}</span></div>` : '';
       }).join('');
-      $('today-list').innerHTML = rows || `<p class="muted">${ml('no_sales_today')}<span class="en">${en('no_sales_today')}</span></p>`;
+      $('today-list').innerHTML = rows;
+      $('today-list-card').hidden = !rows;
 
-      // This month
-      const m = monthProfit(sales, products, bills, purchases, month);
+      const m = monthProfit(sales, products, bills, purchases, thisMonth());
       $('month-profit').textContent = rupees(m.profit);
       $('month-profit').className = `big-number ${m.profit >= 0 ? 'positive' : 'negative'}`;
-      $('month-income').textContent = rupees(m.income);
-      $('month-spend').textContent = rupees(m.spending);
+      $('month-sub').textContent = `${rupees(m.income)} − ${rupees(m.spending)}`;
 
       // Highlight sales that just arrived from a phone call
       const fresh = seen ? sales.filter((s) => !seen.has(s.id)) : [];
       seen = new Set(sales.map((s) => s.id));
       if (fresh.some((s) => s.via === 'call' || s.via === 'web-call')) {
-        for (const id of ['today-card', 'month-card']) {
-          $(id).classList.remove('flash'); void $(id).offsetWidth; $(id).classList.add('flash');
+        for (const el of [$('today-card').parentElement, $('today-list-card')]) {
+          el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
         }
-        toast(`📞 ${ml('added_by_call')} · ${en('added_by_call')}`);
+        toast('added_by_call', 'phone');
       }
     }
 
@@ -122,9 +131,9 @@
       try {
         const res = await fetch('/.netlify/functions/call-me', { method: 'POST' });
         if (!res.ok) throw new Error(res.status);
-        toast(`📞 ${ml('call_started')} · ${en('call_started')}`);
+        toast('call_started', 'phone');
       } catch {
-        toast(`${ml('call_unavailable')}`);
+        toast('call_unavailable', 'phone');
       } finally {
         btn.disabled = false;
         $('call-me-label').innerHTML = label('call_me');
@@ -136,7 +145,7 @@
       seen = null;
       products = await get('products'); bills = await get('bills'); purchases = await get('purchases');
       render(await get('sales'));
-      toast(`${ml('reset_done')} · ${en('reset_done')}`);
+      toast('reset_done', 'reset');
     });
   </script>
 </body>

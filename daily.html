@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#c2410c">
+  <meta name="theme-color" content="#0f766e">
   <title>Mitra · Today's sales</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/icon-192.png">
@@ -34,7 +34,7 @@
   <script type="module">
     import { get, add, remove, listen } from './js/data.js';
     import { today, salesIncome } from './js/calc.js';
-    import { ml, en, label, rupees, esc, topbar, renderNav, toast } from './js/app.js';
+    import { ml, en, label, rupees, esc, icon, topbar, renderNav, toast } from './js/app.js';
 
     const $ = (id) => document.getElementById(id);
     renderNav();
@@ -57,8 +57,7 @@
         const qty = daySales.filter((s) => s.product === p.id).reduce((n, s) => n + s.qty, 0);
         return `<button class="product-btn" data-product="${esc(p.id)}">
           <span><span class="ml">${esc(p.name_ml)}</span><span class="en">${esc(p.name_en)}</span></span>
-          <span class="price">${rupees(p.price)}</span>
-          ${qty ? `<span class="pill green count">${qty}</span>` : ''}
+          <span class="foot"><span class="price">${rupees(p.price)}</span>${qty ? `<span class="pill green">${qty}</span>` : ''}</span>
         </button>`;
       }).join('') || `<p class="muted">${ml('nothing_yet')} · <a href="setup.html">${ml('setup_title')}</a></p>`;
 
@@ -69,10 +68,11 @@
         return `<div class="item">
           <div class="grow">
             <span class="ml">${esc(p?.name_ml ?? s.product)} × ${s.qty}</span>
-            <span class="en">${esc(p?.name_en ?? '')}${s.via === 'call' || s.via === 'web-call' ? ` · 📞 ${en('via_call')}` : ''}</span>
+            <span class="en">${esc(p?.name_en ?? '')}${s.via === 'call' || s.via === 'web-call' ? ` · ${en('via_call')}` : ''}</span>
           </div>
+          ${s.via === 'call' || s.via === 'web-call' ? `<span class="pill">${icon('phone', 14)}</span>` : ''}
           <span class="amount">${rupees(s.qty * (p?.price ?? 0))}</span>
-          <button class="icon-btn danger" data-undo="${esc(s.id)}" aria-label="${en('undo')}">↺</button>
+          <button class="icon-btn danger" data-undo="${esc(s.id)}" aria-label="${en('undo')}">${icon('undo', 18)}</button>
         </div>`;
       }).join('') || `<p class="muted">${ml('no_sales_today')}<span class="en">${en('no_sales_today')}</span></p>`;
     }
@@ -105,9 +105,9 @@
           <div class="muted" id="qty-money" style="text-align:center"></div>
           <div class="keypad">
             ${[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => `<button data-k="${n}">${n}</button>`).join('')}
-            <button data-k="del" aria-label="Delete digit">⌫</button>
+            <button data-k="del" aria-label="Delete digit">${icon('backspace', 26)}</button>
             <button data-k="0">0</button>
-            <button data-k="ok" class="ok" aria-label="${en('add')}">✓</button>
+            <button data-k="ok" class="ok" aria-label="${en('add')}">${icon('check', 28)}</button>
           </div>
           <button class="btn small" data-k="cancel">${ml('cancel')} · ${en('cancel')}</button>
         </div>`;
@@ -124,7 +124,7 @@
           if (!Number(qty)) return;
           await add('sales', { date: $('day').value, product: product.id, qty: Number(qty), via: 'app' });
           close();
-          toast(`✓ ${ml('added_sale')} · ${Number(qty)} ${product.name_en}`);
+          toast(`${ml('added_sale')} · ${Number(qty)} ${product.name_en}`);
           return;
         } else if (qty.length < 3) qty = (qty + k).replace(/^0+/, '');
         show();
