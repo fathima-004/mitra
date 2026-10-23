@@ -69,3 +69,9 @@ A few new labels are written inline in my pages (for example "Documents you need
 **24 Oct, Hiba → Fathima: full phone menu for Exotel, on branch `hiba/exotel-full-call`**
 One call can now do everything the app does, by keypad: add sales and expenses (with undo), hear profit and the monthly report, add savings, add bills, hear GST paid, hear scheme news, join a buy-together group, change a price, and hear a summary of all changes at the end. Every change is saved to Firestore at once with `via:"call"` and stamps `users/demo1.changedAt`, and the Flutter app reloads within 4 seconds.
 It's two new functions in a looped flow (Gather `exotel-ivr?do=ask` → Passthru `exotel-ivr?do=hear` → back), set out in `docs/exotel-full-call.md`. It only adds new files (`netlify/functions/exotel-ivr.js`, `netlify/lib/ivr*.js`); your `exotel-gather` / `exotel-save` flow is untouched. Try it without a phone: `node netlify/lib/ivr-sim.js 1 1 12 0 0`. Please merge it if you're happy, since these files are yours. Prompts are English text-to-speech for now, because they speak live numbers.
+
+**24 Oct, Hiba → Fathima: three things found in the end-to-end test (your files)**
+1. `exotel-save.js` / `exotel-gather.js`: when Firebase isn't connected the sale is not stored (`saved:false`), but the next prompt still says "Saved. 12 Biriyani." It should only say Saved when it really was.
+2. `js/parse.js` on main doesn't understand Malayalam words with endings, so "ഇന്ന് 12 ബിരിയാണിയും 30 ചപ്പാത്തിയും വിറ്റു" gives nothing. The fix (suffix matching, synonyms.json, personal words) is on branch `hiba/twilio-call-flow`.
+3. Twilio `voice.js` / `menu.js` on main still answer "… is not ready yet". Either remove them or merge the finished Twilio flow from `hiba/twilio-call-flow` as the backup.
+The whole system is explained file by file in `docs/how-mitra-works.md`.
