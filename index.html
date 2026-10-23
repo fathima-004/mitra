@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="ml">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#c2410c">
+  <title>Mitra</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main>
+    <header class="hello">
+      <h1 id="hello">നമസ്കാരം</h1>
+      <div class="place" id="place"></div>
+    </header>
+
+    <section class="card" id="today-card" aria-live="polite">
+      <h2 id="today-title"></h2>
+      <div class="big-number" id="today-total">₹0</div>
+      <div id="today-list"></div>
+    </section>
+
+    <a class="card" id="month-card" href="profit.html" style="text-decoration:none;color:inherit">
+      <h2 id="month-title"></h2>
+      <div class="big-number" id="month-profit">₹0</div>
+      <div class="row"><span id="income-label"></span><span class="amount" id="month-income"></span></div>
+      <div class="row"><span id="spend-label"></span><span class="amount" id="month-spend"></span></div>
+    </a>
+
+    <section>
+      <button class="btn call" id="call-me" type="button">
+        <span aria-hidden="true">📞</span>
+        <span id="call-me-label"></span>
+      </button>
+      <p class="note" id="call-hint" style="text-align:center;margin:8px 0 0"></p>
+    </section>
+
+    <nav class="tiles" id="tiles" aria-label="Sections"></nav>
+
+    <button class="btn small" id="reset" type="button"></button>
+  </main>
+
+  <script type="module">
+    import { listen, get, getUser, loadDemo } from './js/data.js';
+    import { monthProfit, thisMonth, today, salesIncome } from './js/calc.js';
+    import { ml, en, label, rupees, renderNav, toast } from './js/app.js';
+
+    const $ = (id) => document.getElementById(id);
+    renderNav();
+
+    const user = await getUser();
+    $('hello').innerHTML = `${ml('hello')}, ${user.name_ml ?? user.name ?? ''} 👋<span class="en">${en('hello')}, ${user.name ?? ''}</span>`;
+    $('place').textContent = `${user.place_ml ?? ''} · ${user.place ?? ''}`;
+    $('today-title').innerHTML = label('today_sales');
+    $('month-title').innerHTML = `${label('month_profit')}`;
+    $('income-label').innerHTML = label('income');
+    $('spend-label').innerHTML = label('spending');
+    $('call-me-label').innerHTML = label('call_me');
+    $('call-hint').innerHTML = `${ml('call_me_hint')}<br><span class="en">${en('call_me_hint')}</span>`;
+    $('reset').textContent = `${ml('reset_demo')} · ${en('reset_demo')}`;
+
+    const TILES = [
+      ['daily.html', '🧾', 'tile_daily'],
+      ['setup.html', '🧺', 'tile_setup'],
+      ['money.html', '🪙', 'tile_money'],
+      ['schemes.html', '📜', 'tile_schemes'],
+      ['bulk.html', '🤝', 'tile_bulk'],
+      ['support.html', '💛', 'tile_support'],
+    ];
+    $('tiles').innerHTML = TILES.map(([href, icon, key]) =>
+      `<a class="tile" href="${href}"><span class="icon" aria-hidden="true">${icon}</span>${label(key)}</a>`).join('');
+
+    let products = await get('products');
+    let bills = await get('bills');
+    let purchases = await get('purchases');
+    let seen = null; // sale ids already shown, to spot new ones from the call
+
+    function render(sales) {
+      const day = today();
+      const month = thisMonth();
+      const todays = sales.filter((s) => s.date === day);
+
+      // Today: one row per product
+      $('today-total').textContent = rupees(salesIncome(todays, products));
+      const rows = products.map((p) => {
+        const qty = todays.filter((s) => s.product === p.id).reduce((n, s) => n + s.qty, 0);
+        return qty ? `<div class="row"><span><span class="ml">${p.name_ml}</span><span class="en">${p.name_en}</span></span><span class="amount">${qty} × ${rupees(p.price)}</span></div>` : '';
+      }).join('');
+      $('today-list').innerHTML = rows || `<p class="muted">${ml('no_sales_today')}<span class="en">${en('no_sales_today')}</span></p>`;
+
+      // This month
+      const m = monthProfit(sales, products, bills, purchases, month);
+      $('month-profit').textContent = rupees(m.profit);
+      $('month-profit').className = `big-number ${m.profit >= 0 ? 'positive' : 'negative'}`;
+      $('month-income').textContent = rupees(m.income);
+      $('month-spend').textContent = rupees(m.spending);
+
+      // Highlight sales that just arrived from a phone call
+      const fresh = seen ? sales.filter((s) => !seen.has(s.id)) : [];
+      seen = new Set(sales.map((s) => s.id));
+      if (fresh.some((s) => s.via === 'call' || s.via === 'web-call')) {
+        for (const id of ['today-card', 'month-card']) {
+          $(id).classList.remove('flash'); void $(id).offsetWidth; $(id).classList.add('flash');
+        }
+        toast(`📞 ${ml('added_by_call')} · ${en('added_by_call')}`);
+      }
+    }
+
+    listen('sales', render);
+    listen('products', async (p) => { products = p; render(await get('sales')); });
+    listen('bills', async (b) => { bills = b; render(await get('sales')); });
+    listen('purchases', async (p) => { purchases = p; render(await get('sales')); });
+
+    // "Call me": Hiba's backend rings the demo phone (PLAN.md §5, call-me function).
+    $('call-me').addEventListener('click', async () => {
+      const btn = $('call-me');
+      btn.disabled = true;
+      $('call-me-label').innerHTML = label('calling');
+      try {
+        const res = await fetch('/.netlify/functions/call-me', { method: 'POST' });
+        if (!res.ok) throw new Error(res.status);
+        toast(`📞 ${ml('call_started')} · ${en('call_started')}`);
+      } catch {
+        toast(`${ml('call_unavailable')}`);
+      } finally {
+        btn.disabled = false;
+        $('call-me-label').innerHTML = label('call_me');
+      }
+    });
+
+    $('reset').addEventListener('click', async () => {
+      await loadDemo();
+      seen = null;
+      products = await get('products'); bills = await get('bills'); purchases = await get('purchases');
+      render(await get('sales'));
+      toast(`${ml('reset_done')} · ${en('reset_done')}`);
+    });
+  </script>
+</body>
+</html>
