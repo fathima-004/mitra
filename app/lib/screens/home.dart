@@ -10,8 +10,11 @@ import '../theme.dart';
 import '../widgets/art.dart';
 import '../widgets/common.dart';
 import '../widgets/insight_tile.dart';
+import '../config.dart';
 import 'call.dart';
 import 'join.dart';
+import 'more.dart';
+import 'setup.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -125,6 +128,10 @@ class HomeScreen extends StatelessWidget {
             const CallMeCard(),
             const SizedBox(height: 14),
 
+            // Everything else: products and bills, schemes, buy together, support
+            const _Tiles(),
+            const SizedBox(height: 14),
+
             // Mitra noticed
             if (list.isNotEmpty)
               MCard(
@@ -170,14 +177,52 @@ class HomeScreen extends StatelessWidget {
 class _LiveChip extends StatelessWidget {
   const _LiveChip();
   @override
-  Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-        decoration: BoxDecoration(color: const Color(0x24FFFFFF), borderRadius: BorderRadius.circular(99)),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          Container(width: 7, height: 7, decoration: const BoxDecoration(color: C.mint, shape: BoxShape.circle)),
-          const SizedBox(width: 6),
-          Text(T.en('live'), style: const TextStyle(color: C.mint, fontWeight: FontWeight.w700, fontSize: 12)),
-        ]),
+  Widget build(BuildContext context) {
+    // Green "Live" when the Firestore link works (or the app is phone-only by design), grey when it is down.
+    final live = !cloudConfigured || repo.online;
+    final color = live ? C.mint : Colors.white60;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(color: const Color(0x24FFFFFF), borderRadius: BorderRadius.circular(99)),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        Container(width: 7, height: 7, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        const SizedBox(width: 6),
+        Text(live ? T.en('live') : 'Offline', style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 12)),
+      ]),
+    );
+  }
+}
+
+class _Tiles extends StatelessWidget {
+  const _Tiles();
+
+  static final _items = <(String, IconData, Color, Color, Widget Function())>[
+    ('tile_setup', Icons.inventory_2_outlined, C.goldSoft, const Color(0xFF9A6F0E), () => const SetupScreen()),
+    ('tile_schemes', Icons.description_outlined, C.brandSoft, C.brand, () => const SchemesScreen()),
+    ('tile_bulk', Icons.groups_outlined, C.amberSoft, const Color(0xFF9A5B0E), () => const BulkScreen()),
+    ('tile_support', Icons.favorite_outline_rounded, C.roseSoft, C.red, () => const SupportScreen()),
+  ];
+
+  @override
+  Widget build(BuildContext context) => GridView.count(
+        crossAxisCount: 2,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        mainAxisSpacing: 12,
+        crossAxisSpacing: 12,
+        childAspectRatio: 1.45,
+        children: [
+          for (final (key, icon, bg, fg, page) in _items)
+            MCard(
+              padding: const EdgeInsets.all(14),
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => page())),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Badge2(icon, bg: bg, fg: fg, size: 40),
+                const Spacer(),
+                Bi(T.ml(key), T.en(key), size: 14.5, weight: FontWeight.w700),
+              ]),
+            ),
+        ],
       );
 }
 

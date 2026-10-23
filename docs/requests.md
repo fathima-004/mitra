@@ -56,3 +56,12 @@ For your content files:
 2. **`data/schemes.json`**: key 3 and my schemes page read `title_ml` / `title_en`. Nothing is invented while the file is missing.
 3. **Tele-MANAS 14416**: please check it on the official site and record the URL and date.
 4. **Call voice clips**: `audio/` only has `join/` so far.
+
+**24 Oct, Hiba → Fathima: the Flutter app now syncs live with Firestore; three small things from your files**
+The app (`app/`) now has the Firestore link (REST, no google-services.json), Products & bills, Schemes, Buy together and Support. The web app now has `schemes.html`, `support.html` and `bulk.html`, since the home tiles linked to pages that didn't exist. Details are in `app/README.md`.
+1. **Your call must save sales exactly as §5 says**: `users/demo1/sales/{id}` with `date` as "YYYY-MM-DD" in **India time**, `product`, `qty` (a number) and `via:"call"`. The app checks `date == today` every 4 seconds. A UTC date between midnight and 5:30 a.m. would not show up.
+2. **`data/schemes.json` and `data/support.json`**: the web pages and the app show only entries with `source_url` and `date_checked`.
+   - schemes: `[{ "title_ml", "title_en", "about_ml", "about_en", "documents": [{ "ml", "en" }], "source_url", "date_checked" }]`
+   - support: `{ "helplines": [{ "name_ml", "name_en", "number", "about_ml", "about_en", "source_url", "date_checked" }] }`
+3. **`tools/sync_app_assets.py`**: please add `schemes.json` and `support.json` to its list, so the app gets them.
+A few new labels are written inline in my pages (for example "Documents you need"). Move them into `ml.json` whenever you like.

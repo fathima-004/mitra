@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- "Call me" and the live Firestore link need the internet in the installed (release) app too. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="mitra"
+        android:label="Mitra"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
