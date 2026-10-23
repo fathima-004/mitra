@@ -6,7 +6,9 @@ Read `PLAN.md` before doing anything. It has the scope, file ownership, data for
 Mitra lets any woman entrepreneur, even with a basic phone, say what she sold in her own Malayalam and know her real monthly profit, and when she can afford the auto she's saving for.
 
 ## Team
-- **Fathima (fathima-004): app screens + content + pitch.** `css/style.css`, `index.html`, `setup.html`, `daily.html`, `profit.html`, `money.html`, `schemes.html`, `support.html`, `bulk.html`, `js/money.js`, `js/app.js`, everything in `data/` and `audio/`, slides.
+- **Fathima (fathima-004): app screens + content + pitch.** `css/style.css`, `index.html`, `setup.html`, `daily.html`, `profit.html`, `money.html`, `schemes.html`, `support.html`, `bulk.html`, `js/money.js`, `js/app.js`, `manifest.webmanifest`, `sw.js`, `icons/`, `tools/`, everything in `data/` and `audio/`, slides.
+
+Local testing: `python tools/serve.py` (no-cache server on port 8080; the phone on the same Wi-Fi can open `http://<laptop-ip>:8080`). Every page must load `js/app.js` (it registers the service worker that makes Mitra an installable phone app).
 - **Hiba (hibaNiz): call agent + backend.** `netlify/functions/*` (Twilio voice flow, Claude parsing, call-me), `call.html`, `js/call.js`, `js/data.js`, `js/calc.js`, `js/parse.js`, `package.json`, `netlify.toml`, Firebase and Netlify setup.
 
 **Only edit files you own.** If you need a change in someone else's file, write it in `docs/requests.md` and tell your teammate. Shared contracts (data format, `data.js` function names) are frozen after hour 1; changing them needs both people to agree.
