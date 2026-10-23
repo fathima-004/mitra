@@ -1,49 +1,46 @@
-// Every screen opens on a small phone without layout errors, and the setup forms save real rows.
-// Run: flutter test
+// Every screen opens on a small phone (360 px) in both languages without layout errors, and the main
+// actions really save. Run: flutter test test/screens_test.dart
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mitra/i18n.dart';
+import 'package:mitra/logic/calc.dart';
+import 'package:mitra/logic/parse.dart';
 import 'package:mitra/main.dart';
+import 'package:mitra/screens/add.dart';
+import 'package:mitra/screens/login.dart';
 import 'package:mitra/screens/more.dart';
-import 'package:mitra/screens/setup.dart';
+import 'package:mitra/screens/products.dart';
+import 'package:mitra/screens/profit.dart';
+import 'package:mitra/screens/records.dart';
 import 'package:mitra/strings.dart';
-import 'package:mitra/theme.dart';
-import 'package:mitra/widgets/common.dart';
+import 'package:mitra/ui/kit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> show(WidgetTester tester, Widget page) async {
-  tester.view.physicalSize = const Size(360 * 3, 720 * 3); // a small Android phone
+  tester.view.physicalSize = const Size(360 * 3, 720 * 3);
   tester.view.devicePixelRatio = 3;
   addTearDown(tester.view.reset);
-  await tester.pumpWidget(MaterialApp(theme: mitraTheme(), home: page));
+  await tester.pumpWidget(MaterialApp(theme: mitraTheme2(), home: page));
   await settle(tester);
 }
 
-// The call button pulses forever, so wait a fixed time instead of "until nothing moves".
 Future<void> settle(WidgetTester tester) async {
-  for (var i = 0; i < 20; i++) {
+  for (var i = 0; i < 15; i++) {
     await tester.pump(const Duration(milliseconds: 100));
   }
 }
 
-/// The real fonts, so text is measured as on a phone (the default test font draws every letter as a wide box).
+/// The real fonts, so text is measured as on a phone.
 Future<void> loadFonts() async {
-  const families = {
-    'Malayalam': ['Regular', 'Medium', 'SemiBold', 'Bold', 'ExtraBold'],
-    'Jakarta': ['Regular', 'Medium', 'SemiBold', 'Bold', 'ExtraBold'],
-  };
-  for (final f in families.entries) {
-    final loader = FontLoader(f.key);
-    for (final w in f.value) {
-      final file = f.key == 'Malayalam' ? 'NotoSansMalayalam-$w.ttf' : 'PlusJakartaSans-$w.ttf';
-      loader.addFont(rootBundle.load('assets/fonts/$file'));
+  const weights = ['Regular', 'Medium', 'SemiBold', 'Bold', 'ExtraBold'];
+  for (final (family, file) in [('Malayalam', 'NotoSansMalayalam'), ('Jakarta', 'PlusJakartaSans'), ('Roboto', 'PlusJakartaSans')]) {
+    final loader = FontLoader(family);
+    for (final w in weights) {
+      loader.addFont(rootBundle.load('assets/fonts/$file-$w.ttf'));
     }
     await loader.load();
   }
-  // Material widgets that don't name a font family use Roboto: give them Jakarta.
-  final roboto = FontLoader('Roboto')..addFont(rootBundle.load('assets/fonts/PlusJakartaSans-Regular.ttf'));
-  await roboto.load();
 }
 
 void main() {
@@ -56,88 +53,88 @@ void main() {
     await repo.init();
   });
 
-  testWidgets('the app with its five tabs', (tester) async {
-    await show(tester, const Shell());
-    expect(find.byType(Shell), findsOneWidget);
-    for (var i = 0; i < 5; i++) {
-      tester.state<ShellState>(find.byType(Shell)).go(i);
-      await tester.pump(const Duration(seconds: 2));
-    }
+  for (final lang in ['ml', 'en']) {
+    testWidgets('[$lang] every screen fits a small phone', (tester) async {
+      L.lang.value = lang;
+      for (final page in <Widget>[
+        const LoginScreen(),
+        const Shell(),
+        const RecordsScreen(),
+        const ProductsScreen(),
+        const MoreScreen(),
+        const AddIncomeScreen(),
+        const AddExpenseScreen(),
+        const ProfitScreen(),
+        const ReportScreen(),
+        const SavingsScreen(),
+        const GstScreen(),
+        const BulkScreen(),
+        const BillsScreen(),
+        const BusinessScreen(),
+        const SupportScreen(),
+        const HelpScreen(),
+      ]) {
+        await show(tester, page);
+        expect(tester.takeException(), isNull, reason: '${page.runtimeType} in $lang');
+      }
+    });
+  }
+
+  testWidgets("add income saves a sale with today's date", (tester) async {
+    L.lang.value = 'en';
+    final before = repo['sales'].length;
+    await show(tester, const AddIncomeScreen());
+    await tester.tap(find.byIcon(Icons.add_rounded));
+    await settle(tester);
+    await tester.tap(find.byIcon(Icons.add_rounded));
+    await settle(tester);
+    expect(find.text('3'), findsOneWidget);
+    expect(find.text(rupees(300)), findsOneWidget, reason: '3 biriyani at ₹100');
+    await tester.tap(find.text('Save'));
+    await settle(tester);
+    expect(repo['sales'].length, before + 1);
+    expect(repo['sales'].last['qty'], 3);
+    expect(repo['sales'].last['date'], today());
   });
 
-  testWidgets('setup: products, bills, purchases', (tester) async {
-    await show(tester, const SetupScreen());
-    expect(find.text('Biriyani'), findsWidgets);
-    await tester.tap(find.text(T.ml('tab_bills')));
+  testWidgets('add expense saves a purchase with its category', (tester) async {
+    L.lang.value = 'en';
+    final before = repo['purchases'].length;
+    await show(tester, const AddExpenseScreen(cat: 'gas'));
+    await tester.enterText(find.byType(TextField).first, '900');
     await settle(tester);
-    await tester.tap(find.text(T.ml('tab_purchases')));
-    await settle(tester);
-  });
-
-  testWidgets('setup: adding a product saves it', (tester) async {
-    await show(tester, const SetupScreen());
-    final before = repo['products'].length;
-    await tester.ensureVisible(find.text('${T.ml('add')}  ${T.en('add')}', findRichText: true));
+    await tester.ensureVisible(find.text('Save'));
     await tester.pump();
-    await tester.tap(find.text('${T.ml('add')}  ${T.en('add')}', findRichText: true));
+    await tester.tap(find.text('Save'));
     await settle(tester);
-    final fields = find.byType(TextField);
-    await tester.enterText(fields.at(0), 'ഇഡ്ഡലി');
-    await tester.enterText(fields.at(1), 'Idli');
-    await tester.enterText(fields.at(2), '10');
-    await tester.tap(find.text('${T.ml('save')}  ${T.en('save')}', findRichText: true));
-    await settle(tester);
-    expect(repo['products'].length, before + 1);
-    expect(repo['products'].last['price'], 10);
-    expect(find.text('Idli'), findsOneWidget, reason: 'the new product must show in the list straight away');
+    expect(repo['purchases'].length, before + 1);
+    expect(repo['purchases'].last['cat'], 'gas');
+    expect(repo['purchases'].last['amount'], 900);
   });
 
-  testWidgets('setup: adding a bill saves it for this month', (tester) async {
-    await show(tester, const SetupScreen());
-    await tester.tap(find.text(T.ml('tab_bills')));
+  testWidgets('the GST calculator adds and removes GST', (tester) async {
+    L.lang.value = 'en';
+    await show(tester, const GstScreen());
+    await tester.tap(find.text('18%'));
     await settle(tester);
-    final before = repo['bills'].length;
-    await tester.ensureVisible(find.text('${T.ml('add')}  ${T.en('add')}', findRichText: true));
-    await tester.pump();
-    await tester.tap(find.text('${T.ml('add')}  ${T.en('add')}', findRichText: true));
+    expect(find.text('₹1180.00'), findsOneWidget, reason: '1000 + 18%');
+    await tester.tap(find.text('Find GST inside a price'));
     await settle(tester);
-    await tester.enterText(find.byType(TextField).at(0), '500');
-    await tester.tap(find.text('${T.ml('save')}  ${T.en('save')}', findRichText: true));
-    await settle(tester);
-    expect(repo['bills'].length, before + 1);
-    expect(repo['bills'].last['type'], 'gas');
-    expect(repo['bills'].last['amount'], 500);
-    expect(find.text('₹500'), findsOneWidget, reason: 'the new bill must show in the list straight away');
+    expect(find.text('₹152.54'), findsOneWidget, reason: 'GST inside 1000 at 18%');
   });
 
-  testWidgets('schemes and support say "being checked" until checked content exists', (tester) async {
-    await show(tester, const SchemesScreen());
-    expect(find.textContaining('being checked'), findsOneWidget);
-    await show(tester, const SupportScreen());
-    expect(find.textContaining('being checked'), findsOneWidget);
-  });
-
-  testWidgets('buy together shows the groups and lets her join one', (tester) async {
-    await show(tester, const BulkScreen());
-    expect(find.textContaining('women buying together'), findsWidgets);
-    final before = repo.bulk.length;
-    final join = find.text('${T.ml('add')}  ${T.en('add')}', findRichText: true);
-    if (join.evaluate().isNotEmpty) {
-      await tester.ensureVisible(join.first);
-      await tester.pump();
-      await tester.tap(join.first);
-      await settle(tester);
-      await tester.enterText(find.byType(TextField), '20');
-      await tester.tap(find.byType(FilledButton));
-      await settle(tester);
-      expect(repo.bulk.length, before + 1);
-    }
-  });
-
-  testWidgets('a long button label wraps instead of being cut off', (tester) async {
-    await show(tester, const Scaffold(body: Padding(padding: EdgeInsets.all(16), child: BigButton('call_see'))));
-    final text = tester.renderObject<RenderParagraph>(find.byType(RichText).first);
-    expect(text.didExceedMaxLines, isFalse);
-    expect(tester.takeException(), isNull);
+  test('speech text is understood with word lists', () {
+    final products = repo['products'];
+    final a = understand('innu 12 biriyani poyi', products);
+    expect(a.sure, isTrue);
+    expect(a.sales, [{'product': 'p1', 'qty': 12}]);
+    final b = understand('ഇന്ന് 12 ബിരിയാണിയും 30 ചപ്പാത്തിയും വിറ്റു', products);
+    expect(b.sales, [{'product': 'p1', 'qty': 12}, {'product': 'p2', 'qty': 30}]);
+    final c = understand('200 രൂപയ്ക്ക് അരി വാങ്ങി', products);
+    expect(c.expense?['cat'], 'ingredients');
+    expect(c.expense?['amount'], 200);
+    final d = understand('gas refill 900', products);
+    expect(d.expense?['cat'], 'gas');
+    expect(understand('kure biriyani', products).sure, isFalse);
   });
 }

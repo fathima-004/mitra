@@ -96,7 +96,7 @@ class _JoinScreenState extends State<JoinScreen> {
 
   Future<void> _finish() async {
     (await SharedPreferences.getInstance()).setBool('joined', true);
-    if (mounted) Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const Shell()));
+    if (mounted) await logIn(context);
   }
 
   // ---------- Join by call: replay with the recorded voice clips ----------
