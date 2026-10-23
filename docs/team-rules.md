@@ -6,13 +6,13 @@ Read `PLAN.md` before doing anything. It has the scope, file ownership, data for
 Mitra lets any woman entrepreneur, even with a basic phone, say what she sold in her own Malayalam and know her real monthly profit, and when she can afford the auto she's saving for.
 
 ## Team
-- **Fathima (fathima-004), Member A:** `money.html`, `schemes.html`, `bulk.html`, `support.html`, `js/money.js`, `data/schemes.json`, `data/ml.json` (all Malayalam text), `data/synonyms.json`, pitch.
-- **Hiba (hibaNiz), Member B:** `index.html`, `setup.html`, `daily.html`, `profit.html`, `call.html`, `css/style.css`, `js/data.js`, `js/calc.js`, `js/parse.js`, `js/call.js`, `netlify/`, deployment.
+- **Fathima (fathima-004): app screens + content + pitch.** `css/style.css`, `index.html`, `setup.html`, `daily.html`, `profit.html`, `money.html`, `schemes.html`, `support.html`, `bulk.html`, `js/money.js`, `js/app.js`, everything in `data/` and `audio/`, slides.
+- **Hiba (hibaNiz): call agent + backend.** `netlify/functions/*` (Twilio voice flow, Claude parsing, call-me), `call.html`, `js/call.js`, `js/data.js`, `js/calc.js`, `js/parse.js`, `package.json`, `netlify.toml`, Firebase and Netlify setup.
 
 **Only edit files you own.** If you need a change in someone else's file, write it in `docs/requests.md` and tell your teammate. Shared contracts (data format, `data.js` function names) are frozen after hour 1; changing them needs both people to agree.
 
 ## Stack
-Plain HTML + CSS + JavaScript (ES modules, no build step, no framework). Firebase Firestore via the CDN modular SDK for data and live updates. Netlify for hosting (auto-deploys from `main`). Works on a phone browser first.
+Plain HTML + CSS + JavaScript (ES modules, no build step, no framework). Firebase Firestore via the CDN modular SDK for data and live updates. Netlify for hosting (auto-deploys from `main`) and Netlify Functions (Node) for the backend. The phone call uses Twilio Programmable Voice (TwiML from Netlify Functions, `<Gather>` with `language="ml-IN"`); the Claude API (Haiku-class model) only turns speech text into `[{product, qty}]`. Functions write to Firestore with `firebase-admin`. Works on a phone browser first.
 
 ## Hard rules
 - **No loans anywhere.** Mitra tracks EMIs she already pays and plans savings. It never offers, recommends or compares loans or lenders.
