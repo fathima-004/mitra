@@ -19,29 +19,56 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Future.wait([T.load(), L.load(), repo.init()]);
   await repo.ensureDemoToday();
+  syncLanguage(repo);
   final prefs = await SharedPreferences.getInstance();
   final loggedIn = (prefs.getBool('loggedIn') ?? false) || (prefs.getBool('joined') ?? false);
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(statusBarColor: Colors.transparent, statusBarIconBrightness: Brightness.dark));
   runApp(MitraApp(loggedIn: loggedIn));
 }
 
-class MitraApp extends StatelessWidget {
+class MitraApp extends StatefulWidget {
   final bool loggedIn;
   const MitraApp({super.key, required this.loggedIn});
 
   @override
-  Widget build(BuildContext context) => ValueListenableBuilder(
-        valueListenable: L.lang,
-        builder: (_, __, ___) => MaterialApp(
-          title: 'Mitra',
-          debugShowCheckedModeBanner: false,
-          theme: mitraTheme2(),
-          // On the web build, ?tab=1 opens a tab directly (screenshots, the projector).
-          home: loggedIn || Uri.base.queryParameters.containsKey('tab')
-              ? Shell(start: int.tryParse(Uri.base.queryParameters['tab'] ?? '') ?? 0)
-              : const LoginScreen(),
-        ),
+  State<MitraApp> createState() => _MitraAppState();
+}
+
+class _MitraAppState extends State<MitraApp> {
+  @override
+  void initState() {
+    super.initState();
+    L.lang.addListener(redrawAll);
+  }
+
+  @override
+  void dispose() {
+    L.lang.removeListener(redrawAll);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => MaterialApp(
+        title: 'Mitra',
+        debugShowCheckedModeBanner: false,
+        theme: mitraTheme2(),
+        // On the web build, ?tab=1 opens a tab directly (screenshots, the projector).
+        home: widget.loggedIn || Uri.base.queryParameters.containsKey('tab')
+            ? Shell(start: int.tryParse(Uri.base.queryParameters['tab'] ?? '') ?? 0)
+            : const LoginScreen(),
       );
+}
+
+/// After a language switch, redraw every widget on screen: the tabs kept alive in the background and any
+/// page opened on top (GST, Savings ...). Text comes from tr(), which widgets don't "listen" to, so a
+/// normal rebuild would skip screens that are const or already built. Nothing is reset: same page, same state.
+void redrawAll() {
+  void mark(Element e) {
+    e.markNeedsBuild();
+    e.visitChildren(mark);
+  }
+
+  WidgetsBinding.instance.rootElement?.visitChildren(mark);
 }
 
 Future<void> logIn(BuildContext context) async {
