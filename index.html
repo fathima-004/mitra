@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0f766e">
+  <meta name="theme-color" content="#0d6b5c">
   <title>Mitra</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/icon-192.png">
@@ -13,37 +13,49 @@
 <body>
   <main>
     <header class="hello">
-      <h1 id="hello"></h1>
-      <div class="place" id="place"></div>
+      <div class="avatar" id="avatar" aria-hidden="true"></div>
+      <div class="grow">
+        <h1 id="hello"></h1>
+        <div class="place" id="place"></div>
+      </div>
+      <span class="brandmark">Mitra</span>
     </header>
 
-    <section class="card summary" aria-live="polite">
-      <a href="daily.html" id="today-card">
-        <h2 id="today-title"></h2>
-        <div class="big-number" id="today-total">₹0</div>
-        <div class="sub" id="today-sub"></div>
-      </a>
-      <a href="profit.html" id="month-card">
+    <a class="card hero" href="profit.html" id="month-card" aria-live="polite">
+      <div class="label-row">
         <h2 id="month-title"></h2>
-        <div class="big-number" id="month-profit">₹0</div>
-        <div class="sub" id="month-sub"></div>
-      </a>
-    </section>
+        <span class="chip live" id="live"></span>
+      </div>
+      <div class="big-number" id="month-profit">₹0</div>
+      <div class="bar" aria-hidden="true"><i id="kept-bar" style="width:0"></i></div>
+      <div class="split">
+        <div><div class="k"><span class="dot in"></span><span id="in-label"></span></div><div class="v" id="month-in">₹0</div></div>
+        <div><div class="k"><span class="dot out"></span><span id="out-label"></span></div><div class="v" id="month-out">₹0</div></div>
+      </div>
+    </a>
 
-    <section class="card" id="today-list-card" hidden>
-      <div id="today-list"></div>
+    <section class="card" id="today-card">
+      <a class="today" href="daily.html">
+        <span class="badge tone-gold" style="width:50px;height:50px;border-radius:16px;display:grid;place-items:center" id="today-icon"></span>
+        <span class="grow">
+          <h2 id="today-title"></h2>
+          <span class="sub" id="today-sub"></span>
+        </span>
+        <span class="big-number" id="today-total">₹0</span>
+      </a>
+      <div class="today-items" id="today-list"></div>
     </section>
 
     <section>
       <button class="btn call" id="call-me" type="button">
         <span class="ic-wrap" id="call-icon"></span>
-        <span id="call-me-label"></span>
+        <span class="grow"><span id="call-me-label"></span><span class="en" id="call-hint" style="font-size:.78rem;margin-top:2px"></span></span>
+        <span class="go" id="call-go"></span>
       </button>
-      <p class="note" id="call-hint" style="text-align:center;margin:8px 0 0"></p>
     </section>
 
     <h2 class="section-title" id="all-title"></h2>
-    <nav class="card menu" id="menu" aria-label="Sections"></nav>
+    <nav class="tiles" id="menu" aria-label="Sections"></nav>
 
     <button class="btn small" id="reset" type="button"></button>
   </main>
@@ -51,35 +63,40 @@
   <script type="module">
     import { listen, get, getUser, loadDemo } from './js/data.js';
     import { monthProfit, thisMonth, today, salesIncome } from './js/calc.js';
-    import { ml, en, label, rupees, esc, icon, renderNav, toast } from './js/app.js';
+    import { ml, en, label, rupees, esc, icon, renderNav, toast, countTo } from './js/app.js';
 
     const $ = (id) => document.getElementById(id);
     renderNav();
 
     const user = await getUser();
+    $('avatar').textContent = (user.name_ml ?? user.name ?? 'M').slice(0, 1);
     $('hello').innerHTML = `<span class="ml">${ml('hello')}, ${esc(user.name_ml ?? user.name ?? '')}</span><span class="en">${en('hello')}, ${esc(user.name ?? '')}</span>`;
-    $('place').textContent = [user.place_ml, user.place].filter(Boolean).join(' · ');
-    $('today-title').innerHTML = label('today_sales');
+    $('place').innerHTML = `${icon('pin', 14)}<span>${esc([user.place_ml, user.place].filter(Boolean).join(' · '))}</span>`;
     $('month-title').innerHTML = label('month_profit');
-    $('call-icon').innerHTML = icon('phone', 20);
-    $('call-me-label').innerHTML = label('call_me');
-    $('call-hint').innerHTML = `${ml('call_me_hint')}<br>${en('call_me_hint')}`;
+    $('live').textContent = en('live');
+    $('in-label').textContent = `${ml('income')} · ${en('income')}`;
+    $('out-label').textContent = `${ml('spending')} · ${en('spending')}`;
+    $('today-icon').innerHTML = icon('receipt', 24);
+    $('today-title').innerHTML = label('today_sales');
+    $('call-icon').innerHTML = icon('phone', 24);
+    $('call-go').innerHTML = icon('arrow', 22);
+    $('call-me-label').innerHTML = `<span class="ml">${ml('call_me')}</span><span class="en">${en('call_me')}</span>`;
+    $('call-hint').textContent = ml('call_me_hint');
     $('all-title').innerHTML = label('everything');
     $('reset').innerHTML = `${icon('reset', 16)} ${ml('reset_demo')} · ${en('reset_demo')}`;
 
     const MENU = [
-      ['daily.html', 'receipt', 'tile_daily', 'tile_daily_sub'],
-      ['setup.html', 'box', 'tile_setup', 'tile_setup_sub'],
-      ['money.html', 'wallet', 'tile_money', 'tile_money_sub'],
-      ['schemes.html', 'file', 'tile_schemes', 'tile_schemes_sub'],
-      ['bulk.html', 'users', 'tile_bulk', 'tile_bulk_sub'],
-      ['support.html', 'heart', 'tile_support', 'tile_support_sub'],
+      ['daily.html', 'receipt', 'tile_daily', 'tile_daily_sub', 'tone-teal'],
+      ['setup.html', 'box', 'tile_setup', 'tile_setup_sub', 'tone-gold'],
+      ['money.html', 'wallet', 'tile_money', 'tile_money_sub', 'tone-leaf'],
+      ['schemes.html', 'file', 'tile_schemes', 'tile_schemes_sub', 'tone-sky'],
+      ['bulk.html', 'users', 'tile_bulk', 'tile_bulk_sub', 'tone-plum'],
+      ['support.html', 'heart', 'tile_support', 'tile_support_sub', 'tone-rose'],
     ];
-    $('menu').innerHTML = MENU.map(([href, ic, key, sub]) => `
-      <a href="${href}">
-        <span class="badge">${icon(ic)}</span>
-        <span class="grow"><span class="ml">${ml(key)}</span><span class="en">${en(sub)}</span></span>
-        <span class="chev">${icon('chevron', 20)}</span>
+    $('menu').innerHTML = MENU.map(([href, ic, key, sub, tone]) => `
+      <a class="tile" href="${href}">
+        <span class="badge ${tone}">${icon(ic)}</span>
+        <span><span class="ml">${ml(key)}</span><span class="en">${en(sub)}</span></span>
       </a>`).join('');
 
     let products = await get('products');
@@ -91,27 +108,28 @@
       const day = today();
       const todays = sales.filter((s) => s.date === day);
 
-      $('today-total').textContent = rupees(salesIncome(todays, products));
+      countTo($('today-total'), salesIncome(todays, products));
       const count = todays.reduce((n, s) => n + s.qty, 0);
       $('today-sub').textContent = count ? `${count} ${en('items_sold')}` : en('no_sales_today');
 
-      const rows = products.map((p) => {
+      $('today-list').innerHTML = products.map((p) => {
         const qty = todays.filter((s) => s.product === p.id).reduce((n, s) => n + s.qty, 0);
-        return qty ? `<div class="item"><span class="grow"><span class="ml">${esc(p.name_ml)}</span><span class="en">${esc(p.name_en)}</span></span><span class="amount">${qty} × ${rupees(p.price)}</span></div>` : '';
+        return qty ? `<span><b>${qty}</b> ${esc(p.name_ml)}</span>` : '';
       }).join('');
-      $('today-list').innerHTML = rows;
-      $('today-list-card').hidden = !rows;
 
       const m = monthProfit(sales, products, bills, purchases, thisMonth());
-      $('month-profit').textContent = rupees(m.profit);
-      $('month-profit').className = `big-number ${m.profit >= 0 ? 'positive' : 'negative'}`;
-      $('month-sub').textContent = `${rupees(m.income)} − ${rupees(m.spending)}`;
+      countTo($('month-profit'), m.profit);
+      $('month-profit').className = `big-number ${m.profit >= 0 ? '' : 'negative'}`;
+      countTo($('month-in'), m.income);
+      countTo($('month-out'), m.spending);
+      // Gold bar = share of income she keeps as profit
+      $('kept-bar').style.width = `${m.income > 0 ? Math.max(0, Math.min(100, (m.profit / m.income) * 100)) : 0}%`;
 
       // Highlight sales that just arrived from a phone call
       const fresh = seen ? sales.filter((s) => !seen.has(s.id)) : [];
       seen = new Set(sales.map((s) => s.id));
       if (fresh.some((s) => s.via === 'call' || s.via === 'web-call')) {
-        for (const el of [$('today-card').parentElement, $('today-list-card')]) {
+        for (const el of [$('month-card'), $('today-card')]) {
           el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
         }
         toast('added_by_call', 'phone');

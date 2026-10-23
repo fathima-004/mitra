@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="ml">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d6b5c">
+  <title>Mitra · Profit</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main>
+    <div id="top"></div>
+
+    <section class="card hero" aria-live="polite">
+      <div class="label-row">
+        <h2 id="month-title"></h2>
+        <span class="chip" id="trend-chip" hidden></span>
+      </div>
+      <div class="big-number" id="profit">₹0</div>
+      <div class="bar" aria-hidden="true"><i id="kept-bar" style="width:0"></i></div>
+      <div class="split">
+        <div><div class="k"><span class="dot in"></span><span id="in-label"></span></div><div class="v" id="income">₹0</div></div>
+        <div><div class="k"><span class="dot out"></span><span id="out-label"></span></div><div class="v" id="spending">₹0</div></div>
+      </div>
+    </section>
+
+    <section class="card" id="tips-card" hidden>
+      <h2 id="tips-title"></h2>
+      <div id="tips"></div>
+    </section>
+
+    <section class="card">
+      <h2 id="chart-title"></h2>
+      <div class="chart" id="chart" role="img"></div>
+    </section>
+
+    <section class="card">
+      <h2 id="best-title"></h2>
+      <div id="best"></div>
+    </section>
+
+    <section class="card">
+      <h2 id="spend-title"></h2>
+      <div id="spend"></div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { get, listen } from './js/data.js';
+    import { monthProfit, breakdown, thisMonth, avgMonthlyProfit } from './js/calc.js';
+    import { ml, en, label, rupees, esc, icon, topbar, renderNav, countTo } from './js/app.js';
+
+    const $ = (id) => document.getElementById(id);
+    renderNav();
+    $('top').innerHTML = topbar('profit_title');
+    $('month-title').innerHTML = label('month_profit');
+    $('in-label').textContent = `${ml('income')} · ${en('income')}`;
+    $('out-label').textContent = `${ml('spending')} · ${en('spending')}`;
+    $('tips-title').innerHTML = `<span style="display:flex;gap:8px;align-items:center">${icon('sparkle', 20)}<span>${label('tips_title')}</span></span>`;
+    $('chart-title').innerHTML = label('chart_title');
+    $('best-title').innerHTML = label('best_title');
+    $('spend-title').innerHTML = label('spend_title');
+
+    const MONTHS_ML = ['ജനു', 'ഫെബ്', 'മാർ', 'ഏപ്രി', 'മേയ്', 'ജൂൺ', 'ജൂലൈ', 'ഓഗ', 'സെപ്', 'ഒക്', 'നവം', 'ഡിസം'];
+    const MONTHS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const mIndex = (month) => Number(month.slice(5, 7)) - 1;
+
+    const d = { products: [], bills: [], purchases: [], sales: [], history: [] };
+
+    function render() {
+      const month = thisMonth();
+      const m = monthProfit(d.sales, d.products, d.bills, d.purchases, month);
+      countTo($('profit'), m.profit);
+      $('profit').className = `big-number ${m.profit >= 0 ? '' : 'negative'}`;
+      countTo($('income'), m.income);
+      countTo($('spending'), m.spending);
+      $('kept-bar').style.width = `${m.income > 0 ? Math.max(0, Math.min(100, (m.profit / m.income) * 100)) : 0}%`;
+
+      // Compared with the average of the last 3 finished months. The month isn't over yet,
+      // so compare her progress with how much of the month has passed.
+      const avg = avgMonthlyProfit(d.history, 3);
+      const now = new Date();
+      const monthDone = now.getDate() / new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      const reached = avg > 0 ? Math.round((m.profit / avg) * 100) : 0;
+      const onTrack = avg > 0 && m.profit / avg >= monthDone;
+      $('trend-chip').hidden = !(avg > 0);
+      $('trend-chip').innerHTML = `${icon(onTrack ? 'up' : 'down', 14)} ${reached}% ${en('of_usual')}`;
+
+      // Monthly profit bars: finished months from history + this month so far
+      const series = [...d.history].sort((a, b) => a.month.localeCompare(b.month)).slice(-6)
+        .map((h) => ({ month: h.month, profit: h.income - h.spending }))
+        .concat({ month, profit: m.profit, now: true });
+      const max = Math.max(1, ...series.map((s) => Math.abs(s.profit)));
+      const best = series.reduce((a, b) => (b.profit > a.profit ? b : a));
+      $('chart').setAttribute('aria-label', series.map((s) => `${MONTHS_EN[mIndex(s.month)]} ${rupees(s.profit)}`).join(', '));
+      $('chart').innerHTML = series.map((s) => {
+        const h = Math.max(4, (Math.max(0, s.profit) / max) * 100);
+        const show = s.now || s === best;
+        return `<div class="col${s.now ? ' now' : ''}" tabindex="0" data-tip="${MONTHS_EN[mIndex(s.month)]} · ${rupees(s.profit)}">
+          <span class="val">${show ? rupees(s.profit) : ''}</span>
+          <span class="b" style="height:${h}%"></span>
+          <span class="mon"><span class="ml">${MONTHS_ML[mIndex(s.month)]}</span><span class="en">${MONTHS_EN[mIndex(s.month)]}</span></span>
+        </div>`;
+      }).join('');
+
+      const { byProduct, bySpend } = breakdown(d.sales, d.products, d.bills, d.purchases, month);
+      const topIn = Math.max(1, ...byProduct.map((x) => x.income));
+      $('best').innerHTML = byProduct.map((x, i) => `
+        <div class="item">
+          <span class="rank${i === 0 ? ' first' : ''}">${i + 1}</span>
+          <div class="grow">
+            <div style="display:flex;justify-content:space-between;gap:8px">
+              <span><span class="ml">${esc(x.product.name_ml)}</span><span class="en">${esc(x.product.name_en)} · ${x.qty} ${en('items_sold')}</span></span>
+              <span class="amount">${rupees(x.income)}</span>
+            </div>
+            <div class="hbar"><i style="width:${(x.income / topIn) * 100}%"></i></div>
+          </div>
+        </div>`).join('') || `<p class="muted">${ml('nothing_yet')}</p>`;
+
+      const topOut = Math.max(1, ...bySpend.map((x) => x.amount));
+      $('spend').innerHTML = bySpend.map((x) => `
+        <div class="item">
+          <div class="grow">
+            <div style="display:flex;justify-content:space-between;gap:8px">
+              <span><span class="ml">${esc(x.label_ml)}</span><span class="en">${esc(x.label_en)}</span></span>
+              <span class="amount">${rupees(x.amount)}</span>
+            </div>
+            <div class="hbar gold"><i style="width:${(x.amount / topOut) * 100}%"></i></div>
+          </div>
+        </div>`).join('') || `<p class="muted">${ml('nothing_yet')}</p>`;
+
+      // Plain facts from her own numbers (no AI, no advice on loans)
+      const tips = [];
+      const star = byProduct[0];
+      if (star?.income) tips.push(['star', `${star.product.name_ml} — ${rupees(star.income)}`, `${star.product.name_en} ${en('tip_star')}`, 'tone-gold']);
+      if (bySpend[0]) tips.push(['wallet', `${bySpend[0].label_ml} — ${rupees(bySpend[0].amount)}`, `${bySpend[0].label_en} ${en('tip_spend')}`, 'tone-rose']);
+      if (avg > 0) tips.push([onTrack ? 'up' : 'down', `${ml('usual_month')}: ${reached}% ${ml(onTrack ? 'on_track' : 'behind')}`, `${reached}% ${en('of_usual')} (${rupees(avg)}) · ${en(onTrack ? 'on_track' : 'behind')}`, onTrack ? 'tone-leaf' : 'tone-gold']);
+      $('tips-card').hidden = !tips.length;
+      $('tips').innerHTML = tips.map(([ic, a, b, tone]) => `
+        <div class="item"><span class="badge ${tone}" style="width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none">${icon(ic === 'star' ? 'sparkle' : ic, 20)}</span>
+        <div class="grow"><span class="ml">${esc(a)}</span><span class="en">${esc(b)}</span></div></div>`).join('');
+    }
+
+    // Tap or hover a bar to see its exact value
+    const tip = document.createElement('div');
+    tip.className = 'chart-tip';
+    tip.hidden = true;
+    document.body.append(tip);
+    const showTip = (col) => {
+      if (!col) { tip.hidden = true; return; }
+      const r = col.querySelector('.b').getBoundingClientRect();
+      tip.textContent = col.dataset.tip;
+      tip.hidden = false;
+      tip.style.left = `${r.left + r.width / 2}px`;
+      tip.style.top = `${r.top + scrollY - 8}px`;
+    };
+    $('chart').addEventListener('pointerover', (e) => showTip(e.target.closest('.col')));
+    $('chart').addEventListener('pointerleave', () => showTip(null));
+    $('chart').addEventListener('focusin', (e) => showTip(e.target.closest('.col')));
+    $('chart').addEventListener('focusout', () => showTip(null));
+
+    for (const col of Object.keys(d)) listen(col, (rows) => { d[col] = rows; render(); });
+    for (const col of Object.keys(d)) d[col] = await get(col);
+    render();
+  </script>
+</body>
+</html>

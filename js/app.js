@@ -24,7 +24,21 @@ export function topbar(key) {
 }
 
 const inr = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 });
-export const rupees = (n) => `${n < 0 ? '−' : ''}₹${inr.format(Math.abs(Math.round(n)))}`;
+// Count a number up to its new value (used for the big money figures).
+export function countTo(el, target, format = rupees) {
+  const from = Number(el.dataset.value ?? 0);
+  el.dataset.value = target;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches || from === target) { el.textContent = format(target); return; }
+  const start = performance.now(), ms = 700;
+  const step = (t) => {
+    const k = Math.min(1, (t - start) / ms), eased = 1 - (1 - k) ** 3;
+    el.textContent = format(from + (target - from) * eased);
+    if (k < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+export const rupees =(n) => `${n < 0 ? '−' : ''}₹${inr.format(Math.abs(Math.round(n)))}`;
 
 // Installable app + offline support on every page that uses app.js.
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
@@ -32,9 +46,9 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catc
 const NAV = [
   { key: 'nav_home', href: 'index.html', icon: 'home' },
   { key: 'nav_daily', href: 'daily.html', icon: 'receipt' },
+  { key: 'nav_call', href: 'call.html', icon: 'phone', center: true },
   { key: 'nav_profit', href: 'profit.html', icon: 'trend' },
   { key: 'nav_money', href: 'money.html', icon: 'wallet' },
-  { key: 'nav_call', href: 'call.html', icon: 'phone' },
 ];
 
 export function renderNav() {
@@ -43,8 +57,8 @@ export function renderNav() {
   nav.className = 'bottom-nav';
   nav.setAttribute('aria-label', 'Main');
   nav.innerHTML = NAV.map((n) => `
-    <a href="${n.href}" class="${n.href === here ? 'on' : ''}" ${n.href === here ? 'aria-current="page"' : ''}>
-      ${icon(n.icon, 22)}
+    <a href="${n.href}" class="${n.center ? 'center' : n.href === here ? 'on' : ''}" ${n.href === here ? 'aria-current="page"' : ''}>
+      ${n.center ? `<span class="fab">${icon(n.icon, 26)}</span>` : icon(n.icon, 22)}
       <span class="ml">${ml(n.key)}</span>
     </a>`).join('');
   document.body.append(nav);

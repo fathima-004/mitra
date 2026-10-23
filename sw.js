@@ -1,8 +1,8 @@
 // Offline support: serve the app from cache when the network is down,
 // but always try the network first so new pushes show up straight away.
-const CACHE = 'mitra-v4';
+const CACHE = 'mitra-v5';
 const CORE = [
-  './', 'index.html', 'setup.html', 'daily.html', 'css/style.css', 'js/app.js', 'js/icons.js', 'js/data.js', 'js/calc.js',
+  './', 'index.html', 'setup.html', 'daily.html', 'profit.html', 'css/style.css', 'js/app.js', 'js/icons.js', 'js/data.js', 'js/calc.js',
   'data/ml.json', 'data/demo.json', 'manifest.webmanifest', 'icons/icon-192.png',
 ];
 
