@@ -27,3 +27,12 @@ function mutate(change) {
 **Local testing tip:** `python tools/serve.py` serves with `Cache-Control: no-store`. Python's plain `http.server` lets Chrome keep running old JS after you edit a file.
 
 Tested: adding `{ date: today(), product: 'p1', qty: 12, via: 'call' }` to `sales` makes `index.html` update by itself, flash, and show "Added by phone call". Your call just needs to write that same shape to Firestore.
+
+---
+
+**23 Oct, Hiba → Fathima: data/synonyms.json format for js/parse.js**
+call.html now understands sentences with word lists in js/parse.js (PLAN.md §7a, step 1). The words are built in for now. When you have data/synonyms.json, tell me and I'll load it instead. Please include:
+- Product words per product id (Malayalam and English spellings: biriyani / biriyaani / ബിരിയാണി and so on)
+- "sold" words (vittu, poyi, വിറ്റു)
+- Number words (ഒന്ന്, രണ്ട്, twelve, ...) and fillers to ignore (innu, ഇന്ന്)
+Also: call.html uses its own short Malayalam and English labels in js/call.js (the T table). Please check those wordings when you have a moment.

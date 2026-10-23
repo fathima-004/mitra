@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ml">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#c2410c">
+  <title>Mitra call</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    [hidden] { display: none !important; }
+    textarea {
+      font: inherit; font-size: 1.1rem; padding: 12px 14px; width: 100%; min-height: 96px;
+      border: 2px solid var(--line); border-radius: 14px; background: #fff; color: var(--ink);
+    }
+    .screen { display: grid; gap: 14px; }
+  </style>
+</head>
+<body>
+  <main>
+    <header class="topbar">
+      <h1 id="title"></h1>
+    </header>
+
+    <!-- Main menu: the same two choices as the phone keypad -->
+    <section class="screen" id="home">
+      <button class="btn call" id="home-sales" type="button"></button>
+      <button class="btn primary" id="home-profit" type="button"></button>
+    </section>
+
+    <!-- Sales: speak or type, then read back and confirm -->
+    <section class="screen" id="sales" hidden>
+      <button class="btn small" id="back-sales" type="button">← </button>
+      <div class="card">
+        <h2 id="ask"></h2>
+        <p class="note" id="example"></p>
+      </div>
+      <button class="btn call" id="speak" type="button"></button>
+      <label class="field">
+        <span id="type-label"></span>
+        <textarea id="text" rows="3"></textarea>
+      </label>
+      <button class="btn primary" id="understand" type="button"></button>
+
+      <div class="card" id="readback" hidden>
+        <p class="big-number" id="readback-text"></p>
+        <h2 id="readback-q"></h2>
+        <button class="btn primary" id="yes" type="button"></button>
+        <button class="btn" id="again" type="button"></button>
+      </div>
+
+      <div class="card" id="keypad" hidden>
+        <p class="note" id="keypad-note"></p>
+        <div id="keypad-rows" style="display:grid;gap:12px"></div>
+        <button class="btn primary" id="keypad-save" type="button"></button>
+      </div>
+    </section>
+
+    <!-- Profit: this month, same numbers as the phone's key 2 -->
+    <section class="screen" id="profit" hidden>
+      <button class="btn small" id="back-profit" type="button">← </button>
+      <div class="card">
+        <h2 id="profit-title">ഈ മാസത്തെ ലാഭം</h2>
+        <div class="big-number" id="profit-number">₹0</div>
+        <div class="row"><span id="profit-income-label"></span><span class="amount" id="profit-income"></span></div>
+        <div class="row"><span id="profit-spend-label"></span><span class="amount" id="profit-spend"></span></div>
+      </div>
+      <div class="card" id="profit-products"></div>
+      <button class="btn" id="read-aloud" type="button"></button>
+    </section>
+  </main>
+
+  <script type="module" src="js/call.js"></script>
+</body>
+</html>
