@@ -78,23 +78,34 @@ const SCHEME_WORDS = /scheme|yojana|mission|women|woman|mahila|self[- ]help|\bsh
 const LOAN_WORDS = /loan|credit|lend|lender|nbfc|mudra|svanidhi|guarantee|interest rate|borrow|microfinance|debt/i;
 const PIB = 'https://www.pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=3&reg=3';
 
-async function schemeNews(ml, fetchImpl = fetch) {
+// Schemes she can join now: the same hand-checked list as the app (app/assets/data/schemes.json, each with its
+// official source and date), only those still open and never loans. Then fresh scheme news from the PIB feed.
+function openSchemes(now = new Date()) {
   try {
-    const checked = require('../../data/schemes.json');
-    const rows = (Array.isArray(checked) ? checked : checked.schemes ?? [])
-      .filter((s) => /^https?:\/\//.test(s.source_url ?? '') && s.date_checked && (s.title_en || s.name_en));
-    if (rows.length) return rows.slice(0, 3).map((s) => (ml ? s.title_ml ?? s.name_ml : null) ?? s.title_en ?? s.name_en);
+    const file = require('../../app/assets/data/schemes.json');
+    const day = new Date(now.getTime() + 5.5 * 3600 * 1000).toISOString().slice(0, 10);
+    return (Array.isArray(file) ? file : file.schemes ?? []).filter((s) => /^https?:\/\//.test(s.source_url ?? '') && s.date_checked
+      && s.loan !== true && (s.open_until == null || String(s.open_until) >= day));
   } catch {
-    // no hand-checked file yet
+    return [];
   }
+}
+
+async function schemeNews(ml, fetchImpl = fetch) {
+  // Spoken: no "₹" sign ("₹2 lakh" → "2 lakh rupees") and no double full stops.
+  const spoken = (t) => String(t ?? '').replace(/\.\s*$/, '')
+    .replace(/₹\s?([\d,]+(?:\s?(?:lakh|ലക്ഷം))?)/g, ml ? '$1 രൂപ' : '$1 rupees');
+  const open = openSchemes().map((s) => (ml ? `${s.title_ml}: ${spoken(s.about_ml)}` : `${s.title_en}: ${spoken(s.about_en)}`));
+  let news = [];
   try {
     const res = await fetchImpl(PIB, { signal: AbortSignal.timeout(3500), headers: { 'User-Agent': 'Mitra/1.0' } });
     const xml = await res.text();
     const titles = [...xml.matchAll(/<item>\s*<title>([\s\S]*?)<\/title>/g)].map((m) => m[1].replace(/<!\[CDATA\[|\]\]>/g, '').trim());
-    return titles.filter((t) => SCHEME_WORDS.test(t) && !LOAN_WORDS.test(t)).slice(0, 2);
+    news = titles.filter((t) => SCHEME_WORDS.test(t) && !LOAN_WORDS.test(t)).slice(0, 2);
   } catch {
-    return [];
+    // offline: the checked list is enough
   }
+  return { open, news };
 }
 
 // ---------- prompts ----------
@@ -244,7 +255,7 @@ function goalLine(g, month, ml) {
   const saved = Number(g.saved) || 0;
   const left = Math.max(0, target - saved);
   const pct = target > 0 ? Math.min(100, Math.round((saved / target) * 100)) : 0;
-  const name = ml ? g.name_ml || String(g.name_en ?? '').split(' (')[0] : String(g.name_en ?? 'your goal').split(' (')[0];
+  const name = ml ? 'സമ്പാദ്യ ലക്ഷ്യം' : 'Savings goal';
   const months = Number(g.monthly) > 0 ? Math.ceil(left / Number(g.monthly)) : null;
   if (left === 0) return ml ? `${name}: ലക്ഷ്യമായ ${r(target)} രൂപ എത്തി!` : `${name}: you have reached your goal of ${r(target)} rupees!`;
   if (ml) {
@@ -437,12 +448,15 @@ async function hear(state, raw, ctx) {
     case 'together': {
       if (key === 0) return go('main');
       if (key === 1) {
-        const news = await schemeNews(ml, ctx.fetch);
-        s.actions.push({ col: null, id: null, say: 'heard scheme news' });
-        if (!news.length) return go('together', t('noNews'));
-        return go('together', ml
-          ? `സർക്കാരിൽ നിന്നുള്ള പുതിയ അറിയിപ്പുകൾ: ${news.join('. ')}. വിശദാംശങ്ങൾ മിത്ര ആപ്പിൽ ഉണ്ട്. മിത്ര ഒരിക്കലും വായ്പ നിർദ്ദേശിക്കില്ല.`
-          : `Latest from the Government: ${news.join('. ')}. The details and links are in the Mitra app. Mitra never offers loans.`);
+        const { open, news } = await schemeNews(ml, ctx.fetch);
+        s.actions.push({ col: null, id: null, say: 'heard schemes' });
+        if (!open.length && !news.length) return go('together', t('noNews'));
+        const parts = [];
+        if (open.length) parts.push(ml ? `ഇപ്പോൾ ചേരാവുന്ന പദ്ധതികൾ: ${open.join('. ')}.` : `Schemes you can join now: ${open.join('. ')}.`);
+        if (news.length) parts.push(ml ? `സർക്കാരിൽ നിന്നുള്ള പുതിയ അറിയിപ്പുകൾ: ${news.join('. ')}.` : `New from the Government: ${news.join('. ')}.`);
+        parts.push(ml ? 'ചേരേണ്ട വിധവും രേഖകളും മിത്ര ആപ്പിൽ ഉണ്ട്. മിത്ര ഒരിക്കലും വായ്പ നിർദ്ദേശിക്കില്ല.'
+          : 'How to join, and the documents, are in the Mitra app. Mitra never offers loans.');
+        return go('together', parts.join(' '));
       }
       if (key === 2) return bulkGroups(d.bulk_requests).length ? go('bulk_pick', '', {}) : go('together', t('noGroups'));
       return sorry('together');
@@ -486,4 +500,4 @@ async function hear(state, raw, ctx) {
   }
 }
 
-module.exports = { ask, hear, newState, totals, bulkGroups, schemeNews, MAIN, T };
+module.exports = { ask, hear, newState, totals, bulkGroups, schemeNews, openSchemes, MAIN, T };
