@@ -31,7 +31,10 @@ class MitraApp extends StatelessWidget {
         title: 'Mitra',
         debugShowCheckedModeBanner: false,
         theme: mitraTheme(),
-        home: joined ? const Shell() : const JoinScreen(),
+        // On the web build, ?tab=3 opens a tab directly (handy for screenshots and the projector).
+        home: joined || Uri.base.queryParameters.containsKey('tab')
+            ? Shell(start: int.tryParse(Uri.base.queryParameters['tab'] ?? '') ?? 0)
+            : const JoinScreen(),
       );
 }
 
