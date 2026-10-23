@@ -23,8 +23,3 @@ class T {
 
 final _inr = NumberFormat.decimalPattern('en_IN');
 String rupees(num n) => '${n < 0 ? '−' : ''}₹${_inr.format(n.abs().round())}';
-
-const monthsMl = ['ജനു', 'ഫെബ്', 'മാർ', 'ഏപ്രി', 'മേയ്', 'ജൂൺ', 'ജൂലൈ', 'ഓഗ', 'സെപ്', 'ഒക്', 'നവം', 'ഡിസം'];
-const monthsMlLong = ['ജനുവരി', 'ഫെബ്രുവരി', 'മാർച്ച്', 'ഏപ്രിൽ', 'മേയ്', 'ജൂൺ', 'ജൂലൈ', 'ഓഗസ്റ്റ്', 'സെപ്റ്റംബർ', 'ഒക്ടോബർ', 'നവംബർ', 'ഡിസംബർ'];
-const monthsEn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-int monthIndex(String month) => int.parse(month.substring(5, 7)) - 1;

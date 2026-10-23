@@ -501,8 +501,8 @@ class BulkScreen extends StatelessWidget {
                       for (final r in rows)
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                          decoration: BoxDecoration(
-                              color: r['user'] == 'demo1' ? K.greenSoft : const Color(0xFFF3F5F3), borderRadius: BorderRadius.circular(20)),
+                          decoration:
+                              BoxDecoration(color: r['user'] == 'demo1' ? K.greenSoft : const Color(0xFFF3F5F3), borderRadius: BorderRadius.circular(20)),
                           child: Text('${r['name'] ?? ''} · ${r['qty']} ${r['unit'] ?? ''}', style: ts(13, w: FontWeight.w600)),
                         ),
                     ]),

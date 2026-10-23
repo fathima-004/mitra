@@ -1,8 +1,7 @@
 // Profit maths, same as js/calc.js (PLAN.md §5). Pure functions, no data access.
 typedef Rec = Map<String, dynamic>;
 
-String isoDate(DateTime d) =>
-    '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+String isoDate(DateTime d) => '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 String today([DateTime? now]) => isoDate(now ?? DateTime.now());
 String thisMonth([DateTime? now]) => today(now).substring(0, 7);
 String monthOf(String isoDate) => isoDate.substring(0, 7);
@@ -16,8 +15,7 @@ num salesIncome(List<Rec> sales, List<Rec> products) {
   return sales.fold<num>(0, (sum, s) => sum + _n(s['qty']) * (price[s['product']] ?? 0));
 }
 
-num monthIncome(List<Rec> sales, List<Rec> products, String month) =>
-    salesIncome(sales.where((s) => monthOf(s['date']) == month).toList(), products);
+num monthIncome(List<Rec> sales, List<Rec> products, String month) => salesIncome(sales.where((s) => monthOf(s['date']) == month).toList(), products);
 
 num monthSpending(List<Rec> bills, List<Rec> purchases, String month) {
   final b = bills.where((x) => x['month'] == month).fold<num>(0, (s, x) => s + _n(x['amount']));
@@ -46,12 +44,9 @@ class SpendLine {
   SpendLine(this.labelMl, this.labelEn, this.amount);
 }
 
-({List<ProductLine> byProduct, List<SpendLine> bySpend}) breakdown(
-    List<Rec> sales, List<Rec> products, List<Rec> bills, List<Rec> purchases, String month) {
+({List<ProductLine> byProduct, List<SpendLine> bySpend}) breakdown(List<Rec> sales, List<Rec> products, List<Rec> bills, List<Rec> purchases, String month) {
   final byProduct = products.map((p) {
-    final qty = sales
-        .where((s) => s['product'] == p['id'] && monthOf(s['date']) == month)
-        .fold<num>(0, (sum, s) => sum + _n(s['qty']));
+    final qty = sales.where((s) => s['product'] == p['id'] && monthOf(s['date']) == month).fold<num>(0, (sum, s) => sum + _n(s['qty']));
     return ProductLine(p, qty, qty * _n(p['price']));
   }).toList()
     ..sort((a, b) => b.income.compareTo(a.income));
@@ -69,8 +64,7 @@ class SpendLine {
   return (byProduct: byProduct, bySpend: bySpend);
 }
 
-List<Rec> _sortedHistory(List<Rec> history) =>
-    [...history]..sort((a, b) => (a['month'] as String).compareTo(b['month'] as String));
+List<Rec> _sortedHistory(List<Rec> history) => [...history]..sort((a, b) => (a['month'] as String).compareTo(b['month'] as String));
 
 num historyProfit(Rec h) => _n(h['income']) - _n(h['spending']);
 

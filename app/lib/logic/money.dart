@@ -23,8 +23,7 @@ GoalPlan goalPlan(Rec goal, num avgProfit) {
   final pct = target > 0 ? ((saved / target) * 100).round().clamp(0, 100) : 0;
   final left = (target - saved).clamp(0, double.infinity);
   final int? months = left == 0 ? 0 : (monthly > 0 ? (left / monthly).ceil() : null);
-  return GoalPlan(pct, left, months, months == null ? null : addMonths(thisMonth(), months),
-      avgProfit > 0 ? monthly / avgProfit : null);
+  return GoalPlan(pct, left, months, months == null ? null : addMonths(thisMonth(), months), avgProfit > 0 ? monthly / avgProfit : null);
 }
 
 enum EmiLevel { ok, tight, risky }

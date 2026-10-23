@@ -69,8 +69,7 @@ class HomeScreen extends StatelessWidget {
                     Row(children: [
                       Icon(todays.isEmpty ? Icons.schedule_rounded : Icons.arrow_upward_rounded, size: 18, color: K.green),
                       const SizedBox(width: 4),
-                      Text(todays.isEmpty ? tr('no_sales_yet') : tr('from_sales', {'n': todays.length}),
-                          style: ts(14.5, w: FontWeight.w600, c: K.green)),
+                      Text(todays.isEmpty ? tr('no_sales_yet') : tr('from_sales', {'n': todays.length}), style: ts(14.5, w: FontWeight.w600, c: K.green)),
                     ]),
                   ]),
                 ),
@@ -90,13 +89,10 @@ class HomeScreen extends StatelessWidget {
                   crossAxisSpacing: 12,
                   childAspectRatio: 1.08,
                   children: [
-                    _Tile(Icons.add_rounded, 'add_income', 'add_income_sub', K.green, K.greenSoft,
-                        () => push(context, const AddIncomeScreen())),
-                    _Tile(Icons.shopping_bag_rounded, 'add_expense', 'add_expense_sub', K.red, K.redSoft,
-                        () => push(context, const AddExpenseScreen())),
+                    _Tile(Icons.add_rounded, 'add_income', 'add_income_sub', K.green, K.greenSoft, () => push(context, const AddIncomeScreen())),
+                    _Tile(Icons.shopping_bag_rounded, 'add_expense', 'add_expense_sub', K.red, K.redSoft, () => push(context, const AddExpenseScreen())),
                     _Tile(Icons.inventory_2_rounded, 'my_products', 'my_products_sub', K.blue, K.blueSoft, () => Shell.of(context)?.go(3)),
-                    _Tile(Icons.bar_chart_rounded, 'my_profit', 'my_profit_sub', K.yellow, K.yellowSoft,
-                        () => push(context, const ProfitScreen())),
+                    _Tile(Icons.bar_chart_rounded, 'my_profit', 'my_profit_sub', K.yellow, K.yellowSoft, () => push(context, const ProfitScreen())),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -172,7 +168,10 @@ class _GoalStrip extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         Text(
-          [tr('goal_left', {'amt': rupees(g.left)}), if (g.ready != null && g.left > 0) tr('ready_by', {'when': monthName(g.ready!)})].join(' · '),
+          [
+            tr('goal_left', {'amt': rupees(g.left)}),
+            if (g.ready != null && g.left > 0) tr('ready_by', {'when': monthName(g.ready!)})
+          ].join(' · '),
           style: ts(13.5, w: FontWeight.w500, c: K.muted),
         ),
       ]),

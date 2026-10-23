@@ -18,28 +18,63 @@ import '../widgets/common.dart';
 enum JoinStep { welcome, phone, about, sell, goal, done, call }
 
 const _districts = [
-  ('തിരുവനന്തപുരം', 'Thiruvananthapuram'), ('കൊല്ലം', 'Kollam'), ('പത്തനംതിട്ട', 'Pathanamthitta'), ('ആലപ്പുഴ', 'Alappuzha'),
-  ('കോട്ടയം', 'Kottayam'), ('ഇടുക്കി', 'Idukki'), ('എറണാകുളം', 'Ernakulam'), ('തൃശ്ശൂർ', 'Thrissur'), ('പാലക്കാട്', 'Palakkad'),
-  ('മലപ്പുറം', 'Malappuram'), ('കോഴിക്കോട്', 'Kozhikode'), ('വയനാട്', 'Wayanad'), ('കണ്ണൂർ', 'Kannur'), ('കാസർഗോഡ്', 'Kasaragod'),
+  ('തിരുവനന്തപുരം', 'Thiruvananthapuram'),
+  ('കൊല്ലം', 'Kollam'),
+  ('പത്തനംതിട്ട', 'Pathanamthitta'),
+  ('ആലപ്പുഴ', 'Alappuzha'),
+  ('കോട്ടയം', 'Kottayam'),
+  ('ഇടുക്കി', 'Idukki'),
+  ('എറണാകുളം', 'Ernakulam'),
+  ('തൃശ്ശൂർ', 'Thrissur'),
+  ('പാലക്കാട്', 'Palakkad'),
+  ('മലപ്പുറം', 'Malappuram'),
+  ('കോഴിക്കോട്', 'Kozhikode'),
+  ('വയനാട്', 'Wayanad'),
+  ('കണ്ണൂർ', 'Kannur'),
+  ('കാസർഗോഡ്', 'Kasaragod'),
 ];
 
 // EXAMPLE presets to tap instead of typing. Prices are only starting points; she edits them.
 const _kinds = {
-  'food': ('ഭക്ഷണം', 'Food', [
-    ('ബിരിയാണി', 'Biriyani', 100), ('ചപ്പാത്തി', 'Chapathi', 8), ('പൊറോട്ട', 'Parotta', 12),
-    ('അച്ചാർ കുപ്പി', 'Pickle bottle', 120), ('ഊണ്', 'Meals', 70), ('അപ്പം', 'Appam', 10),
-  ]),
-  'snacks': ('അച്ചാർ, പലഹാരം', 'Pickles & snacks', [
-    ('അച്ചാർ കുപ്പി', 'Pickle bottle', 120), ('ചിപ്സ് പാക്കറ്റ്', 'Chips packet', 60), ('ഉണ്ണിയപ്പം', 'Unniyappam (dozen)', 80), ('അവലോസ് പൊടി', 'Avalose podi', 90),
-  ]),
-  'tailoring': ('തയ്യൽ', 'Tailoring', [
-    ('ബ്ലൗസ് തയ്യൽ', 'Blouse stitching', 350), ('ചുരിദാർ', 'Churidar', 450), ('ആൾട്ടറേഷൻ', 'Alteration', 100), ('സ്കൂൾ യൂണിഫോം', 'School uniform', 300),
-  ]),
+  'food': (
+    'ഭക്ഷണം',
+    'Food',
+    [
+      ('ബിരിയാണി', 'Biriyani', 100),
+      ('ചപ്പാത്തി', 'Chapathi', 8),
+      ('പൊറോട്ട', 'Parotta', 12),
+      ('അച്ചാർ കുപ്പി', 'Pickle bottle', 120),
+      ('ഊണ്', 'Meals', 70),
+      ('അപ്പം', 'Appam', 10),
+    ]
+  ),
+  'snacks': (
+    'അച്ചാർ, പലഹാരം',
+    'Pickles & snacks',
+    [
+      ('അച്ചാർ കുപ്പി', 'Pickle bottle', 120),
+      ('ചിപ്സ് പാക്കറ്റ്', 'Chips packet', 60),
+      ('ഉണ്ണിയപ്പം', 'Unniyappam (dozen)', 80),
+      ('അവലോസ് പൊടി', 'Avalose podi', 90),
+    ]
+  ),
+  'tailoring': (
+    'തയ്യൽ',
+    'Tailoring',
+    [
+      ('ബ്ലൗസ് തയ്യൽ', 'Blouse stitching', 350),
+      ('ചുരിദാർ', 'Churidar', 450),
+      ('ആൾട്ടറേഷൻ', 'Alteration', 100),
+      ('സ്കൂൾ യൂണിഫോം', 'School uniform', 300),
+    ]
+  ),
 };
 
 const _goals = [
-  ('auto', 'ഓട്ടോ', 'Auto rickshaw', 40000), ('sewing', 'തയ്യൽ മെഷീൻ', 'Sewing machine', 12000),
-  ('school', 'കുട്ടികളുടെ പഠനം', "Children's studies", 25000), ('house', 'വീട് നന്നാക്കൽ', 'House repair', 50000),
+  ('auto', 'ഓട്ടോ', 'Auto rickshaw', 40000),
+  ('sewing', 'തയ്യൽ മെഷീൻ', 'Sewing machine', 12000),
+  ('school', 'കുട്ടികളുടെ പഠനം', "Children's studies", 25000),
+  ('house', 'വീട് നന്നാക്കൽ', 'House repair', 50000),
 ];
 
 class JoinScreen extends StatefulWidget {
@@ -109,7 +144,9 @@ class _JoinScreenState extends State<JoinScreen> {
 
   Future<void> _playClip(String id, int fallbackMs) async {
     final done = Completer<void>();
-    final sub = player.onPlayerComplete.listen((_) { if (!done.isCompleted) done.complete(); });
+    final sub = player.onPlayerComplete.listen((_) {
+      if (!done.isCompleted) done.complete();
+    });
     try {
       await player.play(AssetSource('audio/join/$id.mp3'));
       await done.future.timeout(const Duration(seconds: 12), onTimeout: () {});
@@ -124,7 +161,11 @@ class _JoinScreenState extends State<JoinScreen> {
     if (call == null) return;
     _stopCall();
     final run = ++playing;
-    setState(() { shown.clear(); secs = 0; callEnded = false; });
+    setState(() {
+      shown.clear();
+      secs = 0;
+      callEnded = false;
+    });
     timer = Timer.periodic(const Duration(seconds: 1), (_) => setState(() => secs++));
     for (final line in (call!['lines'] as List).cast<Map<String, dynamic>>()) {
       if (run != playing || !mounted) return;
@@ -172,8 +213,8 @@ class _JoinScreenState extends State<JoinScreen> {
           const SizedBox(height: 14),
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
-            transitionBuilder: (child, a) => FadeTransition(
-                opacity: a, child: SlideTransition(position: Tween(begin: const Offset(0, .03), end: Offset.zero).animate(a), child: child)),
+            transitionBuilder: (child, a) =>
+                FadeTransition(opacity: a, child: SlideTransition(position: Tween(begin: const Offset(0, .03), end: Offset.zero).animate(a), child: child)),
             child: KeyedSubtree(key: ValueKey(step), child: _body()),
           ),
           if (step != JoinStep.welcome && step != JoinStep.done)
@@ -266,9 +307,17 @@ class _JoinScreenState extends State<JoinScreen> {
         ),
         _gap(18),
         Padding(padding: const EdgeInsets.only(left: 4, bottom: 10), child: Bi.k('join_how_join', size: 16, weight: FontWeight.w700)),
-        _path(Icons.smartphone_rounded, 'path_app', false, () { byCall = false; go(JoinStep.phone); }),
+        _path(Icons.smartphone_rounded, 'path_app', false, () {
+          byCall = false;
+          go(JoinStep.phone);
+        }),
         _gap(10),
-        _path(Icons.call_rounded, 'path_call', true, () { byCall = true; shown.clear(); callEnded = false; go(JoinStep.call); }),
+        _path(Icons.call_rounded, 'path_call', true, () {
+          byCall = true;
+          shown.clear();
+          callEnded = false;
+          go(JoinStep.call);
+        }),
         _gap(),
         _loginCard(withHelp: true),
       ]);
@@ -293,13 +342,20 @@ class _JoinScreenState extends State<JoinScreen> {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Bi.k('login_title', size: 16, weight: FontWeight.w700),
           Rows([
+            Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [const Badge2(Icons.smartphone_rounded, size: 40), const SizedBox(width: 12), Expanded(child: Bi.k('login_app', size: 14.5))]),
             Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Badge2(Icons.smartphone_rounded, size: 40), const SizedBox(width: 12), Expanded(child: Bi.k('login_app', size: 14.5))]),
-            Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Badge2(Icons.dialpad_rounded, bg: C.goldSoft, fg: Color(0xFF9A6F0E), size: 40), const SizedBox(width: 12), Expanded(child: Bi.k('login_call', size: 14.5))]),
+              const Badge2(Icons.dialpad_rounded, bg: C.goldSoft, fg: Color(0xFF9A6F0E), size: 40),
+              const SizedBox(width: 12),
+              Expanded(child: Bi.k('login_call', size: 14.5))
+            ]),
             if (withHelp)
               Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const Badge2(Icons.support_agent_rounded, bg: C.roseSoft, fg: C.rose, size: 40), const SizedBox(width: 12), Expanded(child: Bi.k('login_help', size: 14.5))]),
+                const Badge2(Icons.support_agent_rounded, bg: C.roseSoft, fg: C.rose, size: 40),
+                const SizedBox(width: 12),
+                Expanded(child: Bi.k('login_help', size: 14.5))
+              ]),
           ]),
         ]),
       );
@@ -334,7 +390,9 @@ class _JoinScreenState extends State<JoinScreen> {
                     margin: const EdgeInsets.only(right: 10),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                        color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: i < code.length ? C.brand : C.line, width: 1.5)),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: i < code.length ? C.brand : C.line, width: 1.5)),
                     child: Text(i < code.length ? code[i] : '', style: numStyle(28)),
                   ),
               ]),
@@ -352,10 +410,15 @@ class _JoinScreenState extends State<JoinScreen> {
       ]);
 
   void _sendCode() {
-    setState(() { codeSent = true; code = ''; });
+    setState(() {
+      codeSent = true;
+      code = '';
+    });
     // Demo: the code "arrives" and fills itself in, like SMS autofill on Android
     for (var i = 0; i < 4; i++) {
-      Future.delayed(Duration(milliseconds: 700 + i * 220), () { if (mounted) setState(() => code = '1234'.substring(0, i + 1)); });
+      Future.delayed(Duration(milliseconds: 700 + i * 220), () {
+        if (mounted) setState(() => code = '1234'.substring(0, i + 1));
+      });
     }
   }
 
@@ -373,7 +436,10 @@ class _JoinScreenState extends State<JoinScreen> {
             DropdownButtonFormField<String>(
               initialValue: district,
               isExpanded: true,
-              items: [for (final (m, e) in _districts) DropdownMenuItem(value: e, child: Text('$m · $e', style: const TextStyle(fontFamily: 'Jakarta', fontFamilyFallback: fonts)))],
+              items: [
+                for (final (m, e) in _districts)
+                  DropdownMenuItem(value: e, child: Text('$m · $e', style: const TextStyle(fontFamily: 'Jakarta', fontFamilyFallback: fonts)))
+              ],
               onChanged: (v) => setState(() => district = v ?? district),
             ),
             const SizedBox(height: 14),
@@ -420,7 +486,14 @@ class _JoinScreenState extends State<JoinScreen> {
           Expanded(
             child: Padding(
               padding: EdgeInsets.only(right: k == 'tailoring' ? 0 : 8),
-              child: _choice(m, e, kind == k, () => setState(() { kind = k; picked.clear(); })),
+              child: _choice(
+                  m,
+                  e,
+                  kind == k,
+                  () => setState(() {
+                        kind = k;
+                        picked.clear();
+                      })),
             ),
           ),
       ]),
@@ -436,8 +509,7 @@ class _JoinScreenState extends State<JoinScreen> {
         crossAxisSpacing: 10,
         childAspectRatio: 1.25,
         children: [
-          for (final (m, e, price) in items)
-            _pick(m, e, price),
+          for (final (m, e, price) in items) _pick(m, e, price),
         ],
       ),
       _gap(),
@@ -512,7 +584,10 @@ class _JoinScreenState extends State<JoinScreen> {
                 borderRadius: BorderRadius.circular(14),
                 child: InkWell(
                   borderRadius: BorderRadius.circular(14),
-                  onTap: () => setState(() { goal = (key: k, ml: m, en: e); goalAmount.text = '$target'; }),
+                  onTap: () => setState(() {
+                    goal = (key: k, ml: m, en: e);
+                    goalAmount.text = '$target';
+                  }),
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     alignment: Alignment.centerLeft,
@@ -545,7 +620,10 @@ class _JoinScreenState extends State<JoinScreen> {
         _gap(),
         BigButton('join_next', onPressed: () => go(JoinStep.done)),
         TextButton(
-          onPressed: () { setState(() => goal = null); go(JoinStep.done); },
+          onPressed: () {
+            setState(() => goal = null);
+            go(JoinStep.done);
+          },
           child: Text('${T.ml('join_skip')} · ${T.en('join_skip')}', style: const TextStyle(color: C.muted)),
         ),
       ]);
@@ -559,8 +637,7 @@ class _JoinScreenState extends State<JoinScreen> {
     final items = byCall
         ? [for (final p in (r?['products'] as List? ?? const [])) (ml: p['ml'] as String, en: p['en'] as String, price: p['price'] as int)]
         : picked.values.toList();
-    Widget row(IconData ic, String a, String b) =>
-        Row(children: [Badge2(ic, size: 40), const SizedBox(width: 12), Expanded(child: Bi(a, b, size: 15))]);
+    Widget row(IconData ic, String a, String b) => Row(children: [Badge2(ic, size: 40), const SizedBox(width: 12), Expanded(child: Bi(a, b, size: 15))]);
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       HeroCard(
         child: Column(children: [
@@ -577,7 +654,8 @@ class _JoinScreenState extends State<JoinScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          Bi('${T.ml('join_welcome')}, $who!', '${T.en('join_welcome')}, $who!', size: 24, weight: FontWeight.w800, color: Colors.white, enColor: Colors.white70, align: TextAlign.center),
+          Bi('${T.ml('join_welcome')}, $who!', '${T.en('join_welcome')}, $who!',
+              size: 24, weight: FontWeight.w800, color: Colors.white, enColor: Colors.white70, align: TextAlign.center),
           const SizedBox(height: 8),
           Bi.k('join_ready', size: 16, color: Colors.white, enColor: Colors.white70, align: TextAlign.center),
         ]),
@@ -585,12 +663,10 @@ class _JoinScreenState extends State<JoinScreen> {
       _gap(),
       MCard(
         child: Rows([
-          row(Icons.call_rounded, byCall ? '${r?['phone']}' : '+91 ${phone.text}',
-              byCall ? '${T.en('joined_by_call')} · PIN ••••' : T.en('joined_by_app')),
+          row(Icons.call_rounded, byCall ? '${r?['phone']}' : '+91 ${phone.text}', byCall ? '${T.en('joined_by_call')} · PIN ••••' : T.en('joined_by_app')),
           row(Icons.location_on_outlined, d.$1, d.$2),
           row(Icons.inventory_2_outlined, items.map((p) => p.ml).join(', '), items.map((p) => '${p.en} ${rupees(p.price)}').join(' · ')),
-          if (!byCall && goal != null)
-            row(Icons.account_balance_wallet_outlined, '${goal!.ml} · ${rupees(num.tryParse(goalAmount.text) ?? 0)}', goal!.en),
+          if (!byCall && goal != null) row(Icons.account_balance_wallet_outlined, '${goal!.ml} · ${rupees(num.tryParse(goalAmount.text) ?? 0)}', goal!.en),
         ]),
       ),
       _gap(),
@@ -600,7 +676,9 @@ class _JoinScreenState extends State<JoinScreen> {
           Rows([
             for (final (i, k) in ['join_how1', 'join_how2', 'join_how3'].indexed)
               Row(children: [
-                CircleAvatar(radius: 14, backgroundColor: i == 0 ? C.gold : C.bg2,
+                CircleAvatar(
+                    radius: 14,
+                    backgroundColor: i == 0 ? C.gold : C.bg2,
                     child: Text('${i + 1}', style: TextStyle(fontWeight: FontWeight.w800, color: i == 0 ? Colors.white : C.muted))),
                 const SizedBox(width: 12),
                 Expanded(child: Bi.k(k, size: 15)),
@@ -655,8 +733,7 @@ class _JoinScreenState extends State<JoinScreen> {
               child: Icon(Icons.phone_in_talk_rounded, size: 56, color: Colors.white.withValues(alpha: .25)),
             ),
           const SizedBox(height: 8),
-          if (shown.isEmpty)
-            BigButton('call_play', gold: true, icon: Icons.volume_up_rounded, onPressed: () => _runCall()),
+          if (shown.isEmpty) BigButton('call_play', gold: true, icon: Icons.volume_up_rounded, onPressed: () => _runCall()),
           if (!callEnded)
             TextButton(
               onPressed: () => _runCall(fast: true),
@@ -688,13 +765,17 @@ class _JoinScreenState extends State<JoinScreen> {
             ]),
           )
         ),
-      'sys' => (Alignment.center, Bi(line['ml'], line['en'], size: 12.5, color: Colors.white70, enColor: Colors.white54, weight: FontWeight.w500, align: TextAlign.center)),
+      'sys' => (
+          Alignment.center,
+          Bi(line['ml'], line['en'], size: 12.5, color: Colors.white70, enColor: Colors.white54, weight: FontWeight.w500, align: TextAlign.center)
+        ),
       'sms' => (
           Alignment.center,
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: const Border(left: BorderSide(color: C.gold, width: 4))),
+            decoration:
+                BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: const Border(left: BorderSide(color: C.gold, width: 4))),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               const Text('SMS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.5, color: C.goldText)),
               text(C.ink, C.muted),
@@ -708,7 +789,8 @@ class _JoinScreenState extends State<JoinScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
             decoration: BoxDecoration(
               color: C.goldLight,
-              borderRadius: const BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16), bottomLeft: Radius.circular(16), bottomRight: Radius.circular(4)),
+              borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16), topRight: Radius.circular(16), bottomLeft: Radius.circular(16), bottomRight: Radius.circular(4)),
               border: isTalking ? Border.all(color: Colors.white, width: 2) : null,
             ),
             child: text(C.brandDeep, const Color(0xA6062F29)),
@@ -721,7 +803,8 @@ class _JoinScreenState extends State<JoinScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
             decoration: BoxDecoration(
               color: const Color(0x1FFFFFFF),
-              borderRadius: const BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16), bottomRight: Radius.circular(16), bottomLeft: Radius.circular(4)),
+              borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16), topRight: Radius.circular(16), bottomRight: Radius.circular(16), bottomLeft: Radius.circular(4)),
               border: isTalking ? Border.all(color: C.mint, width: 2) : null,
             ),
             child: text(Colors.white, Colors.white70),
