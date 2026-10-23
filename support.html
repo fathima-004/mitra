@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ml">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d6b5c">
+  <title>Mitra · Support</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main>
+    <div id="top"></div>
+    <section class="card">
+      <p><span class="ml">ബിസിനസും വീടും ഒരുമിച്ച് നോക്കുന്നത് എളുപ്പമല്ല. സംസാരിക്കാൻ ഒരാളെ വേണമെങ്കിൽ വിളിക്കൂ, സൗജന്യമാണ്.</span>
+      <span class="en">Running a business and a home is hard. If you want someone to talk to, call. It is free.</span></p>
+    </section>
+    <div id="list" aria-live="polite"></div>
+  </main>
+
+  <script type="module">
+    // Helpline numbers come only from data/support.json, checked on the official site with the source URL
+    // and date stored next to each one (CLAUDE.md). Owner: Hiba (page), Fathima (content).
+    import { ml, en, esc, topbar, renderNav } from './js/app.js';
+
+    const $ = (id) => document.getElementById(id);
+    renderNav();
+    $('top').innerHTML = topbar('tile_support');
+
+    const pick = (r, base, lang) => r[`${base}_${lang}`] ?? r[`${base}_${lang === 'ml' ? 'en' : 'ml'}`] ?? '';
+    const checked = (r) => /^https?:\/\//.test(r.source_url ?? '') && r.date_checked && r.number;
+
+    let list = [];
+    try {
+      const res = await fetch('data/support.json');
+      if (res.ok) {
+        const data = await res.json();
+        list = (Array.isArray(data) ? data : data.helplines ?? []).filter(checked);
+      }
+    } catch { /* missing or offline */ }
+
+    $('list').innerHTML = list.length ? list.map((h) => `
+      <section class="card">
+        <h2><span class="ml">${esc(pick(h, 'name', 'ml'))}</span><span class="en">${esc(pick(h, 'name', 'en'))}</span></h2>
+        <a class="btn call" href="tel:${esc(String(h.number).replace(/\s/g, ''))}">📞 ${esc(h.number)}</a>
+        ${pick(h, 'about', 'ml') ? `<p><span class="ml">${esc(pick(h, 'about', 'ml'))}</span><span class="en">${esc(pick(h, 'about', 'en'))}</span></p>` : ''}
+        <p class="note muted">${ml('checked_on')} · ${en('checked_on')}: ${esc(h.date_checked)}<br>
+          <a href="${esc(h.source_url)}" target="_blank" rel="noopener">${esc(h.source_url)}</a></p>
+      </section>`).join('') : `
+      <section class="card">
+        <p><span class="ml">ഹെൽപ്‌ലൈൻ നമ്പറുകൾ ഔദ്യോഗിക സൈറ്റിൽ ഉറപ്പാക്കിക്കൊണ്ടിരിക്കുന്നു.</span>
+        <span class="en">Helpline numbers are still being checked on official sites.</span></p>
+      </section>`;
+  </script>
+</body>
+</html>

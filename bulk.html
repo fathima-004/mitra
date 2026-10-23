@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ml">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d6b5c">
+  <title>Mitra · Buy together</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main>
+    <div id="top"></div>
+    <p class="note" id="sub"></p>
+    <div id="groups" aria-live="polite"></div>
+  </main>
+
+  <script type="module">
+    // Buy-together board: women nearby group their stock orders (bulk_requests, PLAN.md §5). Owner: Hiba.
+    import { getBulk, addBulk, getUser, USER } from './js/data.js';
+    import { ml, en, label, esc, topbar, renderNav, toast } from './js/app.js';
+
+    const $ = (id) => document.getElementById(id);
+    renderNav();
+    $('top').innerHTML = topbar('tile_bulk');
+    $('sub').innerHTML = label('tile_bulk_sub');
+
+    const MONTHS_ML = ['ജനുവരി', 'ഫെബ്രുവരി', 'മാർച്ച്', 'ഏപ്രിൽ', 'മേയ്', 'ജൂൺ', 'ജൂലൈ', 'ഓഗസ്റ്റ്', 'സെപ്റ്റംബർ', 'ഒക്ടോബർ', 'നവംബർ', 'ഡിസംബർ'];
+    const MONTHS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const user = await getUser();
+
+    async function render() {
+      const rows = await getBulk();
+      const groups = {};
+      for (const r of rows) (groups[`${r.month}|${r.item}`] ??= []).push(r);
+      const keys = Object.keys(groups).sort();
+      $('groups').innerHTML = keys.map((k) => {
+        const list = groups[k];
+        const first = list[0];
+        const total = list.reduce((s, r) => s + Number(r.qty || 0), 0);
+        const m = Number(String(first.month).slice(5, 7)) - 1;
+        const mine = list.some((r) => r.user === USER);
+        return `<section class="card">
+          <div class="row"><span><span class="ml">${esc(first.item_ml ?? first.item)}</span>
+            <span class="en">${esc(first.item)} · ${MONTHS_ML[m] ?? ''} · ${MONTHS_EN[m] ?? ''}</span></span>
+            <span class="amount">${total} ${esc(first.unit ?? '')}</span></div>
+          <p><span class="ml">${list.length} പേർ ഒരുമിച്ച് വാങ്ങുന്നു</span><span class="en">${list.length} women buying together · ${esc(first.place ?? '')}</span></p>
+          <p>${list.map((r) => `<span class="pill${r.user === USER ? ' green' : ''}">${esc(r.name ?? '')} · ${esc(r.qty)} ${esc(r.unit ?? '')}</span>`).join(' ')}</p>
+          ${mine ? `<p><span class="ml">നിങ്ങളും ഇതിലുണ്ട്</span><span class="en">You're in this group</span></p>`
+            : `<button class="btn primary" type="button" data-key="${esc(k)}">${label('add')}</button>`}
+        </section>`;
+      }).join('') || `<p class="muted">${ml('nothing_yet')}</p>`;
+
+      for (const b of $('groups').querySelectorAll('button[data-key]')) {
+        b.addEventListener('click', async () => {
+          const first = groups[b.dataset.key][0];
+          const qty = Math.floor(Number(prompt(`${first.item_ml ?? first.item} എത്ര വേണം? · How much ${first.item} (${first.unit ?? ''})?`)));
+          if (!qty || qty < 1 || qty > 9999) return;
+          await addBulk({ user: USER, name: user.name ?? '', month: first.month, item: first.item, item_ml: first.item_ml,
+            qty, unit: first.unit, place: user.place ?? first.place });
+          toast('saved');
+          render();
+        });
+      }
+    }
+    render();
+  </script>
+</body>
+</html>

@@ -11,6 +11,7 @@ import 'screens/money.dart';
 import 'screens/profit.dart';
 import 'strings.dart';
 import 'theme.dart';
+import 'widgets/common.dart';
 
 final repo = Repo();
 
@@ -52,6 +53,23 @@ class Shell extends StatefulWidget {
 class ShellState extends State<Shell> {
   late int tab = widget.start;
   void go(int i) => setState(() => tab = i);
+
+  // A sale saved by the phone call arrived from Firestore: say so, wherever she is in the app.
+  void _onCallSale() {
+    if (mounted) toast(context, 'added_by_call', icon: Icons.call_rounded);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    repo.callSales.addListener(_onCallSale);
+  }
+
+  @override
+  void dispose() {
+    repo.callSales.removeListener(_onCallSale);
+    super.dispose();
+  }
 
   static const _items = [
     ('nav_home', Icons.home_outlined, Icons.home_rounded),

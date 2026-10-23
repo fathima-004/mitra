@@ -3,12 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import '../config.dart';
 import '../strings.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
 
-/// Deployed Netlify site, e.g. flutter run --dart-define=MITRA_SITE=https://mitra.netlify.app
-const siteUrl = String.fromEnvironment('MITRA_SITE');
 
 class CallMeCard extends StatefulWidget {
   const CallMeCard({super.key});

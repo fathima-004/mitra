@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ml">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d6b5c">
+  <title>Mitra · Schemes</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main>
+    <div id="top"></div>
+    <div id="list" aria-live="polite"></div>
+  </main>
+
+  <script type="module">
+    // Schemes come only from data/schemes.json, checked by a person on the official site, with the
+    // source URL and date stored next to each one (CLAUDE.md). Entries without both are not shown.
+    // Never a loan scheme. Owner: Hiba (page), Fathima (content).
+    import { ml, en, esc, topbar, renderNav } from './js/app.js';
+
+    const $ = (id) => document.getElementById(id);
+    renderNav();
+    $('top').innerHTML = topbar('tile_schemes');
+
+    const pick = (r, base, lang) => r[`${base}_${lang}`] ?? r[`${base}_${lang === 'ml' ? 'en' : 'ml'}`] ?? '';
+    const checked = (r) => /^https?:\/\//.test(r.source_url ?? '') && r.date_checked;
+
+    let list = [];
+    try {
+      const res = await fetch('data/schemes.json');
+      if (res.ok) {
+        const data = await res.json();
+        list = (Array.isArray(data) ? data : data.schemes ?? []).filter(checked);
+      }
+    } catch { /* missing or offline: show the "being checked" note */ }
+
+    $('list').innerHTML = list.length ? list.map((s) => `
+      <section class="card">
+        <h2><span class="ml">${esc(pick(s, 'title', 'ml'))}</span><span class="en">${esc(pick(s, 'title', 'en'))}</span></h2>
+        ${pick(s, 'about', 'ml') ? `<p><span class="ml">${esc(pick(s, 'about', 'ml'))}</span><span class="en">${esc(pick(s, 'about', 'en'))}</span></p>` : ''}
+        ${(s.documents ?? []).length ? `
+          <h3><span class="ml">ആവശ്യമുള്ള രേഖകൾ</span><span class="en">Documents you need</span></h3>
+          ${s.documents.map((d) => `<label class="item"><input type="checkbox">
+            <span><span class="ml">${esc(typeof d === 'string' ? d : d.ml ?? d.en)}</span><span class="en">${esc(typeof d === 'string' ? '' : d.en ?? '')}</span></span></label>`).join('')}` : ''}
+        <p class="note muted">${ml('checked_on')} · ${en('checked_on')}: ${esc(s.date_checked)}<br>
+          <a href="${esc(s.source_url)}" target="_blank" rel="noopener">${esc(s.source_url)}</a></p>
+      </section>`).join('') : `
+      <section class="card">
+        <p><span class="ml">പദ്ധതികളുടെ വിവരങ്ങൾ ഔദ്യോഗിക സൈറ്റുകളിൽ ഉറപ്പാക്കിക്കൊണ്ടിരിക്കുന്നു.</span>
+        <span class="en">Scheme details are still being checked on official sites.</span></p>
+      </section>`;
+  </script>
+</body>
+</html>
