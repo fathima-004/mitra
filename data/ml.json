@@ -30,6 +30,7 @@
  "tile_schemes_sub": { "ml": "", "en": "Government schemes and documents" },
  "tile_bulk_sub": { "ml": "", "en": "Buy stock with women nearby, save money" },
  "tile_support_sub": { "ml": "", "en": "Someone to talk to, free" },
+ "live": { "ml": "തത്സമയം", "en": "Live" },
  "everything": { "ml": "എല്ലാം", "en": "Everything" },
  "items_sold": { "ml": "എണ്ണം വിറ്റു", "en": "items sold" },
  "reset_demo": { "ml": "ഡെമോ വീണ്ടും തുടങ്ങുക", "en": "Reset demo" },
@@ -82,5 +83,17 @@
  "added_sale": { "ml": "വിൽപ്പന ചേർത്തു", "en": "Sale added" },
  "entries": { "ml": "ചേർത്തവ", "en": "Entries" },
  "via_call": { "ml": "ഫോൺ വഴി", "en": "by phone" },
- "undo": { "ml": "തിരുത്തുക", "en": "Undo" }
+ "undo": { "ml": "തിരുത്തുക", "en": "Undo" },
+
+ "profit_title": { "ml": "ലാഭം", "en": "Profit" },
+ "tips_title": { "ml": "ഈ മാസം ശ്രദ്ധിക്കാൻ", "en": "This month at a glance" },
+ "chart_title": { "ml": "ഓരോ മാസത്തെ ലാഭം", "en": "Profit each month" },
+ "best_title": { "ml": "ഏറ്റവും നന്നായി വിറ്റത്", "en": "What sold best" },
+ "spend_title": { "ml": "പണം പോയ വഴി", "en": "Where the money went" },
+ "of_usual": { "ml": "സാധാരണ മാസത്തിന്റെ", "en": "of a usual month" },
+ "usual_month": { "ml": "സാധാരണ മാസത്തിന്റെ", "en": "Usual month" },
+ "on_track": { "ml": "എത്തി, നല്ല പോക്ക്", "en": "on track for this point in the month" },
+ "behind": { "ml": "എത്തി, അൽപ്പം പിന്നിൽ", "en": "a little behind for this point in the month" },
+ "tip_star": { "ml": "", "en": "brought in the most money this month" },
+ "tip_spend": { "ml": "", "en": "is your biggest cost this month" }
 }
