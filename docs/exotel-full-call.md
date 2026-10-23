@@ -17,6 +17,7 @@ Main menu
  4  Schemes & together  → 1 government scheme news (hand-checked data/schemes.json, else the official PIB feed, never loans)
                            2 buy together → pick a group → how much + #
  5  Change a price      → which item → new price + #
+ 8  Malayalam ⇄ English (saved, the app follows)
  9  Repeat · 0 Finish   → "On this call you made 3 changes: … It is all in your Mitra app. Goodbye."
 ```
 Three silences in a row also end the call, with the same summary.
@@ -48,8 +49,13 @@ The loop 1 → 2 → 1 is the whole call. When she finishes, `do=hear` answers s
 
 Point the ExoPhone (incoming calls) and `EXOTEL_APP_ID` ("Call me") at this flow. The old one-sale flow (`exotel-gather`, `exotel-save`) still works and is untouched.
 
-## Voice
-Prompts are spoken by Exotel's text-to-speech in English, because they contain live numbers and names. Malayalam needs a voice that can speak changing numbers; that is the next step (pre-recorded clips for the fixed parts plus numbers).
+## Language
+- The call speaks the language chosen in the app (`users/demo1.lang`). Malayalam is the default.
+- **8** on the main menu switches the call between Malayalam and English. The choice is saved, so the app switches too within a few seconds. Switching in the app changes the next call.
+- Malayalam prompts carry live numbers ("ലാഭം 12457 രൂപ"), so they are spoken with Microsoft's neural Malayalam voice (`ml-IN-SobhanaNeural`, the same voice as the recorded clips), generated for each step. The audio is kept in `call_audio/{CallSid}` and Exotel fetches it from `exotel-ivr?do=say`. Expect a 2–3 second pause before each prompt.
+- That voice service refuses about half of new connections at random. Each prompt is tried up to five times; in testing 20 of 20 prompts came through, the slowest in about 2 seconds. If it still fails, that one prompt is spoken in English by Exotel, so she is never left in silence.
+- To use only Exotel's English voice, set `CALL_VOICE` = `exotel` in Netlify.
+- The voice uses Microsoft's free Edge read-aloud service through the `msedge-tts` package. It is not an official API and could change. For a production pilot, switch to a paid text-to-speech service with Malayalam.
 
 ## Try it without a phone
 ```
