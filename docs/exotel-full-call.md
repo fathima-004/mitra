@@ -14,7 +14,7 @@ Main menu
                            3 savings goal → 1 add to savings → rupees + #
                            4 monthly bills → 1 add a bill → 1 gas · 2 electricity · 3 rent · 4 EMI · 5 other → rupees + #
                            5 GST paid this year (guidance only, confirm with MEC / tax consultant)
- 4  Schemes & together  → 1 government scheme news (hand-checked data/schemes.json, else the official PIB feed, never loans)
+ 4  Schemes & together  → 1 schemes she can join now (the app's checked list, app/assets/data/schemes.json, open and non-loan) + new PIB scheme news
                            2 buy together → pick a group → how much + #
  5  Change a price      → which item → new price + #
  8  Malayalam ⇄ English (saved, the app follows)
