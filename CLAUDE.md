@@ -12,13 +12,13 @@ Mitra lets any woman entrepreneur, even with a basic phone, say what she sold in
 **Only edit files you own.** If you need a change in someone else's file, write it in `docs/requests.md` and tell your teammate. Shared contracts (data format, `data.js` function names) are frozen after hour 1; changing them needs both people to agree.
 
 ## Stack
-Plain HTML + CSS + JavaScript (ES modules, no build step, no framework). Firebase Firestore via the CDN modular SDK for data and live updates. Netlify for hosting (auto-deploys from `main`) and Netlify Functions (Node) for the backend. The phone call uses Twilio Programmable Voice (TwiML from Netlify Functions, `<Gather>` with `language="ml-IN"`); the Claude API (Haiku-class model) only turns speech text into `[{product, qty}]`. Functions write to Firestore with `firebase-admin`. Works on a phone browser first.
+Plain HTML + CSS + JavaScript (ES modules, no build step, no framework). Firebase Firestore via the CDN modular SDK for data and live updates. Netlify for hosting (auto-deploys from `main`) and Netlify Functions (Node) for the backend. The phone call uses Twilio Programmable Voice (TwiML from Netlify Functions, `<Gather>` with `language="ml-IN"`); speech text becomes `[{product, qty}]` using word lists first (`data/synonyms.json`), then a free AI backup chosen by the `AI_PROVIDER` env var (`gemini` default, `groq`, or `claude` only if we get API credit). AI calls use plain `fetch`, no SDKs, with a 4-second timeout. Functions write to Firestore with `firebase-admin`. Works on a phone browser first.
 
 ## Hard rules
 - **No loans anywhere.** Mitra tracks EMIs she already pays and plans savings. It never offers, recommends or compares loans or lenders.
 - **Never invent scheme eligibility, documents, tax limits or helpline numbers.** Only use values a person checked on an official site, with the source URL and date checked stored next to them.
 - Tax and GST screens always say: guidance only, confirm with your Kudumbashree MEC or a tax consultant.
-- **AI never does maths.** Profit, totals, GST and goals are plain JavaScript in `calc.js` / `money.js`. Speech parsing is rule-based first (`parse.js` + `data/synonyms.json`); an AI call is optional and must have a fallback.
+- **AI never does maths.** Profit, totals, GST and goals are plain JavaScript in `calc.js` / `money.js`. Speech parsing is word lists first (`parse.js` + `data/synonyms.json`); the AI backup is optional and always falls back to the keypad. Only demo data is ever sent to a free AI tier.
 - Numbers spoken by voice are always confirmed on the keypad before saving.
 - The demo must work without Wi-Fi problems: pre-loaded demo data, keypad fallback, pre-rendered audio, `localStorage` fallback if Firestore is unreachable.
 - Malayalam first, English second, on every screen. Big text and big buttons.

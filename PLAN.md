@@ -19,7 +19,7 @@ MakeHerHack 2026, CITTIC CUSAT. About 16 hours of building. Two people, two Clau
 ### Hiba: call agent + backend (the highlight)
 Everything that makes the phone call work, end to end, plus Firebase and deployment.
 - Twilio voice flow (Netlify Functions returning TwiML): greet → menu → sales → confirm → save → profit → schemes → support → goodbye
-- Claude parsing: Malayalam/Manglish speech text → `[{product, qty}]` using her product list
+- Understanding her sentence: Malayalam/Manglish speech text → `[{product, qty}]` using her product list. Word lists first, then a free AI backup (see §7a)
 - Firestore writes from the call (Firebase Admin), so the app updates live
 - `js/data.js` (shared data helpers) and `js/calc.js` (profit maths) used by both the call and the app
 - "Call me" endpoint the app button uses
@@ -53,7 +53,7 @@ Every screen the judges see on the laptop, all Malayalam text, the demo data and
 
 | Tier | Feature | Owner |
 |---|---|---|
-| **Must** | Real phone call: menu, speech → Claude parse → read-back → keypad confirm → save → live app update | Hiba |
+| **Must** | Real phone call: menu, speech → word lists / free AI parse → read-back → keypad confirm → save → live app update | Hiba |
 | **Must** | Press 2 on the call: hear this month's profit | Hiba |
 | **Must** | Browser call page (backup, same logic) | Hiba |
 | **Must** | Setup, daily sales, monthly profit screens | Fathima |
@@ -74,9 +74,11 @@ Every screen the judges see on the laptop, all Malayalam text, the demo data and
 **Hiba**
 - [ ] Accept the GitHub invite → `git clone https://github.com/fathima-004/mitra.git`
 - [ ] **Twilio** trial account → get a phone number → **Verified Caller IDs: add every demo phone** (yours, Fathima's) → Voice **Geo Permissions: enable India**
-- [ ] **Anthropic API key** at console.anthropic.com, add about $5 credit (Claude Pro does not include the API)
+- [ ] **Gemini API key (free)** at aistudio.google.com → "Get API key". No credit card. Check the real free limits for the Flash model in AI Studio.
+- [ ] Optional second free backup: **Groq API key** at console.groq.com (free plan never charges; over the limit it returns "try later")
+- [ ] **No paid Claude API for now.** Claude Pro does not include the API. If the organisers give credits or someone adds us to their Anthropic Console organisation, we switch with one setting (§7a).
 - [ ] **Firebase** project (free Spark plan) → Web app config → Firestore in test mode, region `asia-south1` → Project settings → Service accounts → generate a private key (JSON, keep it secret)
-- [ ] **Netlify**: import `fathima-004/mitra`, publish dir `/`, no build command. Add environment variables: `ANTHROPIC_API_KEY`, `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_NUMBER`, `FIREBASE_SERVICE_ACCOUNT` (the JSON), `DEMO_PHONE`
+- [ ] **Netlify**: import `fathima-004/mitra`, publish dir `/`, no build command. Add environment variables: `AI_PROVIDER` (`gemini`), `GEMINI_API_KEY`, `GROQ_API_KEY` (optional), `ANTHROPIC_API_KEY` (only if we get credit), `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_NUMBER`, `FIREBASE_SERVICE_ACCOUNT` (the JSON), `DEMO_PHONE`
 - [ ] Twilio number → Voice webhook: `https://<site>.netlify.app/.netlify/functions/voice` (POST)
 
 **Fathima**
@@ -134,7 +136,8 @@ POST /.netlify/functions/menu       routes the pressed key
 POST /.netlify/functions/sales      Gather speech (language ml-IN) → parse → read back
 POST /.netlify/functions/confirm    1 = save to Firestore, 2 = try again / keypad
 POST /.netlify/functions/profit     plays/says this month's profit
-POST /.netlify/functions/parse      { text, products } → [{product, qty}] (Claude; used by call + call.html)
+POST /.netlify/functions/parse      { text, products } → { items:[{product, qty}], source:"words"|"gemini"|"groq"|"claude", sure:true|false }
+                                    (word lists first, then AI_PROVIDER; used by the call and call.html)
 POST /.netlify/functions/call-me    starts an outbound call to DEMO_PHONE (button on index.html)
 ```
 
@@ -144,9 +147,9 @@ POST /.netlify/functions/call-me    starts an outbound call to DEMO_PHONE (butto
 
 | Time | Hiba (call agent + backend) | Fathima (app + content) |
 |---|---|---|
-| **H0–H1** | Firebase connected; push `js/data.js`, `js/calc.js`; Netlify deploy working; `package.json` with `twilio`, `firebase-admin`, `@anthropic-ai/sdk` | Push `css/style.css`, `index.html` shell, `data/demo.json` (Sheela's month). **Both: freeze §5 contracts.** |
+| **H0–H1** | Firebase connected; push `js/data.js`, `js/calc.js`; Netlify deploy working; `package.json` with `twilio`, `firebase-admin` (AI calls use plain `fetch`, no SDK) | Push `css/style.css`, `index.html` shell, `data/demo.json` (Sheela's month). **Both: freeze §5 contracts.** |
 | **H1–H3** | `voice` + `menu`: Twilio calls the verified phone, Mitra greets and reads the menu, keypad works | `setup.html` + `daily.html` on Firestore; `synonyms.json` v1 to Hiba by H3 |
-| **H3–H5** | `sales` + `parse`: speech (ml-IN) → Claude → `[{product, qty}]`; rule-based fallback with `synonyms.json`; read-back | `profit.html`: totals, chart, tips. Generate all call voice clips, push to `audio/` by H5 |
+| **H3–H5** | `sales` + `parse`: speech (ml-IN) → word lists (`synonyms.json`) → if unsure, Gemini free → `[{product, qty}]`; read-back. Test 20 real sentences, log misses for Fathima | `profit.html`: totals, chart, tips. Generate all call voice clips, push to `audio/` by H5 |
 | **H5–H7** | `confirm` saves to Firestore with `via:"call"`; `profit` speaks profit; **first full test: phone call → laptop updates live** | `money.html` + `js/money.js`: goal, EMI check, GST cards |
 | **H7–H9** | `call-me` endpoint; press 3/4/9; play Fathima's clips; handle silence, unclear speech, wrong product | `index.html`: live today's sales + profit (`listen`), "Call me" button wired to `call-me` |
 | **H9–H11** | `call.html` browser backup using the same `parse` + save | `schemes.html` + `schemes.json`, `support.html`, `bulk.html` |
@@ -166,9 +169,10 @@ POST /.netlify/functions/call-me    starts an outbound call to DEMO_PHONE (butto
 1. `call-me` → Twilio `calls.create({ to: DEMO_PHONE, from: TWILIO_NUMBER, url: …/voice })`.
 2. `voice`: play `audio/greet.mp3` + `audio/menu.mp3`, `<Gather input="dtmf speech" numDigits="1" language="ml-IN">`.
 3. Key 1 → `sales`: play `audio/ask-sales.mp3`, `<Gather input="speech" language="ml-IN" speechTimeout="auto">`.
-4. Twilio posts `SpeechResult` → `parse`:
-   - First try rule-based matching with `data/synonyms.json` against her products (fast, free, no network to Claude).
-   - If not confident, call Claude (Haiku-class model) with her product list; it must return JSON `[{product, qty}]` only. Claude never does maths.
+4. Twilio posts `SpeechResult` → `parse` (details in §7a):
+   - First the word lists (`data/synonyms.json`) against her products.
+   - If not sure, the free AI backup with her product list; it returns JSON `[{product, qty}]` only. The AI never does maths.
+   - Still not sure → "number amarthuka" keypad entry.
    - Save pending items in `calls/{CallSid}`.
 5. Read back: "12 biriyani, 30 chapathi, alle? Shari aanel 1, thettaanel 2." (`<Say language="ml-IN">` or clips + numbers)
 6. `confirm`: 1 → write each item to `users/demo1/sales` with `via:"call"` → **laptop updates live** → play `saved.mp3`, back to menu. 2 → "number amarthuka" keypad entry.
@@ -180,8 +184,24 @@ POST /.netlify/functions/call-me    starts an outbound call to DEMO_PHONE (butto
 **Things to know**
 - Trial calls play a short "trial account" message first and can only call **verified** numbers. That's fine for the demo; upgrading (about $20) removes it.
 - Twilio needs a public URL: test on the deployed Netlify site (every push redeploys in about a minute).
-- Keep every function fast (well under 10 s). Claude Haiku-class responses are about a second.
+- Keep every function fast (well under 10 s). Give every AI call a 4-second timeout; on timeout, fall back to the keypad.
 - Log every call's speech text to Firestore so Fathima can improve `synonyms.json` from real tests.
+
+### 7a. Understanding her sentence (no paid API)
+
+Order inside `parse`, stop at the first one that is sure:
+1. **Word lists** (`data/synonyms.json`, owned by Fathima): match product words (biriyani / biriyaani / beeryani…), "sold" words (vittu / poyi…) and numbers (Malayalam words, English words, digits) against **her** 4–5 products, plus her personal words in `users/demo1/words`. Free, instant, works offline. Sure = every product found has a number and nothing is left over.
+2. **Free AI backup**, chosen by the `AI_PROVIDER` environment variable:
+   - `gemini` (default): Google Gemini API free tier, a Flash model
+   - `groq`: Groq free tier (second backup if Gemini returns "too many requests")
+   - `claude`: Claude API, **only if** we get credit later. Same prompt, same output.
+   One prompt for all providers: her product list + the sentence → reply with JSON only `[{"product":"p1","qty":12}]`, `[]` if unsure. Validate the JSON; products must be from her list; quantities 1–999.
+3. **Keypad**: "biriyani ethra? number amarthuka".
+
+Rules:
+- Switching provider = changing one environment variable in Netlify. No code changes.
+- **Only demo data goes to free AI tiers** (they may use inputs to improve their models). Never send real women's names or phone numbers.
+- Log every sentence + which step understood it (`source`) to Firestore `call_logs`, so Fathima can add missed words to `synonyms.json`. The goal is for the word lists to handle the demo sentences with no AI at all.
 
 **Backup:** `call.html` in the browser: same menu, Chrome Web Speech `ml-IN` + keypad, same `parse` and save. If the venue's phone signal fails, demo this.
 
@@ -228,7 +248,7 @@ Commit small, push at least every hour. Only edit your own files; ask in `docs/r
 |---|---|
 | Phone signal / Twilio fails at the venue | `call.html` browser call page; backup video |
 | Malayalam speech misheard | Read-back + keypad confirm; practised demo sentence; synonyms tuned from test calls |
-| Claude API slow or down | Rule-based parser first; Claude only when unsure |
+| Free AI tier slow, down or "too many requests" | Word lists first; switch `AI_PROVIDER` to `groq`; keypad always works |
 | Live update fails | Refresh button on the laptop |
 | Wi-Fi fails | Phone hotspot; demo data pre-loaded |
 | Claude Pro usage limits | Short focused tasks; the other teammate's account as backup |
