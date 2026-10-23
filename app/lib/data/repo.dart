@@ -110,7 +110,7 @@ class Repo extends ChangeNotifier with WidgetsBindingObserver {
     _outbox = [];
     await _saveOutbox();
     await _save();
-    if (!cloudConfigured) return;
+    if (!cloudConfigured) return ensureDemoToday();
     try {
       await cloud.resetTo(demo, collections);
       online = true;
@@ -119,6 +119,7 @@ class Repo extends ChangeNotifier with WidgetsBindingObserver {
       debugPrint('reset in Firestore failed: $e');
     }
     if (!_disposed) notifyListeners();
+    await ensureDemoToday(); // after the reset, so Firestore gets these too
   }
 
   String _newId(String col) => '${col.substring(0, 1)}${DateTime.now().microsecondsSinceEpoch}';
@@ -147,6 +148,28 @@ class Repo extends ChangeNotifier with WidgetsBindingObserver {
     data[col] = this[col].where((r) => r['id'] != id).toList();
     await _save();
     _queue({'op': 'delete', 'col': col, 'id': id});
+  }
+
+  /// Sheela's example month ends a few days before the demo is shown. So "today" is never empty for the
+  /// judges, the demo account gets a few sales from earlier today, once per day, and only if there are none.
+  Future<void> ensureDemoToday() async {
+    if (user['name'] != 'Sheela' || this['products'].isEmpty) return;
+    final day = today();
+    if (this['sales'].any((s) => s['date'] == day)) return;
+    final now = DateTime.now();
+    final ids = [for (final p in this['products']) p['id'] as String];
+    final plan = [(150, 0, 6), (95, 1, 20), (50, 2, 15), (15, 0, 4)]; // minutes ago, product, qty
+    for (final (ago, i, qty) in plan) {
+      final t = now.subtract(Duration(minutes: ago));
+      if (isoDate(t) != day || i >= ids.length) continue;
+      await add('sales', {
+        'date': day,
+        'time': '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}',
+        'product': ids[i],
+        'qty': qty,
+        'via': 'app',
+      });
+    }
   }
 
   /// Her name and place (users/demo1).

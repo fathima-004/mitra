@@ -179,6 +179,7 @@ void main() {
       fs.callSale('call9', todayIso(), 'p1', 3);
       await repo.syncNow();
       await repo.loadDemo();
+      await repo.syncNow(); // the demo's sales for today follow the reset
       expect(fs.docs.containsKey('$root/users/demo1/sales/call9'), isFalse);
       expect(fs.count('sales'), repo['sales'].length);
       repo.dispose();

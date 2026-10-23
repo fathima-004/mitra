@@ -18,6 +18,7 @@ final repo = Repo();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Future.wait([T.load(), L.load(), repo.init()]);
+  await repo.ensureDemoToday();
   final prefs = await SharedPreferences.getInstance();
   final loggedIn = (prefs.getBool('loggedIn') ?? false) || (prefs.getBool('joined') ?? false);
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(statusBarColor: Colors.transparent, statusBarIconBrightness: Brightness.dark));

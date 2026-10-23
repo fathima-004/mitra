@@ -62,6 +62,8 @@ const _t = <String, (String, String)>{
   'money_today': ('ഇന്ന് കിട്ടിയ പണം', 'Money received today'),
   'from_sales': ('{n} വിൽപ്പനയിൽ നിന്ന്', 'from {n} sales'),
   'no_sales_yet': ('ഇന്ന് ഇതുവരെ ഒന്നുമില്ല', 'Nothing yet today'),
+  'this_month': ('ഈ മാസം', 'This month'),
+  'other_rate': ('മറ്റ്', 'Other'),
   'this_month_profit': ('ഈ മാസത്തെ ലാഭം', "This month's profit"),
   'goal_left': ('ഇനി {amt}', '{amt} to go'),
   'ready_by': ('{when} ആകുമ്പോൾ', 'by {when}'),
