@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:mitra/config.dart';
 import 'package:mitra/data/repo.dart';
+import 'package:mitra/i18n.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const root = 'projects/test/databases/(default)/documents';
@@ -48,7 +49,10 @@ class FakeFirestore {
       return _res(jsonEncode([for (final n in hits) {'document': _docJson(n)}]), 200);
     }
     if (req.method == 'PATCH') {
-      docs[path] = Map<String, dynamic>.from(jsonDecode(req.body)['fields']);
+      final fields = Map<String, dynamic>.from(jsonDecode(req.body)['fields']);
+      final mask = req.url.queryParametersAll['updateMask.fieldPaths'];
+      // With an update mask only those fields change, like real Firestore.
+      docs[path] = mask == null ? fields : {...?docs[path], for (final k in mask) if (fields.containsKey(k)) k: fields[k]};
       writes++;
       return _res(jsonEncode(_docJson(path)), 200);
     }
@@ -219,6 +223,32 @@ void main() {
       await Future.wait([for (var i = 0; i < 20; i++) repo.add('sales', {'date': todayIso(), 'product': 'p1', 'qty': 1, 'via': 'app'})]);
       expect(repo['sales'].length, before + 20);
       expect(repo['sales'].map((s) => s['id']).toSet().length, repo['sales'].length);
+      repo.dispose();
+    }, () => MockClient(fs.handle));
+  });
+
+  test('the language is shared with the phone call both ways', () async {
+    SharedPreferences.setMockInitialValues({});
+    final fs = FakeFirestore();
+    await http.runWithClient(() async {
+      final repo = Repo();
+      await repo.init();
+      L.lang.value = 'ml';
+      syncLanguage(repo);
+      await repo.syncNow(); // seeds
+      await repo.syncNow();
+
+      // App → call: switching in the app saves users/demo1.lang.
+      await L.set('en');
+      await repo.syncNow();
+      expect(fs.docs['$root/users/demo1']?['lang']?['stringValue'], 'en');
+      expect(fs.docs['$root/users/demo1']?['name']?['stringValue'], 'Sheela', reason: 'other fields must stay');
+
+      // Call → app: pressing 8 on the call saves "ml" and stamps changedAt; the app follows.
+      fs.docs['$root/users/demo1']!['lang'] = {'stringValue': 'ml'};
+      fs.docs['$root/users/demo1']!['changedAt'] = {'stringValue': '2026-10-24T11:00:00Z'};
+      await repo.syncNow();
+      expect(L.lang.value, 'ml');
       repo.dispose();
     }, () => MockClient(fs.handle));
   });

@@ -12,6 +12,7 @@ import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config.dart';
+import '../i18n.dart';
 import '../logic/calc.dart';
 import 'cloud.dart' as cloud;
 
@@ -183,7 +184,7 @@ class Repo extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> setUser(Rec changes) async {
     user = {...user, ...changes};
     await _save();
-    _queue({'op': 'user', 'col': 'users', 'id': 'demo1', 'row': user});
+    _queue({'op': 'user', 'col': 'users', 'id': 'demo1', 'row': changes});
   }
 
   /// A request on the buy-together board (bulk_requests).
@@ -322,4 +323,18 @@ class Repo extends ChangeNotifier with WidgetsBindingObserver {
     }
     await _save();
   }
+}
+
+/// The app's language switch and the phone call share one setting: users/demo1.lang.
+/// Switching in the app saves it (the next call speaks it); pressing 8 on a call changes it, and the app follows
+/// at its next check. Call once at start-up.
+void syncLanguage(Repo repo) {
+  if (repo.user['lang'] != L.lang.value) repo.setUser({'lang': L.lang.value});
+  L.lang.addListener(() {
+    if (repo.user['lang'] != L.lang.value) repo.setUser({'lang': L.lang.value});
+  });
+  repo.addListener(() {
+    final lang = repo.user['lang'];
+    if ((lang == 'ml' || lang == 'en') && lang != L.lang.value) L.set(lang as String);
+  });
 }

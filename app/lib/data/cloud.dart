@@ -112,9 +112,12 @@ Future<void> set(String col, String id, Rec row) async {
   _check(r);
 }
 
+/// Updates only the given fields of users/demo1, so fields written by the phone call (lang, changedAt) stay.
 Future<void> setUser(Rec row) async {
+  final mask = [for (final k in row.keys) 'updateMask.fieldPaths=${Uri.encodeQueryComponent(k)}'].join('&');
+  final url = Uri.parse('${_uri('/users/$user')}&$mask');
   final r = await http
-      .patch(_uri('/users/$user'), headers: {'Content-Type': 'application/json'}, body: jsonEncode({'fields': _fields(row)}))
+      .patch(url, headers: {'Content-Type': 'application/json'}, body: jsonEncode({'fields': _fields(row)}))
       .timeout(_timeout);
   _check(r);
 }
