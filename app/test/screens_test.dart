@@ -137,4 +137,37 @@ void main() {
     expect(d.expense?['cat'], 'gas');
     expect(understand('kure biriyani', products).sure, isFalse);
   });
+
+  testWidgets('switching language updates the More tab and pages opened on top', (tester) async {
+    L.lang.value = 'ml';
+    tester.view.physicalSize = const Size(360 * 3, 720 * 3);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    void redraw() => redrawAll();
+    L.lang.addListener(redraw);
+    addTearDown(() => L.lang.removeListener(redraw));
+    await tester.pumpWidget(MaterialApp(theme: mitraTheme2(), home: const Shell(start: 4)));
+    await settle(tester);
+    expect(find.text('കൂടുതൽ'), findsWidgets);
+    await tester.tap(find.text('ജിഎസ്ടി, നികുതി'));
+    await settle(tester);
+    L.lang.value = 'en';
+    await settle(tester);
+    expect(find.text('GST & tax'), findsOneWidget, reason: 'the open GST page');
+    Navigator.of(tester.element(find.text('GST & tax'))).pop();
+    await settle(tester);
+    expect(find.text('Monthly report'), findsOneWidget, reason: 'the More tab underneath');
+    expect(find.text('More'), findsWidgets);
+    L.lang.value = 'ml';
+  });
+
+  testWidgets("home has the call me button under today's money", (tester) async {
+    L.lang.value = 'en';
+    await show(tester, const Shell());
+    expect(find.text('Mitra, call me'), findsOneWidget);
+    final money = tester.getTopLeft(find.text('Money received today')).dy;
+    final call = tester.getTopLeft(find.text('Mitra, call me')).dy;
+    final income = tester.getTopLeft(find.text('Add income')).dy;
+    expect(call > money && call < income, isTrue);
+  });
 }
