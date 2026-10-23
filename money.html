@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="ml">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d6b5c">
+  <title>Mitra · Money Health</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main>
+    <div id="top"></div>
+
+    <section class="card hero" aria-live="polite">
+      <div class="label-row">
+        <h2 id="goal-title"></h2>
+        <span class="chip" id="goal-chip"></span>
+      </div>
+      <div class="big-number" id="goal-saved">₹0</div>
+      <div class="en" id="goal-of"></div>
+      <div class="bar" aria-hidden="true"><i id="goal-bar" style="width:0"></i></div>
+      <div class="split">
+        <div><div class="k" id="left-label"></div><div class="v" id="goal-left">₹0</div></div>
+        <div><div class="k" id="ready-label"></div><div class="v" id="goal-ready"></div></div>
+      </div>
+      <p class="goal-share" id="goal-share"></p>
+    </section>
+
+    <section class="card" id="other-goals-card" hidden>
+      <h2 id="other-goals-title"></h2>
+      <div id="other-goals"></div>
+    </section>
+
+    <section class="card">
+      <h2 id="emi-title"></h2>
+      <label class="field" for="emi-input"><span id="emi-help"></span></label>
+      <input id="emi-input" type="number" inputmode="numeric" min="0" step="100" value="2000">
+      <div class="quick" id="emi-quick"></div>
+      <div class="emi-result" id="emi-result" aria-live="polite"></div>
+      <p class="note" id="emi-existing"></p>
+      <p class="note no-loan" id="emi-note"></p>
+    </section>
+
+    <section class="card">
+      <h2 id="gst-title"></h2>
+      <div class="gst-paid">
+        <div><span class="ml" id="gst-paid-label"></span><span class="en" id="gst-paid-sub"></span></div>
+        <div class="big-number" id="gst-paid">₹0</div>
+      </div>
+      <div class="gst-reg">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+          <span id="gst-reg-label"></span>
+          <span class="pill" id="gst-pill"></span>
+        </div>
+        <div class="hbar"><i id="gst-bar" style="width:0"></i></div>
+        <div class="gst-nums">
+          <span><span class="en" id="year-label"></span><b id="year-sales"></b></span>
+          <span style="text-align:right"><span class="en" id="limit-label"></span><b id="gst-limit"></b></span>
+        </div>
+        <p class="note" id="gst-room"></p>
+      </div>
+      <div class="disclaimer" id="gst-disclaimer"></div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { get, listen } from './js/data.js';
+    import { avgMonthlyProfit, worstMonth, fyStart, yearTurnover } from './js/calc.js';
+    import { goalPlan, emiCheck, gstStatus, gstPaid } from './js/money.js';
+    import { ml, en, label, rupees, esc, icon, topbar, renderNav, countTo } from './js/app.js';
+
+    const $ = (id) => document.getElementById(id);
+    const limits = await fetch('data/limits.json').then((r) => r.json());
+    renderNav();
+    $('top').innerHTML = topbar('money_title');
+    $('left-label').textContent = `${ml('goal_left')} · ${en('goal_left')}`;
+    $('ready-label').textContent = `${ml('ready_by')} · ${en('ready_by')}`;
+    $('other-goals-title').innerHTML = label('other_goals');
+    $('emi-title').innerHTML = `<span style="display:flex;gap:8px;align-items:center">${icon('receipt', 20)}<span>${label('emi_title')}</span></span>`;
+    $('emi-help').innerHTML = label('emi_help');
+    $('emi-note').innerHTML = `${icon('heart', 16)} <span><span class="ml">${ml('emi_note')}</span><span class="en">${en('emi_note')}</span></span>`;
+    $('gst-title').innerHTML = `<span style="display:flex;gap:8px;align-items:center">${icon('file', 20)}<span>${label('gst_title')}</span></span>`;
+    $('gst-paid-label').textContent = ml('gst_paid');
+    $('gst-paid-sub').textContent = `${en('gst_paid')} · ${en('gst_paid_sub')}`;
+    $('gst-reg-label').innerHTML = label('gst_reg');
+    $('year-label').textContent = `${ml('year_sales')} · ${en('year_sales')}`;
+    $('limit-label').textContent = `${ml('limit')} · ${en('limit')}`;
+    $('emi-quick').innerHTML = [1000, 2000, 4000, 8000].map((n) =>
+      `<button type="button" data-v="${n}">${rupees(n)}</button>`).join('');
+
+    const MONTHS_ML = ['ജനുവരി', 'ഫെബ്രുവരി', 'മാർച്ച്', 'ഏപ്രിൽ', 'മേയ്', 'ജൂൺ', 'ജൂലൈ', 'ഓഗസ്റ്റ്', 'സെപ്റ്റംബർ', 'ഒക്ടോബർ', 'നവംബർ', 'ഡിസംബർ'];
+    const MONTHS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthName = (m) => ({ ml: MONTHS_ML[Number(m.slice(5, 7)) - 1], en: `${MONTHS_EN[Number(m.slice(5, 7)) - 1]} ${m.slice(0, 4)}` });
+    const pct = (x) => `${Math.round(x * 100)}%`;
+
+    const d = { products: [], bills: [], purchases: [], sales: [], history: [], goals: [] };
+    let avg = 0, worst = 0;
+
+    function renderGoal() {
+      const [goal, ...others] = d.goals;
+      if (!goal) { $('goal-title').innerHTML = label('goal_title'); $('goal-chip').hidden = true; return; }
+      const g = goalPlan(goal, avg);
+      $('goal-title').innerHTML = `<span class="ml">${esc(goal.name_ml)}</span><span class="en">${esc(goal.name_en)} · ${en('goal_title')}</span>`;
+      $('goal-chip').innerHTML = `${icon(g.pct >= 100 ? 'check' : 'up', 14)} ${g.pct}%`;
+      countTo($('goal-saved'), goal.saved);
+      $('goal-of').textContent = `${ml('goal_saved')} · ${en('goal_saved')} / ${rupees(goal.target)}`;
+      $('goal-bar').style.width = `${g.pct}%`;
+      countTo($('goal-left'), g.left);
+      if (g.left === 0) $('goal-ready').innerHTML = `<span class="ml">${ml('goal_done')}</span>`;
+      else if (!g.ready) $('goal-ready').innerHTML = `<span class="en">${en('goal_no_plan')}</span>`;
+      else {
+        const r = monthName(g.ready);
+        $('goal-ready').innerHTML = `${r.ml} <span class="en" style="display:inline">${r.en} · ${g.months} ${en('months_word')}</span>`;
+      }
+      $('goal-share').innerHTML = g.share === null ? '' : `${icon('wallet', 16)} <span>${rupees(goal.monthly)} ${ml('per_month')} = ${ml('goal_share')} ${pct(g.share)}<span class="en">${rupees(goal.monthly)} ${en('per_month').toLowerCase()} = ${pct(g.share)} ${en('goal_share')} (${rupees(avg)})</span></span>`;
+
+      $('other-goals-card').hidden = !others.length;
+      $('other-goals').innerHTML = others.map((o) => {
+        const p = goalPlan(o, avg);
+        return `<div class="item"><div class="grow">
+          <div style="display:flex;justify-content:space-between;gap:8px">
+            <span><span class="ml">${esc(o.name_ml)}</span><span class="en">${esc(o.name_en)} · ${rupees(o.saved)} / ${rupees(o.target)}</span></span>
+            <span class="amount">${p.pct}%</span>
+          </div>
+          <div class="hbar gold"><i style="width:${p.pct}%"></i></div></div></div>`;
+      }).join('');
+    }
+
+    function renderEmi() {
+      const amount = Math.max(0, Number($('emi-input').value) || 0);
+      for (const b of $('emi-quick').children) b.setAttribute('aria-pressed', String(Number(b.dataset.v) === amount));
+      if (!amount || avg <= 0) { $('emi-result').innerHTML = ''; return; }
+      const e = emiCheck(amount, avg, worst);
+      const tone = { ok: 'green', tight: 'gold', risky: 'red' }[e.level];
+      const box = (key, v) => `<div class="${v < 0 ? 'neg' : ''}"><div class="k"><span class="ml">${ml(key)}</span><span class="en">${en(key)}</span></div><div class="v">${rupees(v)}</div></div>`;
+      $('emi-result').innerHTML = `
+        <div class="verdict ${tone}">
+          ${icon(e.level === 'ok' ? 'check' : e.level === 'tight' ? 'sparkle' : 'down', 22)}
+          <div><span class="ml">${ml(`emi_${e.level}`)}</span><span class="en">${en(`emi_${e.level}`)} · ${pct(e.share)} ${en('emi_takes')}</span></div>
+        </div>
+        <div class="emi-split">${box('after_usual', e.afterAvg)}${box('after_worst', e.afterWorst)}</div>`;
+    }
+
+    function renderGst() {
+      const paid = gstPaid(d.purchases, fyStart(), d.history);
+      countTo($('gst-paid'), paid);
+      const s = gstStatus(yearTurnover(d.sales, d.products, d.history, fyStart()), limits);
+      $('gst-pill').className = `pill ${s.needed ? 'red' : 'green'}`;
+      $('gst-pill').innerHTML = `${icon(s.needed ? 'down' : 'check', 14)} ${ml(s.needed ? 'gst_needed' : 'gst_not_needed')}`;
+      $('gst-pill').title = en(s.needed ? 'gst_needed' : 'gst_not_needed');
+      $('gst-bar').style.width = `${Math.max(1, s.pct)}%`;
+      $('year-sales').textContent = rupees(s.turnover);
+      $('gst-limit').textContent = rupees(s.limit);
+      $('gst-room').innerHTML = s.needed ? '' : `${ml('gst_room')} <b>${rupees(s.left)}</b> <span class="en" style="display:inline">· ${rupees(s.left)} ${en('gst_room')} (${s.pct.toFixed(1)}%)</span>`;
+      const g = limits.gst;
+      const check = s.checked
+        ? `${ml('checked_on')} · ${en('checked_on')}: ${esc(g.date_checked)}`
+        : `<span class="warn">${icon('sparkle', 14)} ${ml('not_checked')} · ${en('not_checked')}</span>`;
+      $('gst-disclaimer').innerHTML = `
+        <p><span class="ml">${ml('gst_disclaimer')}</span><span class="en">${en('gst_disclaimer')}</span></p>
+        <p class="en">${check} · <a href="${esc(g.source)}" target="_blank" rel="noopener">gst.gov.in</a></p>`;
+    }
+
+    function render() {
+      avg = avgMonthlyProfit(d.history, 3);
+      const w = worstMonth(d.history);
+      worst = w ? w.income - w.spending : 0;
+      const emis = d.bills.filter((b) => b.type === 'emi');
+      $('emi-existing').innerHTML = emis.length
+        ? `${emis.map((b) => `${esc(b.label_ml ?? b.label_en)} ${rupees(b.amount)}`).join(', ')} <span class="en">${en('emi_existing')}</span>` : '';
+      renderGoal();
+      renderEmi();
+      renderGst();
+    }
+
+    $('emi-input').addEventListener('input', renderEmi);
+    $('emi-quick').addEventListener('click', (e) => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      $('emi-input').value = b.dataset.v;
+      renderEmi();
+    });
+
+    for (const col of Object.keys(d)) listen(col, (rows) => { d[col] = rows; render(); });
+    for (const col of Object.keys(d)) d[col] = await get(col);
+    render();
+  </script>
+</body>
+</html>
