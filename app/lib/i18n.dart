@@ -138,10 +138,8 @@ const _t = <String, (String, String)>{
   'week_n': ('ആഴ്ച {n}', 'Week {n}'),
   'best_sellers': ('കൂടുതൽ വിറ്റത്', 'Best sellers'),
   'last_6_months': ('കഴിഞ്ഞ 6 മാസം', 'Last 6 months'),
-  'monthly_bills_short': ('മാസ ബില്ലുകൾ', 'Monthly bills'),
   'totals_only': ('ഈ മാസത്തിന്റെ ആകെ തുക മാത്രമേ ഉള്ളൂ', 'Only the totals are kept for this month'),
   'see_report': ('മാസ റിപ്പോർട്ട് കാണുക', 'See monthly report'),
-  'share': ('പങ്കിടുക', 'Share'),
 
   // Products
   'add_product': ('പുതിയ സാധനം ചേർക്കുക', 'Add new product'),
@@ -164,7 +162,6 @@ const _t = <String, (String, String)>{
   'didnt_catch': ('മനസ്സിലായില്ല. ഒന്നുകൂടി പറയൂ, അല്ലെങ്കിൽ തിരഞ്ഞെടുക്കൂ.', "Didn't catch that. Say it again, or choose below."),
   'type_instead': ('ടൈപ്പ് ചെയ്യാം', 'Type instead'),
   'no_mic': ('ഈ ഫോണിൽ സംസാരം കിട്ടുന്നില്ല. ടൈപ്പ് ചെയ്യൂ.', "Voice isn't available on this phone. Type instead."),
-  'you_said': ('നിങ്ങൾ പറഞ്ഞത്', 'You said'),
 
   // More
   'more': ('കൂടുതൽ', 'More'),
@@ -198,7 +195,6 @@ const _t = <String, (String, String)>{
   'offline': ('ഓഫ്‌ലൈൻ', 'Offline'),
 
   // Login
-  'welcome': ('സ്വാഗതം', 'Welcome'),
   'phone': ('ഫോൺ നമ്പർ', 'Phone number'),
   'pin': ('4 അക്ക രഹസ്യ നമ്പർ', '4-digit PIN'),
   'login': ('കയറുക', 'Log in'),
@@ -211,12 +207,10 @@ const _t = <String, (String, String)>{
 
   // Bills
   'add_bill': ('ബിൽ ചേർക്കുക', 'Add bill'),
-  'bill_type': ('ഏത് ബിൽ?', 'Which bill?'),
   'due_day': ('അടയ്ക്കേണ്ട ദിവസം', 'Due day of month'),
   'total': ('ആകെ', 'Total'),
 
   // Savings goal + EMI
-  'saved_so_far': ('ഇതുവരെ', 'Saved so far'),
   'per_month': ('ഓരോ മാസവും {amt}', '{amt} every month'),
   'ready_in': ('{n} മാസം കൊണ്ട്', 'in {n} months'),
   'goal_reached': ('ലക്ഷ്യം എത്തി!', 'Goal reached!'),
@@ -246,22 +240,20 @@ const _t = <String, (String, String)>{
   'year_sales': ('ഈ വർഷത്തെ വിൽപ്പന', 'Sales this year'),
   'limit_unchecked': ('പരിധി ഔദ്യോഗിക സൈറ്റിൽ ഇനിയും ഉറപ്പാക്കിയിട്ടില്ല', 'The limit is not yet checked on the official site'),
   'checked_on': ('ഉറപ്പാക്കിയത്', 'Checked on'),
-  'guidance': ('മാർഗ്ഗനിർദ്ദേശം മാത്രം. കുടുംബശ്രീ MEC-യോടോ ടാക്സ് കൺസൾട്ടന്റിനോടോ ഉറപ്പാക്കുക.',
-      'Guidance only. Confirm with your Kudumbashree MEC or a tax consultant.'),
+  'guidance': (
+    'മാർഗ്ഗനിർദ്ദേശം മാത്രം. കുടുംബശ്രീ MEC-യോടോ ടാക്സ് കൺസൾട്ടന്റിനോടോ ഉറപ്പാക്കുക.',
+    'Guidance only. Confirm with your Kudumbashree MEC or a tax consultant.'
+  ),
 
   // Schemes
   'open_schemes': ('ഇപ്പോൾ ചേരാവുന്ന പദ്ധതികൾ', 'Schemes you can join now'),
   'schemes_only': ('പദ്ധതി വാർത്തകൾ മാത്രം', 'Scheme news only'),
   'from_govt': ('സർക്കാരിൽ നിന്ന് പുതിയത്', 'New from the Government'),
   'pib_source': ('PIB · ഔദ്യോഗിക അറിയിപ്പ്', 'PIB · official press release'),
-  'no_scheme_news': ('ഇന്ന് പദ്ധതി വാർത്തകൾ ഇല്ല', 'No scheme news today'),
   'show_all_news': ('എല്ലാ സർക്കാർ വാർത്തകളും കാണുക', 'Show all government news'),
-  'checked_schemes': ('ഉറപ്പാക്കിയ പദ്ധതികൾ', 'Checked schemes'),
   'documents': ('വേണ്ട രേഖകൾ', 'Documents you need'),
   'being_checked': ('ഉറപ്പാക്കിക്കൊണ്ടിരിക്കുന്നു', 'Still being checked'),
   'offline_saved': ('ഇന്റർനെറ്റ് ഇല്ല. അവസാനം കിട്ടിയത്:', 'No internet. Last fetched:'),
-  'cant_load': ('ഇപ്പോൾ ലോഡ് ആകുന്നില്ല', "Can't load right now"),
-  'open': ('തുറക്കുക', 'Open'),
 
   // Bulk
   'women_together': ('{n} പേർ ഒരുമിച്ച്', '{n} women together'),
@@ -270,8 +262,10 @@ const _t = <String, (String, String)>{
   'how_much_need': ('എത്ര വേണം?', 'How much do you need?'),
 
   // Support
-  'support_line': ('ബിസിനസും വീടും ഒരുമിച്ച് നോക്കുന്നത് എളുപ്പമല്ല. സംസാരിക്കാൻ ഒരാളെ വേണമെങ്കിൽ വിളിക്കൂ.',
-      'Running a business and a home is hard. If you want someone to talk to, call.'),
+  'support_line': (
+    'ബിസിനസും വീടും ഒരുമിച്ച് നോക്കുന്നത് എളുപ്പമല്ല. സംസാരിക്കാൻ ഒരാളെ വേണമെങ്കിൽ വിളിക്കൂ.',
+    'Running a business and a home is hard. If you want someone to talk to, call.'
+  ),
 
   // Business details
   'your_name': ('പേര്', 'Name'),
@@ -283,33 +277,50 @@ const _t = <String, (String, String)>{
   'how_profit': ('ലാഭം എങ്ങനെ കാണാം', 'How to see profit'),
   'how_speak': ('പറഞ്ഞ് എങ്ങനെ ചേർക്കാം', 'How to add by speaking'),
   'how_call': ('ഫോൺ വിളിയിലൂടെ', 'Using a phone call'),
-  'how_income_a': ('ഹോമിൽ "വരവ് ചേർക്കുക" തൊടുക. സാധനം തിരഞ്ഞെടുക്കുക, + ഉപയോഗിച്ച് എണ്ണം ആക്കുക, സേവ് ചെയ്യുക.',
-      'On Home, tap "Add income". Pick the item, use + to set how many, then Save.'),
-  'how_expense_a': ('"ചെലവ് ചേർക്കുക" തൊടുക. എന്തിനാണെന്ന് തിരഞ്ഞെടുത്ത് തുക എഴുതി സേവ് ചെയ്യുക.',
-      'Tap "Add expense". Choose what it was for, type the amount, then Save.'),
-  'how_profit_a': ('"എന്റെ ലാഭം" തൊടുക. വരവിൽ നിന്ന് ചെലവും ബില്ലുകളും കുറച്ചതാണ് ലാഭം.',
-      'Tap "My profit". Profit is income minus expenses and bills.'),
-  'how_speak_a': ('താഴെ നടുവിലെ മൈക്ക് തൊടുക. "ഇന്ന് 12 ബിരിയാണി വിറ്റു" എന്ന് പറയുക. ശരിയാണെങ്കിൽ സേവ് ചെയ്യുക.',
-      'Tap the mic in the middle at the bottom. Say "I sold 12 biriyani". If it is right, Save.'),
-  'how_call_a': ('സാധാരണ ഫോണിൽ നിന്നും മിത്രയെ വിളിച്ച് വിൽപ്പന പറയാം. ആപ്പിൽ അത് തനിയെ വരും.',
-      'From any basic phone, call Mitra and say what you sold. It shows up in the app by itself.'),
+  'how_income_a': (
+    'ഹോമിൽ "വരവ് ചേർക്കുക" തൊടുക. സാധനം തിരഞ്ഞെടുക്കുക, + ഉപയോഗിച്ച് എണ്ണം ആക്കുക, സേവ് ചെയ്യുക.',
+    'On Home, tap "Add income". Pick the item, use + to set how many, then Save.'
+  ),
+  'how_expense_a': (
+    '"ചെലവ് ചേർക്കുക" തൊടുക. എന്തിനാണെന്ന് തിരഞ്ഞെടുത്ത് തുക എഴുതി സേവ് ചെയ്യുക.',
+    'Tap "Add expense". Choose what it was for, type the amount, then Save.'
+  ),
+  'how_profit_a': ('"എന്റെ ലാഭം" തൊടുക. വരവിൽ നിന്ന് ചെലവും ബില്ലുകളും കുറച്ചതാണ് ലാഭം.', 'Tap "My profit". Profit is income minus expenses and bills.'),
+  'how_speak_a': (
+    'താഴെ നടുവിലെ മൈക്ക് തൊടുക. "ഇന്ന് 12 ബിരിയാണി വിറ്റു" എന്ന് പറയുക. ശരിയാണെങ്കിൽ സേവ് ചെയ്യുക.',
+    'Tap the mic in the middle at the bottom. Say "I sold 12 biriyani". If it is right, Save.'
+  ),
+  'how_call_a': (
+    'സാധാരണ ഫോണിൽ നിന്നും മിത്രയെ വിളിച്ച് വിൽപ്പന പറയാം. ആപ്പിൽ അത് തനിയെ വരും.',
+    'From any basic phone, call Mitra and say what you sold. It shows up in the app by itself.'
+  ),
 
   // Info texts ("?" buttons)
-  'info_home': ('ഇന്ന് കിട്ടിയ പണം വിൽപ്പനയിൽ നിന്നാണ്. താഴെയുള്ള ബട്ടണുകളിലൂടെ വരവും ചെലവും ചേർക്കാം.',
-      "Money received today comes from today's sales. Use the buttons below to add income and expenses."),
-  'info_profit': ('ലാഭം = വരവ് − (ചെലവ് + മാസ ബില്ലുകൾ). കണക്കുകൂട്ടൽ ഫോണിൽ തന്നെ, കൃത്യമായി.',
-      'Profit = income − (expenses + monthly bills). Worked out exactly on the phone.'),
+  'info_home': (
+    'ഇന്ന് കിട്ടിയ പണം വിൽപ്പനയിൽ നിന്നാണ്. താഴെയുള്ള ബട്ടണുകളിലൂടെ വരവും ചെലവും ചേർക്കാം.',
+    "Money received today comes from today's sales. Use the buttons below to add income and expenses."
+  ),
+  'info_profit': (
+    'ലാഭം = വരവ് − (ചെലവ് + മാസ ബില്ലുകൾ). കണക്കുകൂട്ടൽ ഫോണിൽ തന്നെ, കൃത്യമായി.',
+    'Profit = income − (expenses + monthly bills). Worked out exactly on the phone.'
+  ),
   'info_records': ('ഓരോ വരവും ചെലവും ദിവസം തിരിച്ച്. മായ്ക്കാൻ ഒന്ന് തൊടുക.', 'Every income and expense, day by day. Tap one to delete it.'),
-  'info_products': ('നിങ്ങൾ വിൽക്കുന്നതും വിലയും. വില മാറ്റിയാൽ ഈ മാസത്തെ കണക്കും പുതിയ വിലയിൽ മാറും.',
-      "What you sell and the price. Changing a price also changes this month's totals."),
-  'info_report': ('ഓരോ ആഴ്ചയിലെ വരവും ചെലവും. മാസ ബില്ലുകൾ ആകെ ചെലവിൽ ഉണ്ട്.',
-      'Income and expenses for each week. Monthly bills are included in total expenses.'),
-  'info_gst': ('ജിഎസ്ടി കാൽക്കുലേറ്റർ കണക്ക് മാത്രം ചെയ്യുന്നു. നിരക്ക് നിങ്ങൾ തിരഞ്ഞെടുക്കുന്നു.',
-      'The calculator only does the maths. You choose the rate.'),
-  'info_schemes': ('സർക്കാരിന്റെ ഔദ്യോഗിക അറിയിപ്പുകൾ (PIB) നേരിട്ട്. വായ്പകൾ കാണിക്കില്ല. അപേക്ഷിക്കും മുമ്പ് ഔദ്യോഗിക സൈറ്റിൽ ഉറപ്പാക്കുക.',
-      'Straight from official Government press releases (PIB). Loans are never shown. Check the official site before applying.'),
-  'info_bulk': ('അടുത്തുള്ള സ്ത്രീകൾ ഒരുമിച്ച് ഓർഡർ ചെയ്താൽ മൊത്തവിലയ്ക്ക് സാധനം കിട്ടും.',
-      'When women nearby order together, they get wholesale prices.'),
-  'info_savings': ('ഓരോ മാസവും മാറ്റിവെക്കുന്ന തുകയനുസരിച്ച് ലക്ഷ്യം എപ്പോൾ എത്തും എന്ന് കാണാം. മിത്ര ഒരിക്കലും വായ്പ നിർദ്ദേശിക്കില്ല.',
-      'See when you reach your goal from what you put aside each month. Mitra never suggests loans.'),
+  'info_products': (
+    'നിങ്ങൾ വിൽക്കുന്നതും വിലയും. വില മാറ്റിയാൽ ഈ മാസത്തെ കണക്കും പുതിയ വിലയിൽ മാറും.',
+    "What you sell and the price. Changing a price also changes this month's totals."
+  ),
+  'info_report': (
+    'ഓരോ ആഴ്ചയിലെ വരവും ചെലവും. മാസ ബില്ലുകൾ ആകെ ചെലവിൽ ഉണ്ട്.',
+    'Income and expenses for each week. Monthly bills are included in total expenses.'
+  ),
+  'info_gst': ('ജിഎസ്ടി കാൽക്കുലേറ്റർ കണക്ക് മാത്രം ചെയ്യുന്നു. നിരക്ക് നിങ്ങൾ തിരഞ്ഞെടുക്കുന്നു.', 'The calculator only does the maths. You choose the rate.'),
+  'info_schemes': (
+    'സർക്കാരിന്റെ ഔദ്യോഗിക അറിയിപ്പുകൾ (PIB) നേരിട്ട്. വായ്പകൾ കാണിക്കില്ല. അപേക്ഷിക്കും മുമ്പ് ഔദ്യോഗിക സൈറ്റിൽ ഉറപ്പാക്കുക.',
+    'Straight from official Government press releases (PIB). Loans are never shown. Check the official site before applying.'
+  ),
+  'info_bulk': ('അടുത്തുള്ള സ്ത്രീകൾ ഒരുമിച്ച് ഓർഡർ ചെയ്താൽ മൊത്തവിലയ്ക്ക് സാധനം കിട്ടും.', 'When women nearby order together, they get wholesale prices.'),
+  'info_savings': (
+    'ഓരോ മാസവും മാറ്റിവെക്കുന്ന തുകയനുസരിച്ച് ലക്ഷ്യം എപ്പോൾ എത്തും എന്ന് കാണാം. മിത്ര ഒരിക്കലും വായ്പ നിർദ്ദേശിക്കില്ല.',
+    'See when you reach your goal from what you put aside each month. Mitra never suggests loans.'
+  ),
 };

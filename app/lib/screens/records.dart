@@ -34,8 +34,8 @@ class _RecordsScreenState extends State<RecordsScreen> {
       for (final s in repo['sales']) {
         final p = products[s['product']];
         final qty = (s['qty'] as num?) ?? 0;
-        out.add(_Entry(s, true, 'sales', '${s['date']}', '${s['time'] ?? ''}', '${pick(p, 'name')} ($qty)',
-            qty * ((p?['price'] as num?) ?? 0), s['via'] == 'call' || s['via'] == 'web-call', Icons.arrow_downward_rounded));
+        out.add(_Entry(s, true, 'sales', '${s['date']}', '${s['time'] ?? ''}', '${pick(p, 'name')} ($qty)', qty * ((p?['price'] as num?) ?? 0),
+            s['via'] == 'call' || s['via'] == 'web-call', Icons.arrow_downward_rounded));
       }
     }
     if (filter != 1) {
@@ -86,8 +86,7 @@ class _RecordsScreenState extends State<RecordsScreen> {
     await repo.remove(e.col, row['id']);
     if (!mounted) return;
     say(context, tr('removed'),
-        icon: Icons.delete_outline_rounded,
-        action: SnackBarAction(label: tr('undo'), textColor: K.yellowSoft, onPressed: () => repo.add(e.col, row)));
+        icon: Icons.delete_outline_rounded, action: SnackBarAction(label: tr('undo'), textColor: K.yellowSoft, onPressed: () => repo.add(e.col, row)));
   }
 
   @override
@@ -100,7 +99,8 @@ class _RecordsScreenState extends State<RecordsScreen> {
             days.putIfAbsent(e.date, () => []).add(e);
           }
           return Scaffold(
-            appBar: AppBar(title: Text(tr('records'), style: ts(19, w: FontWeight.w800)), actions: const [InfoButton('info_records'), LangSwitch(), SizedBox(width: 8)]),
+            appBar: AppBar(
+                title: Text(tr('records'), style: ts(19, w: FontWeight.w800)), actions: const [InfoButton('info_records'), LangSwitch(), SizedBox(width: 8)]),
             body: RefreshIndicator(
               onRefresh: repo.syncNow,
               color: K.green,
@@ -121,7 +121,8 @@ class _RecordsScreenState extends State<RecordsScreen> {
                       ),
                     ),
                 ]),
-                if (entries.isEmpty) Padding(padding: const EdgeInsets.all(40), child: Text(tr('nothing_here'), textAlign: TextAlign.center, style: ts(16, c: K.muted))),
+                if (entries.isEmpty)
+                  Padding(padding: const EdgeInsets.all(40), child: Text(tr('nothing_here'), textAlign: TextAlign.center, style: ts(16, c: K.muted))),
                 for (final day in days.entries) ...[
                   Padding(padding: const EdgeInsets.fromLTRB(4, 16, 4, 8), child: Text(_dayLabel(day.key), style: ts(15, w: FontWeight.w700, c: K.muted))),
                   for (final e in day.value)
@@ -132,8 +133,7 @@ class _RecordsScreenState extends State<RecordsScreen> {
                         padding: const EdgeInsets.fromLTRB(12, 10, 14, 10),
                         onTap: () => _remove(e),
                         child: Row(children: [
-                          Bubble(e.byCall ? Icons.call_rounded : e.icon,
-                              color: e.income ? K.green : K.red, bg: e.income ? K.greenSoft : K.redSoft, size: 40),
+                          Bubble(e.byCall ? Icons.call_rounded : e.icon, color: e.income ? K.green : K.red, bg: e.income ? K.greenSoft : K.redSoft, size: 40),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

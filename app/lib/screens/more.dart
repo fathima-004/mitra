@@ -196,8 +196,8 @@ class BillsScreen extends StatelessWidget {
                 decoration: InputDecoration(labelText: tr('due_day')),
               ),
               const SizedBox(height: 16),
-              BigBtn(tr('save'), icon: Icons.check_circle_rounded, color: K.red,
-                  onTap: (int.tryParse(amount.text) ?? 0) > 0 ? () => Navigator.pop(ctx, true) : null),
+              BigBtn(tr('save'),
+                  icon: Icons.check_circle_rounded, color: K.red, onTap: (int.tryParse(amount.text) ?? 0) > 0 ? () => Navigator.pop(ctx, true) : null),
             ]),
           ),
         ),
@@ -205,14 +205,16 @@ class BillsScreen extends StatelessWidget {
     );
     if (ok != true) return;
     final day = int.tryParse(due.text);
-    await repo.add('bills', {
-      'month': thisMonth(),
-      'type': type,
-      'label_ml': L.ml ? tr('cat_$type') : null,
-      'label_en': L.ml ? null : tr('cat_$type'),
-      'amount': int.parse(amount.text),
-      if (day != null && day >= 1 && day <= 31) 'due_day': day,
-    }..removeWhere((k, v) => v == null));
+    await repo.add(
+        'bills',
+        {
+          'month': thisMonth(),
+          'type': type,
+          'label_ml': L.ml ? tr('cat_$type') : null,
+          'label_en': L.ml ? null : tr('cat_$type'),
+          'amount': int.parse(amount.text),
+          if (day != null && day >= 1 && day <= 31) 'due_day': day,
+        }..removeWhere((k, v) => v == null));
     if (context.mounted) say(context, tr('saved'));
   }
 

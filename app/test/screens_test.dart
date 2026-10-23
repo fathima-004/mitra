@@ -127,9 +127,14 @@ void main() {
     final products = repo['products'];
     final a = understand('innu 12 biriyani poyi', products);
     expect(a.sure, isTrue);
-    expect(a.sales, [{'product': 'p1', 'qty': 12}]);
+    expect(a.sales, [
+      {'product': 'p1', 'qty': 12}
+    ]);
     final b = understand('ഇന്ന് 12 ബിരിയാണിയും 30 ചപ്പാത്തിയും വിറ്റു', products);
-    expect(b.sales, [{'product': 'p1', 'qty': 12}, {'product': 'p2', 'qty': 30}]);
+    expect(b.sales, [
+      {'product': 'p1', 'qty': 12},
+      {'product': 'p2', 'qty': 30}
+    ]);
     final c = understand('200 രൂപയ്ക്ക് അരി വാങ്ങി', products);
     expect(c.expense?['cat'], 'ingredients');
     expect(c.expense?['amount'], 200);
