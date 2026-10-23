@@ -20,6 +20,9 @@ const NAV = [
   { key: 'nav_call', href: 'call.html', icon: '📞' },
 ];
 
+// Installable app + offline support on every page that uses app.js.
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+
 export function renderNav() {
   const here = location.pathname.split('/').pop() || 'index.html';
   const nav = document.createElement('nav');
