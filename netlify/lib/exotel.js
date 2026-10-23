@@ -28,8 +28,8 @@ const json = (body, statusCode = 200) => ({
 });
 const forbidden = json({ error: 'forbidden' }, 403);
 
-// Public URL of a Malayalam clip in audio/exotel/ (served by Netlify from the repo).
-const audio = (event, name) => `https://${event.headers.host}/audio/exotel/${name}.mp3`;
+// Public URL of a Malayalam clip (.wav) in audio/exotel/ (served by Netlify from the repo).
+const audio = (event, name) => `https://${event.headers.host}/audio/exotel/${name}.wav`;
 
 // Her products in menu order (Firestore, else the demo file).
 async function products() {

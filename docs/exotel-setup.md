@@ -36,17 +36,24 @@ After adding or changing any of these: Deploys → Trigger deploy → Deploy sit
 4. Trigger a deploy. The app side also needs the project's web config (Hiba: `js/data.js` and the Flutter `--dart-define` values in `app/lib/config.dart`).
 
 ## 2. Build the flow in Exotel App Bazaar
-Create a new app named **Mitra** and add these boxes in order:
+One straight line of boxes (Gathers set to "Configure parameters dynamically by providing a URL"):
 
-| # | Applet | Setting |
-|---|---|---|
-| 1 | **Gather** (programmable, "URL" option) | `https://<site>.netlify.app/.netlify/functions/exotel-gather?ask=product` |
-| 2 | **Gather** (programmable) | `https://<site>.netlify.app/.netlify/functions/exotel-gather?ask=qty` |
-| 3 | **Passthru** (wait for response / sync) | `https://<site>.netlify.app/.netlify/functions/exotel-save` |
-| 4 | **Gather** (programmable) | `https://<site>.netlify.app/.netlify/functions/exotel-gather?ask=done` |
-| 5 | **Hangup** | |
+| # | Applet | URL | Next ("entered digits" / 200 OK) | Other exits |
+|---|---|---|---|---|
+| G1 | Gather | `…/exotel-gather?ask=product` | G2 | Hangup |
+| G2 | Gather | `…/exotel-gather?ask=qty` | P1 | Hangup |
+| P1 | Passthru (not async) | `…/exotel-save` | G3 | Hangup |
+| G3 | Gather | `…/exotel-gather?ask=done` | P2 | Hangup |
+| P2 | Passthru (not async) | `…/exotel-save` | G4 | Hangup |
+| G4 | Gather | `…/exotel-gather?ask=done` | Hangup | Hangup |
 
-Connect each box's "next" (and Passthru's success, error and timeout exits) to the following box. Save. The app id is the number at the end of the flow's page link: put it in `EXOTEL_APP_ID`.
+`…` = `https://<site>.netlify.app/.netlify/functions`. What she hears:
+- G1: "Namaskaram, Mitra. Sales 1, profit 2, talk to someone 3" (Malayalam)
+- 1 → G2 "what did you sell? biriyani 1, …" → G3 "how many? number then #" → P2 saves → G4 "Saved. 12 Biriyani. This month's profit is … rupees."
+- 2 → G2 speaks this month's profit, then the call ends
+- 3 → G2 plays the support message (Tele-MANAS), then the call ends
+
+Fixed sentences are Malayalam clips (`audio/exotel/*.wav`); sentences with numbers are in English. `CALL_LANG=en` in Netlify makes everything English.
 
 ## 3. Use the flow
 - **She calls in:** ExoPhones → your number → set its flow to **Mitra**.
