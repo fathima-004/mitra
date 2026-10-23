@@ -47,7 +47,12 @@ TextStyle ts(double size, {FontWeight w = FontWeight.w600, Color c = K.ink, doub
 
 /// Money and numbers: always the number font.
 TextStyle money(double size, {Color c = K.ink, FontWeight w = FontWeight.w800}) => TextStyle(
-    fontFamily: 'Jakarta', fontSize: size, fontWeight: w, color: c, letterSpacing: -size * .02, height: 1.1,
+    fontFamily: 'Jakarta',
+    fontSize: size,
+    fontWeight: w,
+    color: c,
+    letterSpacing: -size * .02,
+    height: 1.1,
     fontFeatures: const [FontFeature.tabularFigures()]);
 
 ThemeData mitraTheme2() {
@@ -59,8 +64,7 @@ ThemeData mitraTheme2() {
     fontFamilyFallback: const ['Malayalam'],
   );
   return base.copyWith(
-    appBarTheme: const AppBarTheme(
-        backgroundColor: K.bg, surfaceTintColor: Colors.transparent, elevation: 0, centerTitle: true, foregroundColor: K.ink),
+    appBarTheme: const AppBarTheme(backgroundColor: K.bg, surfaceTintColor: Colors.transparent, elevation: 0, centerTitle: true, foregroundColor: K.ink),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: Colors.white,
@@ -119,8 +123,7 @@ class LangSwitch extends StatelessWidget {
                 const Icon(Icons.translate_rounded, size: 17, color: K.green),
                 const SizedBox(width: 5),
                 Text(L.ml ? 'EN' : 'മല',
-                    style: TextStyle(
-                        fontFamily: L.ml ? 'Jakarta' : 'Malayalam', fontSize: 14, fontWeight: FontWeight.w800, color: K.green)),
+                    style: TextStyle(fontFamily: L.ml ? 'Jakarta' : 'Malayalam', fontSize: 14, fontWeight: FontWeight.w800, color: K.green)),
               ]),
             ),
           ),
@@ -173,9 +176,7 @@ class Tint extends StatelessWidget {
           onTap: onTap,
           child: Container(
             padding: padding,
-            decoration: border == null
-                ? null
-                : BoxDecoration(borderRadius: BorderRadius.circular(K.r), border: Border.all(color: border!, width: 1.2)),
+            decoration: border == null ? null : BoxDecoration(borderRadius: BorderRadius.circular(K.r), border: Border.all(color: border!, width: 1.2)),
             child: child,
           ),
         ),
@@ -233,9 +234,7 @@ class BigBtn extends StatelessWidget {
               decoration: outline ? BoxDecoration(borderRadius: BorderRadius.circular(16), border: Border.all(color: color, width: 1.6)) : null,
               child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 if (icon != null) ...[Icon(icon, color: outline ? color : Colors.white, size: 24), const SizedBox(width: 10)],
-                Flexible(
-                    child: Text(label,
-                        textAlign: TextAlign.center, style: ts(18, w: FontWeight.w800, c: outline ? color : Colors.white))),
+                Flexible(child: Text(label, textAlign: TextAlign.center, style: ts(18, w: FontWeight.w800, c: outline ? color : Colors.white))),
               ]),
             ),
           ),
@@ -330,7 +329,8 @@ void say(BuildContext context, String text, {IconData icon = Icons.check_circle_
   ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()
     ..showSnackBar(SnackBar(
-      content: Row(children: [Icon(icon, color: Colors.white, size: 20), const SizedBox(width: 10), Expanded(child: Text(text, style: ts(15, c: Colors.white)))]),
+      content:
+          Row(children: [Icon(icon, color: Colors.white, size: 20), const SizedBox(width: 10), Expanded(child: Text(text, style: ts(15, c: Colors.white)))]),
       action: action,
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
     ));

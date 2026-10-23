@@ -170,8 +170,8 @@ class _SpeakScreenState extends State<SpeakScreen> with SingleTickerProviderStat
               title: '${i['qty']} ${pick(products[i['product']], 'name')}',
               trailing: Text(rupees((i['qty'] as int) * ((products[i['product']]?['price'] as num?) ?? 0)), style: money(16, c: K.green)),
               // Change the number before saving: open the normal form with it filled in.
-              onTap: () => Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (_) => AddIncomeScreen(product: i['product'] as String, qty: i['qty'] as int))),
+              onTap: () => Navigator.of(context)
+                  .pushReplacement(MaterialPageRoute(builder: (_) => AddIncomeScreen(product: i['product'] as String, qty: i['qty'] as int))),
             ),
           const Divider(color: K.line),
           Row(children: [
@@ -213,8 +213,7 @@ class _SpeakScreenState extends State<SpeakScreen> with SingleTickerProviderStat
         const SizedBox(height: 20),
         Center(child: SizedBox(width: 210, height: 210, child: Center(child: _mic()))),
         const SizedBox(height: 10),
-        Text(listening ? tr('listening') : (ready ? tr('tap_to_speak') : tr('no_mic')),
-            textAlign: TextAlign.center, style: ts(22, w: FontWeight.w800)),
+        Text(listening ? tr('listening') : (ready ? tr('tap_to_speak') : tr('no_mic')), textAlign: TextAlign.center, style: ts(22, w: FontWeight.w800)),
         Text(tr('speak_hint'), textAlign: TextAlign.center, style: ts(14.5, w: FontWeight.w500, c: K.muted)),
         if (heard.isNotEmpty) ...[
           const SizedBox(height: 16),
@@ -227,9 +226,13 @@ class _SpeakScreenState extends State<SpeakScreen> with SingleTickerProviderStat
           Text(tr('didnt_catch'), textAlign: TextAlign.center, style: ts(15, c: K.red)),
           const SizedBox(height: 12),
           Row(children: [
-            Expanded(child: BigBtn(tr('add_income'), color: K.green, onTap: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const AddIncomeScreen())))),
+            Expanded(
+                child: BigBtn(tr('add_income'),
+                    color: K.green, onTap: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const AddIncomeScreen())))),
             const SizedBox(width: 10),
-            Expanded(child: BigBtn(tr('add_expense'), color: K.red, onTap: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const AddExpenseScreen())))),
+            Expanded(
+                child: BigBtn(tr('add_expense'),
+                    color: K.red, onTap: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const AddExpenseScreen())))),
           ]),
         ] else
           Tint(

@@ -49,8 +49,7 @@ class MonthPicker extends StatelessWidget {
             icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 28),
             style: ts(17, w: FontWeight.w700),
             items: [
-              for (final m in knownMonths())
-                DropdownMenuItem(value: m, child: Text(m == thisMonth() ? '${tr('this_month')} (${monthName(m)})' : monthName(m))),
+              for (final m in knownMonths()) DropdownMenuItem(value: m, child: Text(m == thisMonth() ? '${tr('this_month')} (${monthName(m)})' : monthName(m))),
             ],
             onChanged: (v) => v == null ? null : onChanged(v),
           ),
@@ -143,8 +142,8 @@ class _ProfitScreenState extends State<ProfitScreen> {
                 for (final tip in tips.take(3)) TipRow(tip),
               ],
               const SizedBox(height: 8),
-              BigBtn(tr('see_report'), icon: Icons.insert_chart_outlined_rounded, color: K.green, outline: true,
-                  onTap: () => push(context, ReportScreen(month: month))),
+              BigBtn(tr('see_report'),
+                  icon: Icons.insert_chart_outlined_rounded, color: K.green, outline: true, onTap: () => push(context, ReportScreen(month: month))),
             ],
           );
         },
@@ -265,7 +264,9 @@ class _ReportScreenState extends State<ReportScreen> {
                   child: Column(children: [
                     _legend(),
                     const SizedBox(height: 8),
-                    _bars([for (final (i, w) in _weeks().indexed) (tr('week_n', {'n': i + 1}), w.$1, w.$2)]),
+                    _bars([
+                      for (final (i, w) in _weeks().indexed) (tr('week_n', {'n': i + 1}), w.$1, w.$2)
+                    ]),
                   ]),
                 ),
                 if (best.isNotEmpty) ...[
@@ -295,8 +296,7 @@ class _ReportScreenState extends State<ReportScreen> {
                   _legend(),
                   const SizedBox(height: 8),
                   _bars([
-                    for (final m in months)
-                      (monthName(m, short: true), monthTotals(m).income, monthTotals(m).spending),
+                    for (final m in months) (monthName(m, short: true), monthTotals(m).income, monthTotals(m).spending),
                   ], height: 170),
                 ]),
               ),

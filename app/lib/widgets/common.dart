@@ -12,8 +12,7 @@ class Bi extends StatelessWidget {
   final Color? color, enColor;
   final FontWeight weight;
   final TextAlign align;
-  const Bi(this.ml, this.en,
-      {super.key, this.size = 16, this.color, this.enColor, this.weight = FontWeight.w600, this.align = TextAlign.start});
+  const Bi(this.ml, this.en, {super.key, this.size = 16, this.color, this.enColor, this.weight = FontWeight.w600, this.align = TextAlign.start});
 
   /// From a ml.json key.
   factory Bi.k(String key, {double size = 16, Color? color, Color? enColor, FontWeight weight = FontWeight.w600, TextAlign align = TextAlign.start}) =>
@@ -76,8 +75,11 @@ class HeroCard extends StatelessWidget {
         ),
         clipBehavior: Clip.antiAlias,
         child: Stack(children: [
-          Positioned(right: -60, top: -60, child: Container(width: 220, height: 220,
-              decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: const Color(0x0DFFFFFF), width: 28)))),
+          Positioned(
+              right: -60,
+              top: -60,
+              child: Container(
+                  width: 220, height: 220, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: const Color(0x0DFFFFFF), width: 28)))),
           if (palm) const Positioned(right: -18, bottom: -6, child: PalmArt()),
           Padding(padding: const EdgeInsets.fromLTRB(20, 22, 20, 26), child: child),
           Positioned(left: 0, right: 0, bottom: 0, child: Container(height: 7, decoration: const BoxDecoration(gradient: C.goldLine))),
@@ -86,53 +88,6 @@ class HeroCard extends StatelessWidget {
     );
   }
 }
-
-/// Money that counts up to its new value.
-class Money extends StatelessWidget {
-  final num value;
-  final TextStyle style;
-  const Money(this.value, {super.key, required this.style});
-
-  @override
-  Widget build(BuildContext context) => TweenAnimationBuilder<double>(
-        tween: Tween(end: value.toDouble()),
-        duration: const Duration(milliseconds: 700),
-        curve: Curves.easeOutCubic,
-        builder: (_, v, __) => Text(rupees(v), style: style),
-      );
-}
-
-/// Thin progress bar.
-class HBar extends StatelessWidget {
-  final double fraction;
-  final Gradient gradient;
-  final Color track;
-  final double height;
-  const HBar(this.fraction,
-      {super.key,
-      this.gradient = const LinearGradient(colors: [C.brand, Color(0xFF2AA58A)]),
-      this.track = C.bg2,
-      this.height = 10});
-
-  @override
-  Widget build(BuildContext context) => ClipRRect(
-        borderRadius: BorderRadius.circular(99),
-        child: Container(
-          height: height,
-          color: track,
-          alignment: Alignment.centerLeft,
-          child: TweenAnimationBuilder<double>(
-            tween: Tween(end: fraction.clamp(0, 1)),
-            duration: const Duration(milliseconds: 800),
-            curve: Curves.easeOutCubic,
-            builder: (_, f, __) => FractionallySizedBox(
-                widthFactor: f, child: Container(decoration: BoxDecoration(gradient: gradient, borderRadius: BorderRadius.circular(99)))),
-          ),
-        ),
-      );
-}
-
-const goldBar = LinearGradient(colors: [C.goldLight, C.gold]);
 
 /// Rounded icon tile.
 class Badge2 extends StatelessWidget {
@@ -164,39 +119,6 @@ class Rows extends StatelessWidget {
             child: children[i],
           ),
       ]);
-}
-
-/// Page title with a back button.
-class TopBar extends StatelessWidget {
-  final String keyName;
-  const TopBar(this.keyName, {super.key});
-
-  @override
-  Widget build(BuildContext context) => Row(children: [
-        if (Navigator.of(context).canPop()) ...[
-          Material(
-            color: C.card,
-            borderRadius: BorderRadius.circular(14),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(14),
-              onTap: () => Navigator.of(context).maybePop(),
-              child: const SizedBox(width: 46, height: 46, child: Icon(Icons.arrow_back_rounded, color: C.ink)),
-            ),
-          ),
-          const SizedBox(width: 14),
-        ],
-        Expanded(child: Bi.k(keyName, size: 24, weight: FontWeight.w800)),
-      ]);
-}
-
-void toast(BuildContext context, String key, {IconData icon = Icons.check_rounded}) {
-  final text = T.ml(key) == key ? key : '${T.ml(key)} · ${T.en(key)}';
-  ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(SnackBar(
-      content: Row(children: [Icon(icon, color: C.goldLight, size: 18), const SizedBox(width: 10), Expanded(child: Text(text))]),
-      margin: const EdgeInsets.fromLTRB(16, 0, 16, 100),
-    ));
 }
 
 /// Primary button: green gradient, Malayalam + English.

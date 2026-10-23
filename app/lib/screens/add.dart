@@ -66,8 +66,7 @@ class _Label extends StatelessWidget {
   final String text;
   const _Label(this.text);
   @override
-  Widget build(BuildContext context) =>
-      Padding(padding: const EdgeInsets.fromLTRB(4, 18, 4, 8), child: Text(text, style: ts(16, w: FontWeight.w700)));
+  Widget build(BuildContext context) => Padding(padding: const EdgeInsets.fromLTRB(4, 18, 4, 8), child: Text(text, style: ts(16, w: FontWeight.w700)));
 }
 
 // ---------------- Income ----------------

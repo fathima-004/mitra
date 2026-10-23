@@ -17,37 +17,49 @@
   </main>
 
   <script type="module">
-    // Schemes come only from data/schemes.json, checked by a person on the official site, with the
-    // source URL and date stored next to each one (CLAUDE.md). Entries without both are not shown.
-    // Never a loan scheme. Owner: Hiba (page), Fathima (content).
+    // Non-loan schemes she can join now. Each entry was checked on the official page, with the source URL and
+    // date stored next to it (CLAUDE.md); entries without both, marked as loans, or past their last date to
+    // apply (open_until) are not shown. Same list as the Flutter app and the phone call:
+    // data/schemes.json if the team adds one, else app/assets/data/schemes.json. Owner: Hiba.
     import { ml, en, esc, topbar, renderNav } from './js/app.js';
+    import { today } from './js/calc.js';
 
     const $ = (id) => document.getElementById(id);
     renderNav();
     $('top').innerHTML = topbar('tile_schemes');
 
     const pick = (r, base, lang) => r[`${base}_${lang}`] ?? r[`${base}_${lang === 'ml' ? 'en' : 'ml'}`] ?? '';
-    const checked = (r) => /^https?:\/\//.test(r.source_url ?? '') && r.date_checked;
+    const both = (r, base) => pick(r, base, 'ml') ? `<span class="ml">${esc(pick(r, base, 'ml'))}</span><span class="en">${esc(pick(r, base, 'en'))}</span>` : '';
+    const open = (r) => /^https?:\/\//.test(r.source_url ?? '') && r.date_checked && r.loan !== true
+      && (r.open_until == null || String(r.open_until) >= today());
 
-    let list = [];
-    try {
-      const res = await fetch('data/schemes.json');
-      if (res.ok) {
-        const data = await res.json();
-        list = (Array.isArray(data) ? data : data.schemes ?? []).filter(checked);
+    async function load() {
+      for (const url of ['data/schemes.json', 'app/assets/data/schemes.json']) {
+        try {
+          const res = await fetch(url);
+          if (!res.ok) continue;
+          const data = await res.json();
+          return (Array.isArray(data) ? data : data.schemes ?? []).filter(open);
+        } catch { /* try the next one */ }
       }
-    } catch { /* missing or offline: show the "being checked" note */ }
+      return [];
+    }
 
+    const list = await load();
+    const line = (icon, html) => html ? `<p class="row" style="justify-content:flex-start;gap:10px"><span aria-hidden="true">${icon}</span><span>${html}</span></p>` : '';
     $('list').innerHTML = list.length ? list.map((s) => `
       <section class="card">
-        <h2><span class="ml">${esc(pick(s, 'title', 'ml'))}</span><span class="en">${esc(pick(s, 'title', 'en'))}</span></h2>
-        ${pick(s, 'about', 'ml') ? `<p><span class="ml">${esc(pick(s, 'about', 'ml'))}</span><span class="en">${esc(pick(s, 'about', 'en'))}</span></p>` : ''}
+        <h2>${both(s, 'title')}</h2>
+        <p>${both(s, 'about')}</p>
+        ${line('₹', both(s, 'cost'))}
+        ${line('👤', both(s, 'who'))}
         ${(s.documents ?? []).length ? `
-          <h3><span class="ml">ആവശ്യമുള്ള രേഖകൾ</span><span class="en">Documents you need</span></h3>
+          <h3><span class="ml">വേണ്ട രേഖകൾ</span><span class="en">Documents you need</span></h3>
           ${s.documents.map((d) => `<label class="item"><input type="checkbox">
-            <span><span class="ml">${esc(typeof d === 'string' ? d : d.ml ?? d.en)}</span><span class="en">${esc(typeof d === 'string' ? '' : d.en ?? '')}</span></span></label>`).join('')}` : ''}
-        <p class="note muted">${ml('checked_on')} · ${en('checked_on')}: ${esc(s.date_checked)}<br>
-          <a href="${esc(s.source_url)}" target="_blank" rel="noopener">${esc(s.source_url)}</a></p>
+            <span><span class="ml">${esc(d.ml ?? d.en ?? d)}</span><span class="en">${esc(d.en ?? '')}</span></span></label>`).join('')}` : ''}
+        ${line('📍', both(s, 'how'))}
+        <p class="note muted">${ml('checked_on')} · ${en('checked_on')}: ${esc(s.date_checked)} ·
+          <a href="${esc(s.source_url)}" target="_blank" rel="noopener">${esc(new URL(s.source_url).host)}</a></p>
       </section>`).join('') : `
       <section class="card">
         <p><span class="ml">പദ്ധതികളുടെ വിവരങ്ങൾ ഔദ്യോഗിക സൈറ്റുകളിൽ ഉറപ്പാക്കിക്കൊണ്ടിരിക്കുന്നു.</span>
