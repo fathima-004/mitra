@@ -166,27 +166,35 @@ export async function get(col) {
   return [...((await store())[col] ?? [])];
 }
 
+// Local writes run one after another. Two saves in the same moment (a bill and a purchase, or
+// "12 biriyani, 30 chapathi" saved together) would otherwise both read the same old copy, and the
+// second write would drop the first one's row. Online, Firestore would repair it; offline, a sale was lost.
+let queue = Promise.resolve();
+function mutate(key, change, fallback) {
+  const run = queue.then(async () => {
+    const s = key === KEY ? await store() : read(key, fallback);
+    const next = change(s) ?? s;
+    write(key, next);
+  });
+  queue = run.catch(() => {});
+  return run;
+}
+
 export async function add(col, obj) {
-  const s = await store();
   const id = obj.id ?? newId();
   const row = { ...obj, id };
-  s[col] = [...(s[col] ?? []), row];
-  write(KEY, s);
+  await mutate(KEY, (s) => { s[col] = [...(s[col] ?? []), row]; });
   sync((instance) => fs.setDoc(fs.doc(instance, 'users', USER, col, id), row));
   return id;
 }
 
 export async function update(col, id, obj) {
-  const s = await store();
-  s[col] = (s[col] ?? []).map((d) => (d.id === id ? { ...d, ...obj, id } : d));
-  write(KEY, s);
+  await mutate(KEY, (s) => { s[col] = (s[col] ?? []).map((d) => (d.id === id ? { ...d, ...obj, id } : d)); });
   sync((instance) => fs.setDoc(fs.doc(instance, 'users', USER, col, id), obj, { merge: true }));
 }
 
 export async function remove(col, id) {
-  const s = await store();
-  s[col] = (s[col] ?? []).filter((d) => d.id !== id);
-  write(KEY, s);
+  await mutate(KEY, (s) => { s[col] = (s[col] ?? []).filter((d) => d.id !== id); });
   sync((instance) => fs.deleteDoc(fs.doc(instance, 'users', USER, col, id)));
 }
 
@@ -250,10 +258,10 @@ export async function getBulk() {
 }
 
 export async function addBulk(obj) {
-  const list = await getBulk();
+  await getBulk(); // refresh the local copy from Firestore when it can be reached
   const id = newId();
   const row = { ...obj, id };
-  write(BULK_KEY, [...list, row]);
+  await mutate(BULK_KEY, (list) => [...list, row], []);
   sync((instance) => fs.setDoc(fs.doc(instance, 'bulk_requests', id), row));
   return id;
 }

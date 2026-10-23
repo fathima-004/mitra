@@ -34,10 +34,11 @@ const t = (key) => `<span class="ml">${T[key][0]}</span><span class="en">${T[key
 let products = [];
 let bills = [];
 let purchases = [];
+let words = []; // her personal words, users/demo1/words
 let pending = null; // items waiting for "yes"
 
 async function load() {
-  [products, bills, purchases] = await Promise.all([get('products'), get('bills'), get('purchases')]);
+  [products, bills, purchases, words] = await Promise.all([get('products'), get('bills'), get('purchases'), get('words')]);
 }
 
 function show(screen) {
@@ -91,14 +92,41 @@ async function saveItems(items) {
   show('home');
 }
 
-function understand() {
+// Free AI backup on the server (PLAN.md §7a step 2). Only demo data is sent. 4.5 s, then the keypad.
+async function askServer(text) {
+  try {
+    const res = await fetch('/.netlify/functions/parse', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, products: products.map(({ id, name_en, name_ml }) => ({ id, name_en, name_ml })) }),
+      signal: AbortSignal.timeout(4500),
+    });
+    return res.ok ? await res.json() : null;
+  } catch {
+    return null; // offline or local server without functions
+  }
+}
+
+let busy = false;
+async function understand() {
   const text = $('text').value.trim();
-  if (!text) return;
-  const result = parse(text, products);
-  if (result.sure) showReadback(result.items);
-  else {
-    $('keypad-note').innerHTML = t('not_sure');
-    showKeypad(result.items);
+  if (!text || busy) return;
+  busy = true;
+  $('understand').disabled = true;
+  try {
+    let result = parse(text, products, { words });
+    if (!result.sure) {
+      const server = await askServer(text);
+      if (server?.sure && Array.isArray(server.items)) result = server;
+    }
+    if (result.sure) showReadback(result.items);
+    else {
+      $('keypad-note').innerHTML = t('not_sure');
+      showKeypad(result.items);
+    }
+  } finally {
+    busy = false;
+    $('understand').disabled = false;
   }
 }
 
