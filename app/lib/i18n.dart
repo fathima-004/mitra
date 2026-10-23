@@ -250,6 +250,8 @@ const _t = <String, (String, String)>{
       'Guidance only. Confirm with your Kudumbashree MEC or a tax consultant.'),
 
   // Schemes
+  'open_schemes': ('ഇപ്പോൾ ചേരാവുന്ന പദ്ധതികൾ', 'Schemes you can join now'),
+  'schemes_only': ('പദ്ധതി വാർത്തകൾ മാത്രം', 'Scheme news only'),
   'from_govt': ('സർക്കാരിൽ നിന്ന് പുതിയത്', 'New from the Government'),
   'pib_source': ('PIB · ഔദ്യോഗിക അറിയിപ്പ്', 'PIB · official press release'),
   'no_scheme_news': ('ഇന്ന് പദ്ധതി വാർത്തകൾ ഇല്ല', 'No scheme news today'),

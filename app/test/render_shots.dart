@@ -60,6 +60,7 @@ void main() {
     'savings': () => const SavingsScreen(),
     'bulk': () => const BulkScreen(),
     'help': () => const HelpScreen(),
+    'schemes': () => const SchemesScreen(),
   };
 
   for (final lang in ['ml', 'en']) {

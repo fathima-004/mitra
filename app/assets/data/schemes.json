@@ -1,0 +1,117 @@
+{
+ "_note": "Non-loan schemes she can join now, each checked on the official page (source_url, date_checked). open_until: last date to apply, or null if open all year. Shown in the app's Government schemes screen. Mitra never lists loans.",
+ "schemes": [
+  {
+   "id": "pmsby",
+   "title_en": "PM Suraksha Bima Yojana (accident insurance)",
+   "title_ml": "പ്രധാനമന്ത്രി സുരക്ഷാ ബീമാ യോജന (അപകട ഇൻഷുറൻസ്)",
+   "about_en": "₹2 lakh for accidental death or total disability, ₹1 lakh for partial disability.",
+   "about_ml": "അപകട മരണത്തിനോ പൂർണ്ണ വൈകല്യത്തിനോ ₹2 ലക്ഷം, ഭാഗിക വൈകല്യത്തിന് ₹1 ലക്ഷം.",
+   "cost_en": "₹20 a year, taken from your bank or post office account.",
+   "cost_ml": "വർഷം ₹20, ബാങ്ക് അല്ലെങ്കിൽ പോസ്റ്റ് ഓഫീസ് അക്കൗണ്ടിൽ നിന്ന് എടുക്കും.",
+   "who_en": "Age 18 to 70, with a bank or post office account.",
+   "who_ml": "18 മുതൽ 70 വയസ്സ് വരെ, ബാങ്ക് അല്ലെങ്കിൽ പോസ്റ്റ് ഓഫീസ് അക്കൗണ്ട് ഉള്ളവർക്ക്.",
+   "documents": [
+    {
+     "en": "Bank or post office savings account",
+     "ml": "ബാങ്ക് അല്ലെങ്കിൽ പോസ്റ്റ് ഓഫീസ് സേവിംഗ്സ് അക്കൗണ്ട്"
+    },
+    {
+     "en": "Enrolment and auto-debit form, at your bank",
+     "ml": "ബാങ്കിലെ ചേരാനുള്ള ഫോം (ഓട്ടോ-ഡെബിറ്റ് സമ്മതം)"
+    }
+   ],
+   "how_en": "Ask at your bank or post office branch. The cover runs from 1 June to 31 May each year.",
+   "how_ml": "നിങ്ങളുടെ ബാങ്കിലോ പോസ്റ്റ് ഓഫീസിലോ ചോദിക്കുക. ഓരോ വർഷവും ജൂൺ 1 മുതൽ മേയ് 31 വരെയാണ് പരിരക്ഷ.",
+   "source_url": "https://jansuraksha.gov.in/Files/PMSBY/English/FAQ.pdf",
+   "date_checked": "2026-10-24",
+   "checked_by": "Mitra team, from the official FAQ",
+   "open_until": null
+  },
+  {
+   "id": "pmjjby",
+   "title_en": "PM Jeevan Jyoti Bima Yojana (life insurance)",
+   "title_ml": "പ്രധാനമന്ത്രി ജീവൻ ജ്യോതി ബീമാ യോജന (ലൈഫ് ഇൻഷുറൻസ്)",
+   "about_en": "₹2 lakh to your family if you die from any cause. For the first 30 days after joining, only accidental death is covered.",
+   "about_ml": "ഏത് കാരണത്താൽ മരിച്ചാലും കുടുംബത്തിന് ₹2 ലക്ഷം. ചേർന്ന് ആദ്യ 30 ദിവസം അപകട മരണത്തിന് മാത്രമാണ് പരിരക്ഷ.",
+   "cost_en": "₹436 a year (less if you join later in the year), taken from your account.",
+   "cost_ml": "വർഷം ₹436 (വർഷത്തിന്റെ പകുതിക്ക് ശേഷം ചേർന്നാൽ കുറവ്), അക്കൗണ്ടിൽ നിന്ന് എടുക്കും.",
+   "who_en": "Age 18 to 50, with a bank or post office account.",
+   "who_ml": "18 മുതൽ 50 വയസ്സ് വരെ, ബാങ്ക് അല്ലെങ്കിൽ പോസ്റ്റ് ഓഫീസ് അക്കൗണ്ട് ഉള്ളവർക്ക്.",
+   "documents": [
+    {
+     "en": "Bank or post office savings account",
+     "ml": "ബാങ്ക് അല്ലെങ്കിൽ പോസ്റ്റ് ഓഫീസ് സേവിംഗ്സ് അക്കൗണ്ട്"
+    },
+    {
+     "en": "Enrolment and auto-debit form, at your bank",
+     "ml": "ബാങ്കിലെ ചേരാനുള്ള ഫോം (ഓട്ടോ-ഡെബിറ്റ് സമ്മതം)"
+    }
+   ],
+   "how_en": "Ask at your bank or post office branch.",
+   "how_ml": "നിങ്ങളുടെ ബാങ്കിലോ പോസ്റ്റ് ഓഫീസിലോ ചോദിക്കുക.",
+   "source_url": "https://jansuraksha.gov.in/Files/PMJJBY/English/FAQ.pdf",
+   "date_checked": "2026-10-24",
+   "checked_by": "Mitra team, from the official FAQ",
+   "open_until": null
+  },
+  {
+   "id": "apy",
+   "title_en": "Atal Pension Yojana (pension)",
+   "title_ml": "അടൽ പെൻഷൻ യോജന (പെൻഷൻ)",
+   "about_en": "A pension of ₹1,000 to ₹5,000 a month after age 60, guaranteed by the Government. You pay a small amount every month until 60.",
+   "about_ml": "60 വയസ്സിന് ശേഷം മാസം ₹1,000 മുതൽ ₹5,000 വരെ പെൻഷൻ, സർക്കാർ ഉറപ്പ്. 60 വയസ്സ് വരെ മാസം ചെറിയ തുക അടയ്ക്കണം.",
+   "cost_en": "Depends on your age and the pension you choose, taken from your account.",
+   "cost_ml": "വയസ്സും തിരഞ്ഞെടുക്കുന്ന പെൻഷനും അനുസരിച്ച്, അക്കൗണ്ടിൽ നിന്ന് എടുക്കും.",
+   "who_en": "Age 18 to 40, with a savings bank account. Ask your bank whether you can join: the rules have changed since they were written.",
+   "who_ml": "18 മുതൽ 40 വയസ്സ് വരെ, സേവിംഗ്സ് ബാങ്ക് അക്കൗണ്ട് ഉള്ളവർക്ക്. ചേരാൻ പറ്റുമോ എന്ന് ബാങ്കിൽ ചോദിക്കുക: നിയമങ്ങളിൽ മാറ്റം വന്നിട്ടുണ്ട്.",
+   "documents": [
+    {
+     "en": "Savings bank account",
+     "ml": "സേവിംഗ്സ് ബാങ്ക് അക്കൗണ്ട്"
+    },
+    {
+     "en": "Application form, at your bank",
+     "ml": "ബാങ്കിലെ അപേക്ഷാ ഫോം"
+    }
+   ],
+   "how_en": "Fill the form at any bank branch.",
+   "how_ml": "ഏത് ബാങ്ക് ശാഖയിലും ഫോം പൂരിപ്പിച്ച് നൽകാം.",
+   "source_url": "https://jansuraksha.gov.in/Files/APY/English/Rules.pdf",
+   "date_checked": "2026-10-24",
+   "checked_by": "Mitra team, from the official rules",
+   "open_until": null
+  },
+  {
+   "id": "udyam",
+   "title_en": "Udyam Registration (free business registration)",
+   "title_ml": "ഉദ്യം രജിസ്ട്രേഷൻ (സൗജന്യ ബിസിനസ് രജിസ്ട്രേഷൻ)",
+   "about_en": "Register your business as a micro enterprise (MSME) with the Government, online.",
+   "about_ml": "നിങ്ങളുടെ ബിസിനസ് ചെറുകിട സംരംഭമായി (MSME) സർക്കാരിൽ ഓൺലൈനായി രജിസ്റ്റർ ചെയ്യാം.",
+   "cost_en": "Free. No fee is to be paid to anyone.",
+   "cost_ml": "സൗജന്യം. ആർക്കും പണം നൽകേണ്ടതില്ല.",
+   "who_en": "Anyone running a small business.",
+   "who_ml": "ചെറിയ ബിസിനസ് നടത്തുന്ന ആർക്കും.",
+   "documents": [
+    {
+     "en": "Aadhaar number",
+     "ml": "ആധാർ നമ്പർ"
+    },
+    {
+     "en": "PAN",
+     "ml": "പാൻ കാർഡ്"
+    },
+    {
+     "en": "GSTIN, only if you have to have one",
+     "ml": "ജിഎസ്ടി നമ്പർ (വേണ്ടവർക്ക് മാത്രം)"
+    }
+   ],
+   "how_en": "Only on udyamregistration.gov.in, the one official site. Nothing to upload. The District Industries Centre can help.",
+   "how_ml": "udyamregistration.gov.in എന്ന ഒരേയൊരു ഔദ്യോഗിക സൈറ്റിൽ മാത്രം. ഒന്നും അപ്‌ലോഡ് ചെയ്യേണ്ട. ജില്ലാ വ്യവസായ കേന്ദ്രം സഹായിക്കും.",
+   "source_url": "https://udyamregistration.gov.in/",
+   "date_checked": "2026-10-24",
+   "checked_by": "Mitra team, from the official site",
+   "open_until": null
+  }
+ ]
+}

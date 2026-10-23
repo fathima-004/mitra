@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 import '../config.dart';
+import '../data/services.dart';
 import '../i18n.dart';
 import '../logic/calc.dart';
 import '../logic/insights.dart';
@@ -73,6 +74,10 @@ class HomeScreen extends StatelessWidget {
                     ]),
                   ]),
                 ),
+                const SizedBox(height: 10),
+
+                // Mitra rings her phone: she says what she sold, the app fills in by itself.
+                const CallMeButton(),
                 const SizedBox(height: 12),
 
                 // Four big buttons
@@ -157,7 +162,7 @@ class _GoalStrip extends StatelessWidget {
         Row(children: [
           const Bubble(Icons.flag_rounded, color: K.purple, bg: K.purpleSoft, size: 42),
           const SizedBox(width: 12),
-          Expanded(child: Text(pick(goal, 'name').split(' (').first, style: ts(15.5, w: FontWeight.w700))),
+          Expanded(child: Text(tr('savings'), style: ts(15.5, w: FontWeight.w700))),
           Text('${g.pct}%', style: money(20, c: K.purple)),
         ]),
         const SizedBox(height: 10),
@@ -252,4 +257,41 @@ class TipRow extends StatelessWidget {
       ),
     );
   }
+}
+
+class CallMeButton extends StatefulWidget {
+  const CallMeButton({super.key});
+  @override
+  State<CallMeButton> createState() => _CallMeButtonState();
+}
+
+class _CallMeButtonState extends State<CallMeButton> {
+  bool busy = false;
+
+  Future<void> _call() async {
+    setState(() => busy = true);
+    final ok = await callMe();
+    if (!mounted) return;
+    setState(() => busy = false);
+    say(context, tr(ok ? 'call_started' : 'call_unavailable'), icon: Icons.call_rounded);
+  }
+
+  @override
+  Widget build(BuildContext context) => Box(
+        onTap: busy ? null : _call,
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+        child: Row(children: [
+          const Bubble(Icons.call_rounded, color: Colors.white, bg: K.green, size: 46),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(tr(busy ? 'calling' : 'call_me'), style: ts(16.5, w: FontWeight.w800, c: K.greenDark)),
+              Text(tr('call_me_sub'), style: ts(13, w: FontWeight.w500, c: K.muted)),
+            ]),
+          ),
+          busy
+              ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5, color: K.green))
+              : const Icon(Icons.arrow_forward_rounded, color: K.green),
+        ]),
+      );
 }
