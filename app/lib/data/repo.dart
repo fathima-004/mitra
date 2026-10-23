@@ -5,6 +5,7 @@
 // to Firestore. Changes made offline wait in an outbox and are sent when the connection returns.
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -39,6 +40,7 @@ class Repo extends ChangeNotifier with WidgetsBindingObserver {
   Timer? _timer;
   bool _disposed = false;
   bool _pulledAll = false;
+  Object? _changedAt; // users/demo1.changedAt last seen; the phone call bumps it on every change
   bool _active = true;
 
   List<Rec> operator [](String col) => data[col] ?? const [];
@@ -122,7 +124,12 @@ class Repo extends ChangeNotifier with WidgetsBindingObserver {
     await ensureDemoToday(); // after the reset, so Firestore gets these too
   }
 
-  String _newId(String col) => '${col.substring(0, 1)}${DateTime.now().microsecondsSinceEpoch}';
+  // Time + a counter + random letters: two saves in the same instant (several items from one sentence,
+  // or a coarse phone clock) must never get the same id, or the second would overwrite the first.
+  static int _seq = 0;
+  static final _rand = Random();
+  String _newId(String col) =>
+      '${col.substring(0, 1)}${DateTime.now().microsecondsSinceEpoch}${(_seq++ % 1000).toString().padLeft(3, '0')}${_rand.nextInt(1 << 20).toRadixString(36)}';
 
   Future<String> add(String col, Rec obj) async {
     final id = (obj['id'] as String?) ?? _newId(col);
@@ -240,13 +247,21 @@ class Repo extends ChangeNotifier with WidgetsBindingObserver {
     final wasOnline = online;
     try {
       await _flush();
+      // A send started earlier (while offline) may have just failed: try once more with a fresh one.
+      if (_outbox.isNotEmpty) await _flush();
       // Never let Firestore overwrite changes that haven't reached it yet.
       if (_outbox.isNotEmpty) {
         online = false;
         return;
       }
       if (_pulledAll) {
-        await _pullToday();
+        // One read: has the phone call (or anyone) changed something other than today's sales?
+        final remoteUser = await cloud.getUser();
+        if (remoteUser != null && remoteUser['changedAt'] != _changedAt) {
+          await _pullAll();
+        } else {
+          await _pullToday();
+        }
       } else {
         await _pullAll();
       }
@@ -267,6 +282,7 @@ class Repo extends ChangeNotifier with WidgetsBindingObserver {
       _pulledAll = true;
       return;
     }
+    _changedAt = remoteUser['changedAt'];
     final lists = await Future.wait([for (final c in collections) cloud.list(c)]);
     final remoteBulk = await cloud.list('bulk_requests');
     final before = _ids(this['sales']);

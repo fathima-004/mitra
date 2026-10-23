@@ -185,4 +185,41 @@ void main() {
       repo.dispose();
     }, () => MockClient(fs.handle));
   });
+
+  test('a change made on the phone call (not a sale) shows up after the next check', () async {
+    final fs = FakeFirestore();
+    await http.runWithClient(() async {
+      final repo = Repo();
+      await repo.init();
+      await repo.syncNow(); // seeds
+      await repo.syncNow(); // full pull
+      // The call saves an expense and stamps users/demo1.changedAt.
+      fs.docs['$root/users/demo1/purchases/callx1'] = {
+        'id': {'stringValue': 'callx1'},
+        'date': {'stringValue': todayIso()},
+        'item': {'stringValue': 'Gas'},
+        'cat': {'stringValue': 'gas'},
+        'amount': {'integerValue': '900'},
+        'via': {'stringValue': 'call'},
+      };
+      fs.docs['$root/users/demo1']!['changedAt'] = {'stringValue': '2026-10-24T10:00:00Z'};
+      await repo.syncNow();
+      expect(repo['purchases'].any((p) => p['id'] == 'callx1' && p['amount'] == 900), isTrue);
+      repo.dispose();
+    }, () => MockClient(fs.handle));
+  });
+
+  test('many saves in the same instant all keep their own row', () async {
+    SharedPreferences.setMockInitialValues({});
+    final fs = FakeFirestore();
+    await http.runWithClient(() async {
+      final repo = Repo();
+      await repo.init();
+      final before = repo['sales'].length;
+      await Future.wait([for (var i = 0; i < 20; i++) repo.add('sales', {'date': todayIso(), 'product': 'p1', 'qty': 1, 'via': 'app'})]);
+      expect(repo['sales'].length, before + 20);
+      expect(repo['sales'].map((s) => s['id']).toSet().length, repo['sales'].length);
+      repo.dispose();
+    }, () => MockClient(fs.handle));
+  });
 }
