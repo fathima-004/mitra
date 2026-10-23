@@ -27,8 +27,36 @@
         <div class="item"><span class="badge tone-gold" data-i="trend"></span><div class="grow"><span class="ml" data-t="join_b2"></span><span class="en" data-e="join_b2"></span></div></div>
         <div class="item"><span class="badge tone-rose" data-i="heart"></span><div class="grow"><span class="ml" data-t="join_b3"></span><span class="en" data-e="join_b3"></span></div></div>
       </div>
-      <button class="btn primary" data-next><span class="ml" data-t="join_start"></span><span class="en" data-e="join_start"></span></button>
-      <p class="note center"><span class="ml" data-t="join_basic"></span><span class="en" data-e="join_basic"></span></p>
+      <div class="card need">
+        <h2><span class="ml" data-t="join_need"></span><span class="en" data-e="join_need"></span></h2>
+        <ul class="need-list">
+          <li class="yes"><span data-i="check"></span><span><span class="ml" data-t="need_phone"></span><span class="en" data-e="need_phone"></span></span></li>
+          <li class="yes"><span data-i="check"></span><span><span class="ml" data-t="need_name"></span><span class="en" data-e="need_name"></span></span></li>
+          <li class="yes"><span data-i="check"></span><span><span class="ml" data-t="need_sell"></span><span class="en" data-e="need_sell"></span></span></li>
+        </ul>
+        <div class="no-list" id="no-list"></div>
+      </div>
+
+      <h2 class="section-title"><span class="ml" data-t="join_how_join"></span><span class="en" data-e="join_how_join"></span></h2>
+      <div class="paths">
+        <button class="path" data-next>
+          <span class="path-ic tone-teal" data-i="home"></span>
+          <span><span class="ml" data-t="path_app"></span><span class="en" data-e="path_app"></span></span>
+          <span class="go" data-i="arrow"></span>
+        </button>
+        <button class="path gold" id="path-call">
+          <span class="path-ic tone-gold" data-i="phone"></span>
+          <span><span class="ml" data-t="path_call"></span><span class="en" data-e="path_call"></span></span>
+          <span class="go" data-i="arrow"></span>
+        </button>
+      </div>
+
+      <div class="card login">
+        <h2><span class="ml" data-t="login_title"></span><span class="en" data-e="login_title"></span></h2>
+        <div class="item"><span class="badge tone-teal" data-i="home"></span><div class="grow"><span class="ml" data-t="login_app"></span><span class="en" data-e="login_app"></span></div></div>
+        <div class="item"><span class="badge tone-gold" data-i="phone"></span><div class="grow"><span class="ml" data-t="login_call"></span><span class="en" data-e="login_call"></span></div></div>
+        <div class="item"><span class="badge tone-rose" data-i="users"></span><div class="grow"><span class="ml" data-t="login_help"></span><span class="en" data-e="login_help"></span></div></div>
+      </div>
     </section>
 
     <!-- 2. Phone number + code -->
@@ -105,8 +133,31 @@
         <div class="item"><span class="rank">2</span><div class="grow"><span class="ml" data-t="join_how2"></span><span class="en" data-e="join_how2"></span></div></div>
         <div class="item"><span class="rank">3</span><div class="grow"><span class="ml" data-t="join_how3"></span><span class="en" data-e="join_how3"></span></div></div>
       </div>
+      <div class="card login">
+        <h2><span class="ml" data-t="login_title"></span><span class="en" data-e="login_title"></span></h2>
+        <div class="item"><span class="badge tone-teal" data-i="home"></span><div class="grow"><span class="ml" data-t="login_app"></span><span class="en" data-e="login_app"></span></div></div>
+        <div class="item"><span class="badge tone-gold" data-i="phone"></span><div class="grow"><span class="ml" data-t="login_call"></span><span class="en" data-e="login_call"></span></div></div>
+      </div>
       <a class="btn primary" href="index.html"><span class="ml" data-t="join_open"></span><span class="en" data-e="join_open"></span></a>
       <p class="note center"><span data-e="join_demo_end"></span></p>
+    </section>
+
+    <!-- 7. Join by a phone call (basic phone) -->
+    <section class="step" data-step="6" hidden>
+      <h1><span class="ml" data-t="path_call"></span><span class="en" data-e="call_sub"></span></h1>
+      <div class="callphone">
+        <div class="call-head">
+          <span class="call-av" data-i="phone"></span>
+          <div class="grow"><b>മിത്ര · Mitra</b><span id="call-state"></span></div>
+          <span class="call-time" id="call-time">00:00</span>
+        </div>
+        <div class="call-log" id="call-log" aria-live="polite"></div>
+        <div class="call-actions">
+          <button class="btn gold" id="call-play"></button>
+          <button class="btn small" id="call-skip"></button>
+        </div>
+      </div>
+      <button class="btn primary" id="call-done" hidden><span class="ml" data-t="call_see"></span><span class="en" data-e="call_see"></span></button>
     </section>
 
     <button class="btn small" id="back" hidden></button>
@@ -148,16 +199,21 @@
 
     const me = { kind: 'food', picked: new Map(), goal: null, lang: 'ml' };
 
-    // Steps
+    $('no-list').innerHTML = ['need_no_email', 'need_no_password', 'need_no_docs', 'need_no_bank'].map((k) =>
+      `<span class="no">${icon('x', 14)} ${ml(k)} <span class="en">${en(k)}</span></span>`).join('');
+
+    // Steps: 0 welcome, 1–4 app sign-up, 5 ready, 6 join by call
+    const DONE = 5, CALL = 6;
     const steps = [...document.querySelectorAll('.step')];
     let at = 0;
-    $('dots').innerHTML = steps.map(() => '<i></i>').join('');
+    $('dots').innerHTML = steps.slice(0, DONE + 1).map(() => '<i></i>').join('');
     function go(n) {
       at = Math.max(0, Math.min(steps.length - 1, n));
       steps.forEach((s, i) => { s.hidden = i !== at; });
       [...$('dots').children].forEach((d, i) => d.classList.toggle('on', i <= at));
-      $('back').hidden = at === 0 || at === steps.length - 1;
-      if (at === steps.length - 1) renderDone();
+      $('dots').hidden = at === CALL || (at === DONE && me.via === 'call');
+      $('back').hidden = at === 0 || at === DONE;
+      if (at === DONE) renderDone();
       scrollTo({ top: 0, behavior: 'smooth' });
     }
     document.addEventListener('click', (e) => {
@@ -166,7 +222,73 @@
       if (b.hasAttribute('data-skip-goal')) me.goal = null;
       go(at + 1);
     });
-    $('back').addEventListener('click', () => go(at - 1));
+    $('back').addEventListener('click', () => { if (at === CALL) stopCall(); go(at === CALL ? 0 : at - 1); });
+    $('path-call').addEventListener('click', () => { resetCall(); go(CALL); });
+
+    // Join by call: replay of the sign-up call, with the recorded Malayalam voice clips
+    const call = await fetch('data/join_call.json').then((r) => r.json());
+    let playing = 0, timer = null, secs = 0, audio = null;
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    const playClip = (id, fallbackMs) => new Promise((done) => {
+      audio = new Audio(`audio/join/${id}.mp3`);
+      const end = () => { clearTimeout(t); done(); };
+      const t = setTimeout(end, 12000);
+      audio.onended = end;
+      audio.onerror = () => { clearTimeout(t); setTimeout(done, fallbackMs); };
+      audio.play().catch(() => { clearTimeout(t); setTimeout(done, fallbackMs); });
+    });
+    function bubble(line) {
+      const el = document.createElement('div');
+      if (line.who === 'key') el.className = 'cl key', el.innerHTML = `${icon('phone', 14)} <b>${esc(line.v)}</b>`;
+      else if (line.who === 'sys') el.className = 'cl sys', el.innerHTML = `<span class="ml">${esc(line.ml)}</span><span class="en">${esc(line.en)}</span>`;
+      else if (line.who === 'sms') el.className = 'cl sms', el.innerHTML = `<span class="sms-tag">SMS</span><span class="ml">${esc(line.ml)}</span><span class="en">${esc(line.en)}</span>`;
+      else el.className = `cl ${line.who}`, el.innerHTML = `<span class="ml">${esc(line.ml)}</span><span class="en">${esc(line.en)}</span>`;
+      $('call-log').append(el);
+      el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      return el;
+    }
+    function setState(key) { $('call-state').textContent = `${ml(key)} · ${en(key)}`; }
+    function resetCall() {
+      stopCall();
+      $('call-log').innerHTML = '';
+      secs = 0; $('call-time').textContent = '00:00';
+      setState('call_ready');
+      $('call-play').innerHTML = `${icon('phone', 18)} ${ml('call_play')} · ${en('call_play')}`;
+      $('call-play').hidden = false;
+      $('call-skip').innerHTML = `${ml('call_skip')} · ${en('call_skip')}`;
+      $('call-done').hidden = true;
+      $('call-skip').hidden = false;
+    }
+    function stopCall() { playing++; clearInterval(timer); audio?.pause(); }
+    async function runCall(fast) {
+      const run = ++playing;
+      $('call-log').innerHTML = '';
+      $('call-play').hidden = true;
+      clearInterval(timer);
+      secs = 0;
+      timer = setInterval(() => { secs++; $('call-time').textContent = `00:${String(secs).padStart(2, '0')}`.slice(-5); }, 1000);
+      setState('call_live');
+      for (const line of call.lines) {
+        if (run !== playing) return;
+        const el = bubble(line);
+        if (fast) continue;
+        if (line.id) { el.classList.add('talking'); await playClip(line.id, 900 + line.ml.length * 40); el.classList.remove('talking'); await sleep(250); }
+        else await sleep(line.who === 'key' ? 700 : 1400);
+      }
+      if (run !== playing) return;
+      clearInterval(timer);
+      setState('call_ended');
+      const r = call.result;
+      Object.assign(me, { via: 'call', name: r.name, district: r.district, phoneShown: r.phone, goal: null });
+      me.picked = new Map(r.products.map((p) => [p.en, p]));
+      $('call-skip').hidden = true;
+      $('call-done').hidden = false;
+      $('call-done').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+    $('call-play').addEventListener('click', () => runCall(false));
+    $('call-skip').addEventListener('click', () => { stopCall(); runCall(true); });
+    $('call-done').addEventListener('click', () => go(DONE));
+    resetCall();
 
     // Phone + demo code (no SMS is sent in the demo)
     $('phone').addEventListener('input', (e) => { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10); });
@@ -237,11 +359,12 @@
     $('goal-amount').addEventListener('input', (e) => { if (me.goal) me.goal.target = Number(e.target.value) || 0; });
 
     function renderDone() {
-      const name = $('name').value.trim() || 'Sheela';
-      const d = DISTRICTS.find((x) => x[1] === $('district').value);
+      const byCall = me.via === 'call';
+      const name = byCall ? me.name : $('name').value.trim() || 'Sheela';
+      const d = DISTRICTS.find((x) => x[1] === (byCall ? me.district : $('district').value));
       $('welcome-name').innerHTML = `<span class="ml">${ml('join_welcome')}, ${esc(name)}!</span><span class="en">${en('join_welcome')}, ${esc(name)}!</span>`;
       const rows = [
-        ['phone', `+91 ${esc($('phone').value)}`, ''],
+        ['phone', byCall ? esc(me.phoneShown) : `+91 ${esc($('phone').value)}`, byCall ? `${en('joined_by_call')} · PIN ••••` : en('joined_by_app')],
         ['pin', d[0], d[1]],
         ['box', [...me.picked.values()].map((p) => esc(p.ml)).join(', '), [...me.picked.values()].map((p) => `${esc(p.en)} ${rupees(p.price)}`).join(' · ')],
       ];

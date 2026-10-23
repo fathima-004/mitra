@@ -36,3 +36,10 @@ call.html now understands sentences with word lists in js/parse.js (PLAN.md §7a
 - "sold" words (vittu, poyi, വിറ്റു)
 - Number words (ഒന്ന്, രണ്ട്, twelve, ...) and fillers to ignore (innu, ഇന്ന്)
 Also: call.html uses its own short Malayalam and English labels in js/call.js (the T table). Please check those wordings when you have a moment.
+
+**23 Oct night, Fathima → Hiba: join and login by phone call (optional, only after the Must items work)**
+`join.html` now shows judges how a woman joins. One path is "basic phone: join by calling Mitra". It plays a recorded example call (script in `data/join_call.json`, clips in `audio/join/`, made with `tools/make_join_audio.py`). For now it's only a replay. If you have time after the demo call works, the real version would be:
+- `voice`: if the caller's number (`From`) isn't a known user → play `audio/join/j1.mp3` ("this number is new, press 1 to join").
+- Ask name → place → products with prices (speech, read back, 1 = right / 2 = wrong) → 4-digit PIN by keypad → save a user keyed by her phone number → SMS welcome.
+- Login next time: known `From` number → "Namaskaram <name>" → ask the PIN → menu.
+If there's no time, we keep it as the replay plus a pitch line. No change is needed in your files for the demo.
