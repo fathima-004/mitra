@@ -65,3 +65,7 @@ The app (`app/`) now has the Firestore link (REST, no google-services.json), Pro
    - support: `{ "helplines": [{ "name_ml", "name_en", "number", "about_ml", "about_en", "source_url", "date_checked" }] }`
 3. **`tools/sync_app_assets.py`**: please add `schemes.json` and `support.json` to its list, so the app gets them.
 A few new labels are written inline in my pages (for example "Documents you need"). Move them into `ml.json` whenever you like.
+
+**24 Oct, Hiba → Fathima: full phone menu for Exotel, on branch `hiba/exotel-full-call`**
+One call can now do everything the app does, by keypad: add sales and expenses (with undo), hear profit and the monthly report, add savings, add bills, hear GST paid, hear scheme news, join a buy-together group, change a price, and hear a summary of all changes at the end. Every change is saved to Firestore at once with `via:"call"` and stamps `users/demo1.changedAt`, and the Flutter app reloads within 4 seconds.
+It's two new functions in a looped flow (Gather `exotel-ivr?do=ask` → Passthru `exotel-ivr?do=hear` → back), set out in `docs/exotel-full-call.md`. It only adds new files (`netlify/functions/exotel-ivr.js`, `netlify/lib/ivr*.js`); your `exotel-gather` / `exotel-save` flow is untouched. Try it without a phone: `node netlify/lib/ivr-sim.js 1 1 12 0 0`. Please merge it if you're happy, since these files are yours. Prompts are English text-to-speech for now, because they speak live numbers.
