@@ -1,0 +1,24 @@
+{
+  "_note": "EXAMPLE sign-up call for the join demo (join.html). Mitra lines and her replies are pre-recorded with tools/make_join_audio.py into audio/join/<id>.mp3. Ramla is not a real person.",
+  "lines": [
+    { "who": "sys", "ml": "റംല ഒരു സാധാരണ ഫോണിൽ നിന്ന് മിത്രയുടെ നമ്പറിലേക്ക് വിളിക്കുന്നു", "en": "Ramla calls Mitra's number from a basic phone" },
+    { "who": "mitra", "id": "j1", "ml": "നമസ്കാരം! ഞാൻ മിത്ര. ഈ നമ്പർ പുതിയതാണ്. മിത്രയിൽ ചേരാൻ ഒന്ന് അമർത്തുക.", "en": "Hello! I'm Mitra. This number is new. Press 1 to join Mitra." },
+    { "who": "key", "v": "1" },
+    { "who": "mitra", "id": "j2", "ml": "നിങ്ങളുടെ പേര് പറയൂ.", "en": "Please say your name." },
+    { "who": "her", "id": "h2", "ml": "റംല", "en": "Ramla" },
+    { "who": "mitra", "id": "j3", "ml": "റംല, ഏത് സ്ഥലത്താണ്?", "en": "Ramla, where do you live?" },
+    { "who": "her", "id": "h3", "ml": "മലപ്പുറം", "en": "Malappuram" },
+    { "who": "mitra", "id": "j4", "ml": "എന്തൊക്കെയാണ് വിൽക്കുന്നത്? വിലയും പറയൂ.", "en": "What do you sell? Say the price too." },
+    { "who": "her", "id": "h4", "ml": "ബിരിയാണി നൂറു രൂപ, ചപ്പാത്തി എട്ടു രൂപ", "en": "Biriyani 100 rupees, chapathi 8 rupees" },
+    { "who": "mitra", "id": "j5", "ml": "ബിരിയാണി നൂറു രൂപ, ചപ്പാത്തി എട്ടു രൂപ. ശരിയാണെങ്കിൽ ഒന്ന്, തെറ്റാണെങ്കിൽ രണ്ട് അമർത്തുക.", "en": "Biriyani ₹100, chapathi ₹8. Press 1 if right, 2 if wrong." },
+    { "who": "key", "v": "1" },
+    { "who": "mitra", "id": "j6", "ml": "ഇനി നിങ്ങൾക്ക് മാത്രം അറിയാവുന്ന ഒരു നാലക്ക രഹസ്യ നമ്പർ അമർത്തുക.", "en": "Now press a 4-digit secret PIN that only you know." },
+    { "who": "key", "v": "••••" },
+    { "who": "mitra", "id": "j7", "ml": "ചേർന്നു! ഇനി ഈ ഫോണിൽ നിന്ന് വിളിച്ചാൽ മിത്ര നിങ്ങളെ തിരിച്ചറിയും. ഒരു എസ് എം എസും വരും.", "en": "You're in! When you call from this phone, Mitra will know it's you. You'll also get an SMS." },
+    { "who": "sms", "ml": "മിത്രയിലേക്ക് സ്വാഗതം, റംല! വിറ്റത് പറയാൻ ഈ നമ്പറിൽ വിളിക്കൂ.", "en": "Welcome to Mitra, Ramla! Call this number to tell Mitra what you sold." }
+  ],
+  "result": {
+    "name": "Ramla", "name_ml": "റംല", "district": "Malappuram", "phone": "+91 98•••• ••10",
+    "products": [ { "ml": "ബിരിയാണി", "en": "Biriyani", "price": 100 }, { "ml": "ചപ്പാത്തി", "en": "Chapathi", "price": 8 } ]
+  }
+}
