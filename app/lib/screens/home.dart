@@ -1,310 +1,254 @@
+// Home: today's money, four big buttons, this month in one line. Owner: Hiba.
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
+import '../config.dart';
+import '../i18n.dart';
 import '../logic/calc.dart';
 import '../logic/insights.dart';
 import '../logic/money.dart';
 import '../main.dart';
-import '../strings.dart';
-import '../theme.dart';
-import '../widgets/art.dart';
-import '../widgets/common.dart';
-import '../widgets/insight_tile.dart';
-import '../config.dart';
-import 'call.dart';
-import 'join.dart';
+import '../strings.dart' show rupees;
+import '../ui/kit.dart';
+import 'add.dart';
 import 'more.dart';
-import 'setup.dart';
+import 'profit.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: repo,
-      builder: (context, _) {
-        final user = repo.user;
-        final month = thisMonth();
-        final m = monthProfit(repo['sales'], repo['products'], repo['bills'], repo['purchases'], month);
-        final todays = repo['sales'].where((s) => s['date'] == today()).toList();
-        final list = insights(repo.data).take(2).toList();
-        final shell = Shell.of(context);
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: repo,
+        builder: (context, _) {
+          final todays = repo['sales'].where((s) => s['date'] == today()).toList();
+          final income = salesIncome(todays, repo['products']);
+          final m = monthProfit(repo['sales'], repo['products'], repo['bills'], repo['purchases'], thisMonth());
+          final goal = repo['goals'].firstOrNull;
+          final tips = insights(repo.data).toList();
+          final name = L.ml ? (repo.user['name_ml'] ?? repo.user['name']) : (repo.user['name'] ?? repo.user['name_ml']);
 
-        return SafeArea(
-          bottom: false,
-          // Swipe down to check Firestore now (PLAN.md §11: if the live update fails, refresh).
-          child: RefreshIndicator(
-            onRefresh: repo.syncNow,
-            color: C.brand,
-            child: ListView(physics: const AlwaysScrollableScrollPhysics(), padding: const EdgeInsets.fromLTRB(16, 12, 16, 120), children: [
-              // Hello
-              Row(children: [
-                Container(
-                  width: 54,
-                  height: 54,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: const LinearGradient(colors: [C.goldLight, C.gold]),
-                    border: Border.all(color: Colors.white, width: 3),
+          return SafeArea(
+            child: RefreshIndicator(
+              onRefresh: repo.syncNow,
+              color: K.green,
+              child: ListView(physics: const AlwaysScrollableScrollPhysics(), padding: const EdgeInsets.fromLTRB(16, 10, 16, 24), children: [
+                // Header
+                Row(children: [
+                  const Bubble(Icons.eco_rounded, color: Colors.white, bg: K.green, size: 44),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text(tr('app_name'), style: ts(22, w: FontWeight.w800, h: 1.1)),
+                      Text(tr('tagline'), style: ts(13, w: FontWeight.w500, c: K.muted)),
+                    ]),
                   ),
-                  child: Text('${user['name_ml'] ?? 'M'}'.characters.first,
-                      style: const TextStyle(fontFamily: 'Malayalam', fontSize: 20, fontWeight: FontWeight.w800, color: C.brandDeep)),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Bi('${T.ml('hello')}, ${user['name_ml'] ?? ''}', '${T.en('hello')}, ${user['name'] ?? ''}', size: 21, weight: FontWeight.w800),
-                    Row(children: [
-                      const Icon(Icons.location_on_outlined, size: 14, color: C.muted),
-                      const SizedBox(width: 3),
-                      Text('${user['place_ml'] ?? ''} · ${user['place'] ?? ''}', style: const TextStyle(fontSize: 13, color: C.muted)),
-                    ]),
-                  ]),
-                ),
-                const Text('MITRA', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: 2, color: C.brand, fontSize: 13)),
-              ]),
-              const SizedBox(height: 16),
-
-              // This month's profit
-              HeroCard(
-                onTap: () => shell?.go(3),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Expanded(child: Bi.k('month_profit', size: 15, color: Colors.white, enColor: Colors.white70, weight: FontWeight.w700)),
-                    const _LiveChip(),
-                  ]),
-                  const SizedBox(height: 8),
-                  Money(m.profit, style: numStyle(46, color: m.profit >= 0 ? Colors.white : const Color(0xFFFFD2C7))),
-                  const SizedBox(height: 12),
-                  HBar(m.income > 0 ? m.profit / m.income : 0, gradient: goldBar, track: const Color(0x26FFFFFF), height: 8),
-                  const SizedBox(height: 14),
-                  Row(children: [
-                    Expanded(child: _Split('income', m.income, C.mint)),
-                    const SizedBox(width: 10),
-                    Expanded(child: _Split('spending', m.spending, C.goldLight)),
-                  ]),
+                  if (cloudConfigured) _LiveDot(online: repo.online),
+                  _Bell(count: tips.length, onTap: () => showTips(context, tips)),
                 ]),
-              ),
-              const SizedBox(height: 14),
+                const SizedBox(height: 18),
+                Text('${tr('hello')}, $name 👋', style: ts(18, w: FontWeight.w600, c: K.muted)),
+                Text(tr('todays_business'), style: ts(26, w: FontWeight.w800)),
+                const SizedBox(height: 12),
 
-              // Savings goal on the road
-              if (repo['goals'].isNotEmpty) _GoalRoad(repo['goals'].first, onTap: () => shell?.go(4)),
-              if (repo['goals'].isNotEmpty) const SizedBox(height: 14),
-
-              // Today's sales
-              MCard(
-                onTap: () => shell?.go(1),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Row(children: [
-                    const Badge2(Icons.receipt_long_rounded, bg: C.goldSoft, fg: Color(0xFF9A6F0E), size: 50),
-                    const SizedBox(width: 14),
-                    Expanded(
-                        child: Bi(T.ml('today_sales'),
-                            todays.isEmpty ? T.en('no_sales_today') : '${todays.fold<num>(0, (n, s) => n + s['qty'])} ${T.en('items_sold')}',
-                            size: 16, weight: FontWeight.w700)),
-                    Money(salesIncome(todays, repo['products']), style: numStyle(28)),
-                  ]),
-                  if (todays.isNotEmpty) ...[
-                    const SizedBox(height: 12),
-                    Wrap(spacing: 8, runSpacing: 8, children: [
-                      for (final p in repo['products'])
-                        if (todays.any((s) => s['product'] == p['id']))
-                          Container(
-                            padding: const EdgeInsets.fromLTRB(6, 4, 12, 4),
-                            decoration: BoxDecoration(color: C.bg, borderRadius: BorderRadius.circular(99), border: Border.all(color: C.line)),
-                            child: Row(mainAxisSize: MainAxisSize.min, children: [
-                              FoodArt(p, size: 26),
-                              const SizedBox(width: 6),
-                              Text('${todays.where((s) => s['product'] == p['id']).fold<num>(0, (n, s) => n + s['qty'])} ',
-                                  style: const TextStyle(fontWeight: FontWeight.w800, color: C.brand)),
-                              Text(p['name_ml'], style: const TextStyle(fontFamily: 'Malayalam', fontWeight: FontWeight.w600)),
-                            ]),
-                          ),
-                    ]),
-                  ],
-                ]),
-              ),
-              const SizedBox(height: 14),
-
-              // Mitra, call me
-              const CallMeCard(),
-              const SizedBox(height: 14),
-
-              // Everything else: products and bills, schemes, buy together, support
-              const _Tiles(),
-              const SizedBox(height: 14),
-
-              // Mitra noticed
-              if (list.isNotEmpty)
-                MCard(
+                // Money received today
+                Tint(
+                  color: K.greenSoft,
+                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
+                  onTap: () => Shell.of(context)?.go(1),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    const IconTitle(Icons.auto_awesome_rounded, 'noticed_title'),
-                    Rows([for (final i in list) InsightTile(i)]),
-                    TextButton.icon(
-                      onPressed: () => shell?.go(3),
-                      icon: const Icon(Icons.arrow_forward_rounded, size: 16),
-                      label: Text('${T.ml('see_all')} · ${T.en('see_all')}'),
+                    Text(tr('money_today'), style: ts(16, w: FontWeight.w600, c: K.greenDark)),
+                    const SizedBox(height: 4),
+                    TweenAnimationBuilder<double>(
+                      tween: Tween(end: income.toDouble()),
+                      duration: const Duration(milliseconds: 600),
+                      builder: (_, v, __) => Text(rupees(v), style: money(40, c: K.greenDark)),
                     ),
+                    const SizedBox(height: 4),
+                    Row(children: [
+                      Icon(todays.isEmpty ? Icons.schedule_rounded : Icons.arrow_upward_rounded, size: 18, color: K.green),
+                      const SizedBox(width: 4),
+                      Text(todays.isEmpty ? tr('no_sales_yet') : tr('from_sales', {'n': todays.length}),
+                          style: ts(14.5, w: FontWeight.w600, c: K.green)),
+                    ]),
                   ]),
                 ),
-              const SizedBox(height: 18),
+                const SizedBox(height: 12),
 
-              Center(
-                child: Wrap(alignment: WrapAlignment.center, children: [
-                  TextButton.icon(
-                    onPressed: () async {
-                      await repo.loadDemo();
-                      if (context.mounted) toast(context, 'reset_done', icon: Icons.restart_alt_rounded);
-                    },
-                    icon: const Icon(Icons.restart_alt_rounded, size: 16, color: C.muted),
-                    label: Text('${T.ml('reset_demo')} · ${T.en('reset_demo')}', style: const TextStyle(color: C.muted)),
-                  ),
-                  TextButton.icon(
-                    onPressed: () async {
-                      (await SharedPreferences.getInstance()).setBool('joined', false);
-                      if (context.mounted) Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const JoinScreen()));
-                    },
-                    icon: const Icon(Icons.group_outlined, size: 16, color: C.muted),
-                    label: Text('${T.ml('join_link')} · ${T.en('join_link')}', style: const TextStyle(color: C.muted)),
-                  ),
-                ]),
-              ),
-            ]),
-          ),
-        );
-      },
-    );
-  }
-}
+                // Four big buttons
+                GridView.count(
+                  crossAxisCount: 2,
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  physics: const NeverScrollableScrollPhysics(),
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 1.08,
+                  children: [
+                    _Tile(Icons.add_rounded, 'add_income', 'add_income_sub', K.green, K.greenSoft,
+                        () => push(context, const AddIncomeScreen())),
+                    _Tile(Icons.shopping_bag_rounded, 'add_expense', 'add_expense_sub', K.red, K.redSoft,
+                        () => push(context, const AddExpenseScreen())),
+                    _Tile(Icons.inventory_2_rounded, 'my_products', 'my_products_sub', K.blue, K.blueSoft, () => Shell.of(context)?.go(3)),
+                    _Tile(Icons.bar_chart_rounded, 'my_profit', 'my_profit_sub', K.yellow, K.yellowSoft,
+                        () => push(context, const ProfitScreen())),
+                  ],
+                ),
+                const SizedBox(height: 12),
 
-class _LiveChip extends StatelessWidget {
-  const _LiveChip();
-  // Listens itself: this chip is const, so Home rebuilding would skip it.
-  @override
-  Widget build(BuildContext context) => ListenableBuilder(listenable: repo, builder: (context, _) => _chip());
-
-  Widget _chip() {
-    // Green "Live" when the Firestore link works (or the app is phone-only by design), grey when it is down.
-    final live = !cloudConfigured || repo.online;
-    final color = live ? C.mint : Colors.white60;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(color: const Color(0x24FFFFFF), borderRadius: BorderRadius.circular(99)),
-      child: Row(mainAxisSize: MainAxisSize.min, children: [
-        Container(width: 7, height: 7, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-        const SizedBox(width: 6),
-        Text(live ? T.en('live') : 'Offline', style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 12)),
-      ]),
-    );
-  }
-}
-
-class _Tiles extends StatelessWidget {
-  const _Tiles();
-
-  static final _items = <(String, IconData, Color, Color, Widget Function())>[
-    ('tile_setup', Icons.inventory_2_outlined, C.goldSoft, const Color(0xFF9A6F0E), () => const SetupScreen()),
-    ('tile_schemes', Icons.description_outlined, C.brandSoft, C.brand, () => const SchemesScreen()),
-    ('tile_bulk', Icons.groups_outlined, C.amberSoft, const Color(0xFF9A5B0E), () => const BulkScreen()),
-    ('tile_support', Icons.favorite_outline_rounded, C.roseSoft, C.red, () => const SupportScreen()),
-  ];
-
-  @override
-  Widget build(BuildContext context) => GridView.count(
-        padding: EdgeInsets.zero, // no extra safe-area gap inside the page list
-        crossAxisCount: 2,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        childAspectRatio: 1.45,
-        children: [
-          for (final (key, icon, bg, fg, page) in _items)
-            MCard(
-              padding: const EdgeInsets.all(14),
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => page())),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Badge2(icon, bg: bg, fg: fg, size: 40),
-                const Spacer(),
-                Bi(T.ml(key), T.en(key), size: 14.5, weight: FontWeight.w700),
+                // This month, one line
+                Box(
+                  onTap: () => push(context, const ProfitScreen()),
+                  padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+                  child: Row(children: [
+                    const Bubble(Icons.calendar_month_rounded, color: K.yellow, bg: K.yellowSoft, size: 42),
+                    const SizedBox(width: 12),
+                    Expanded(child: Text(tr('this_month_profit'), style: ts(15.5, w: FontWeight.w700))),
+                    Text(rupees(m.profit), style: money(20, c: m.profit >= 0 ? K.green : K.red)),
+                    const Icon(Icons.chevron_right_rounded, color: K.muted),
+                  ]),
+                ),
+                if (goal != null) ...[
+                  const SizedBox(height: 10),
+                  _GoalStrip(goal),
+                ],
               ]),
             ),
-        ],
+          );
+        },
       );
 }
 
-class _Split extends StatelessWidget {
-  final String keyName;
-  final num value;
-  final Color dot;
-  const _Split(this.keyName, this.value, this.dot);
+void push(BuildContext context, Widget page) => Navigator.of(context).push(MaterialPageRoute(builder: (_) => page));
+
+class _Tile extends StatelessWidget {
+  final IconData icon;
+  final String title, sub;
+  final Color color, bg;
+  final VoidCallback onTap;
+  const _Tile(this.icon, this.title, this.sub, this.color, this.bg, this.onTap);
 
   @override
-  Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(color: const Color(0x1AFFFFFF), borderRadius: BorderRadius.circular(14)),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            Container(width: 7, height: 7, decoration: BoxDecoration(color: dot, shape: BoxShape.circle)),
-            const SizedBox(width: 6),
-            Flexible(
-                child: Text('${T.ml(keyName)} · ${T.en(keyName)}',
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontFamily: 'Jakarta', fontFamilyFallback: fonts, color: Colors.white70, fontSize: 12))),
-          ]),
+  Widget build(BuildContext context) => Tint(
+        color: bg,
+        onTap: onTap,
+        padding: const EdgeInsets.all(12),
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Bubble(icon, color: Colors.white, bg: color, size: 54),
+          const SizedBox(height: 10),
+          Text(tr(title), textAlign: TextAlign.center, maxLines: 2, style: ts(17, w: FontWeight.w800, c: color, h: 1.15)),
           const SizedBox(height: 2),
-          Money(value, style: numStyle(18, color: Colors.white)),
+          Text(tr(sub), textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(13, w: FontWeight.w500, c: K.muted)),
         ]),
       );
 }
 
-/// The auto drives towards the flag as she saves.
-class _GoalRoad extends StatelessWidget {
+class _GoalStrip extends StatelessWidget {
   final Map<String, dynamic> goal;
-  final VoidCallback onTap;
-  const _GoalRoad(this.goal, {required this.onTap});
+  const _GoalStrip(this.goal);
 
   @override
   Widget build(BuildContext context) {
     final g = goalPlan(goal, avgMonthlyProfit(repo['history'], 3));
-    return MCard(
-      onTap: onTap,
-      padding: const EdgeInsets.fromLTRB(18, 16, 18, 12),
+    return Box(
+      onTap: () => push(context, const SavingsScreen()),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Text('${goal['name_ml']} ', style: const TextStyle(fontFamily: 'Malayalam', fontWeight: FontWeight.w700, fontSize: 16)),
-          Text('${g.pct}%', style: numStyle(17, color: C.brand)),
+          const Bubble(Icons.flag_rounded, color: K.purple, bg: K.purpleSoft, size: 42),
+          const SizedBox(width: 12),
+          Expanded(child: Text(pick(goal, 'name').split(' (').first, style: ts(15.5, w: FontWeight.w700))),
+          Text('${g.pct}%', style: money(20, c: K.purple)),
         ]),
-        Text('${(goal['name_en'] as String).split(' (').first} · ${rupees(goal['saved'])} / ${rupees(goal['target'])}',
-            style: const TextStyle(color: C.muted, fontSize: 13)),
-        SizedBox(
-          height: 78,
-          child: LayoutBuilder(builder: (context, box) {
-            final road = box.maxWidth - 92;
-            return Stack(children: [
-              Positioned(left: 0, right: 92, bottom: 6, child: HBar(g.pct / 100, gradient: C.goldLine, track: C.line, height: 6)),
-              TweenAnimationBuilder<double>(
-                tween: Tween(end: g.pct / 100),
-                duration: const Duration(milliseconds: 1200),
-                curve: Curves.easeOutCubic,
-                builder: (_, f, child) => Positioned(left: (road - 92).clamp(0, double.infinity) * f, bottom: 8, child: child!),
-                child: AutoArt(pct: g.pct.toDouble(), width: 92),
-              ),
-              Positioned(
-                right: 0,
-                bottom: 0,
-                child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                  const Icon(Icons.flag_rounded, color: C.gold, size: 24),
-                  Text(rupees(g.left), style: numStyle(16)),
-                  Text(T.ml('goal_left'), style: const TextStyle(fontFamily: 'Malayalam', fontSize: 11, color: C.muted)),
-                ]),
-              ),
-            ]);
-          }),
+        const SizedBox(height: 10),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: LinearProgressIndicator(value: g.pct / 100, minHeight: 10, backgroundColor: K.purpleSoft, color: K.purple),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          [tr('goal_left', {'amt': rupees(g.left)}), if (g.ready != null && g.left > 0) tr('ready_by', {'when': monthName(g.ready!)})].join(' · '),
+          style: ts(13.5, w: FontWeight.w500, c: K.muted),
         ),
       ]),
+    );
+  }
+}
+
+class _LiveDot extends StatelessWidget {
+  final bool online;
+  const _LiveDot({required this.online});
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(right: 4),
+        child: Row(children: [
+          Container(width: 8, height: 8, decoration: BoxDecoration(color: online ? K.green : K.muted, shape: BoxShape.circle)),
+          const SizedBox(width: 4),
+          Text(tr(online ? 'live' : 'offline'), style: ts(12, c: online ? K.green : K.muted)),
+        ]),
+      );
+}
+
+class _Bell extends StatelessWidget {
+  final int count;
+  final VoidCallback onTap;
+  const _Bell({required this.count, required this.onTap});
+  @override
+  Widget build(BuildContext context) => IconButton(
+        tooltip: tr('mitra_noticed'),
+        onPressed: onTap,
+        icon: Badge(
+          isLabelVisible: count > 0,
+          label: Text('$count'),
+          backgroundColor: K.red,
+          child: const Icon(Icons.notifications_none_rounded, size: 28, color: K.ink),
+        ),
+      );
+}
+
+/// "Mitra noticed": the tips, in a sheet (they are not needed on the home page itself).
+void showTips(BuildContext context, List<Insight> tips) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+    builder: (_) => SafeArea(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * .75),
+        child: ListView(shrinkWrap: true, padding: const EdgeInsets.fromLTRB(20, 18, 20, 20), children: [
+          Text(tr('mitra_noticed'), style: ts(20, w: FontWeight.w800)),
+          const SizedBox(height: 10),
+          if (tips.isEmpty) Text(tr('nothing_here'), style: ts(15, c: K.muted)),
+          for (final t in tips) TipRow(t),
+        ]),
+      ),
+    ),
+  );
+}
+
+class TipRow extends StatelessWidget {
+  final Insight tip;
+  const TipRow(this.tip, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final (color, bg) = switch (tip.tone) {
+      InsightTone.leaf => (K.green, K.greenSoft),
+      InsightTone.gold => (K.yellow, K.yellowSoft),
+      InsightTone.rose => (K.red, K.redSoft),
+      _ => (K.blue, K.blueSoft),
+    };
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Tint(
+        color: bg,
+        padding: const EdgeInsets.all(14),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Icon(Icons.auto_awesome_rounded, color: color),
+          const SizedBox(width: 12),
+          Expanded(child: Text(L.ml ? tip.ml : tip.en, style: ts(15, w: FontWeight.w600, h: 1.45))),
+        ]),
+      ),
     );
   }
 }

@@ -149,6 +149,13 @@ class Repo extends ChangeNotifier with WidgetsBindingObserver {
     _queue({'op': 'delete', 'col': col, 'id': id});
   }
 
+  /// Her name and place (users/demo1).
+  Future<void> setUser(Rec changes) async {
+    user = {...user, ...changes};
+    await _save();
+    _queue({'op': 'user', 'col': 'users', 'id': 'demo1', 'row': user});
+  }
+
   /// A request on the buy-together board (bulk_requests).
   Future<String> addBulk(Rec obj) async {
     final id = _newId('bulk');
@@ -180,7 +187,9 @@ class Repo extends ChangeNotifier with WidgetsBindingObserver {
     while (_outbox.isNotEmpty) {
       final op = _outbox.first;
       try {
-        if (op['op'] == 'delete') {
+        if (op['op'] == 'user') {
+          await cloud.setUser(Map<String, dynamic>.from(op['row'] as Map));
+        } else if (op['op'] == 'delete') {
           await cloud.delete(op['col'], op['id']);
         } else {
           await cloud.set(op['col'], op['id'], Map<String, dynamic>.from(op['row'] as Map));

@@ -3,43 +3,63 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'data/repo.dart';
-import 'screens/call.dart';
-import 'screens/daily.dart';
+import 'i18n.dart';
 import 'screens/home.dart';
-import 'screens/join.dart';
-import 'screens/money.dart';
-import 'screens/profit.dart';
+import 'screens/login.dart';
+import 'screens/more.dart';
+import 'screens/products.dart';
+import 'screens/records.dart';
+import 'screens/speak.dart';
 import 'strings.dart';
-import 'theme.dart';
-import 'widgets/common.dart';
+import 'ui/kit.dart';
 
 final repo = Repo();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Future.wait([T.load(), repo.init()]);
-  final joined = (await SharedPreferences.getInstance()).getBool('joined') ?? false;
+  await Future.wait([T.load(), L.load(), repo.init()]);
+  final prefs = await SharedPreferences.getInstance();
+  final loggedIn = (prefs.getBool('loggedIn') ?? false) || (prefs.getBool('joined') ?? false);
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(statusBarColor: Colors.transparent, statusBarIconBrightness: Brightness.dark));
-  runApp(MitraApp(joined: joined));
+  runApp(MitraApp(loggedIn: loggedIn));
 }
 
 class MitraApp extends StatelessWidget {
-  final bool joined;
-  const MitraApp({super.key, required this.joined});
+  final bool loggedIn;
+  const MitraApp({super.key, required this.loggedIn});
 
   @override
-  Widget build(BuildContext context) => MaterialApp(
-        title: 'Mitra',
-        debugShowCheckedModeBanner: false,
-        theme: mitraTheme(),
-        // On the web build, ?tab=3 opens a tab directly (handy for screenshots and the projector).
-        home: joined || Uri.base.queryParameters.containsKey('tab')
-            ? Shell(start: int.tryParse(Uri.base.queryParameters['tab'] ?? '') ?? 0)
-            : const JoinScreen(),
+  Widget build(BuildContext context) => ValueListenableBuilder(
+        valueListenable: L.lang,
+        builder: (_, __, ___) => MaterialApp(
+          title: 'Mitra',
+          debugShowCheckedModeBanner: false,
+          theme: mitraTheme2(),
+          // On the web build, ?tab=1 opens a tab directly (screenshots, the projector).
+          home: loggedIn || Uri.base.queryParameters.containsKey('tab')
+              ? Shell(start: int.tryParse(Uri.base.queryParameters['tab'] ?? '') ?? 0)
+              : const LoginScreen(),
+        ),
       );
 }
 
-/// The five tabs with a raised round call button in the middle.
+Future<void> logIn(BuildContext context) async {
+  (await SharedPreferences.getInstance()).setBool('loggedIn', true);
+  if (context.mounted) {
+    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_) => const Shell()), (_) => false);
+  }
+}
+
+Future<void> logOut(BuildContext context) async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setBool('loggedIn', false);
+  await prefs.setBool('joined', false);
+  if (context.mounted) {
+    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_) => const LoginScreen()), (_) => false);
+  }
+}
+
+/// Home, Records, Speak (the big mic), Products, More.
 class Shell extends StatefulWidget {
   final int start;
   const Shell({super.key, this.start = 0});
@@ -51,12 +71,19 @@ class Shell extends StatefulWidget {
 }
 
 class ShellState extends State<Shell> {
-  late int tab = widget.start;
-  void go(int i) => setState(() => tab = i);
+  late int tab = widget.start.clamp(0, 4);
+
+  void go(int i) {
+    if (i == 2) {
+      openSpeak(context);
+      return;
+    }
+    setState(() => tab = i);
+  }
 
   // A sale saved by the phone call arrived from Firestore: say so, wherever she is in the app.
   void _onCallSale() {
-    if (mounted) toast(context, 'added_by_call', icon: Icons.call_rounded);
+    if (mounted) say(context, tr('added_by_call'), icon: Icons.call_rounded);
   }
 
   @override
@@ -73,31 +100,26 @@ class ShellState extends State<Shell> {
 
   static const _items = [
     ('nav_home', Icons.home_outlined, Icons.home_rounded),
-    ('nav_daily', Icons.receipt_long_outlined, Icons.receipt_long_rounded),
-    ('nav_call', Icons.call_rounded, Icons.call_rounded),
-    ('nav_profit', Icons.trending_up_rounded, Icons.trending_up_rounded),
-    ('nav_money', Icons.account_balance_wallet_outlined, Icons.account_balance_wallet_rounded),
+    ('nav_records', Icons.receipt_long_outlined, Icons.receipt_long_rounded),
+    ('nav_speak', Icons.mic_rounded, Icons.mic_rounded),
+    ('nav_products', Icons.inventory_2_outlined, Icons.inventory_2_rounded),
+    ('nav_more', Icons.menu_rounded, Icons.menu_rounded),
   ];
 
   @override
   Widget build(BuildContext context) {
-    const pages = [HomeScreen(), DailyScreen(), CallScreen(), ProfitScreen(), MoneyScreen()];
+    const pages = [HomeScreen(), RecordsScreen(), SizedBox(), ProductsScreen(), MoreScreen()];
     return Scaffold(
-      extendBody: true,
       body: IndexedStack(index: tab, children: pages),
-      bottomNavigationBar: SafeArea(
-        child: Container(
-          margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-          padding: const EdgeInsets.all(6),
-          decoration: BoxDecoration(
-            color: C.card.withValues(alpha: .96),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: C.line),
-            boxShadow: const [BoxShadow(color: Color(0x4017231F), blurRadius: 30, offset: Offset(0, 12), spreadRadius: -10)],
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(color: Colors.white, border: Border(top: BorderSide(color: K.line))),
+        child: SafeArea(
+          child: SizedBox(
+            height: 78,
+            child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+              for (var i = 0; i < _items.length; i++) Expanded(child: _navItem(i)),
+            ]),
           ),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-            for (var i = 0; i < _items.length; i++) Expanded(child: _navItem(i)),
-          ]),
         ),
       ),
     );
@@ -107,43 +129,33 @@ class ShellState extends State<Shell> {
     final (key, off, on) = _items[i];
     final selected = tab == i;
     if (i == 2) {
-      return GestureDetector(
-        onTap: () => go(i),
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Transform.translate(
-            offset: const Offset(0, -22),
-            child: Container(
-              width: 58,
-              height: 58,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: const LinearGradient(colors: [C.brand, C.brandDeep], begin: Alignment.topLeft, end: Alignment.bottomRight),
-                border: Border.all(color: C.bg, width: 5),
-                boxShadow: const [BoxShadow(color: Color(0x99062F29), blurRadius: 20, offset: Offset(0, 10), spreadRadius: -6)],
-              ),
-              child: const Icon(Icons.call_rounded, color: Colors.white, size: 26),
+      return InkWell(
+        onTap: () => go(2),
+        child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+          Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              color: K.green,
+              shape: BoxShape.circle,
+              boxShadow: [BoxShadow(color: K.green.withValues(alpha: .35), blurRadius: 14, offset: const Offset(0, 4))],
             ),
+            child: const Icon(Icons.mic_rounded, color: Colors.white, size: 30),
           ),
-          Transform.translate(
-              offset: const Offset(0, -18),
-              child: Text(T.ml(key), style: const TextStyle(fontFamily: 'Malayalam', fontSize: 11.5, fontWeight: FontWeight.w700, color: C.brand))),
+          const SizedBox(height: 2),
+          Text(tr(key), maxLines: 1, style: ts(12, w: FontWeight.w700, c: K.green)),
+          const SizedBox(height: 4),
         ]),
       );
     }
+    final color = selected ? K.green : K.muted;
     return InkWell(
-      borderRadius: BorderRadius.circular(16),
       onTap: () => go(i),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        decoration: BoxDecoration(color: selected ? C.brandSoft : Colors.transparent, borderRadius: BorderRadius.circular(16)),
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Icon(selected ? on : off, color: selected ? C.brand : C.muted, size: 22),
-          const SizedBox(height: 2),
-          Text(T.ml(key),
-              style: TextStyle(fontFamily: 'Malayalam', fontSize: 11.5, fontWeight: selected ? FontWeight.w800 : FontWeight.w600, color: selected ? C.brand : C.muted)),
-        ]),
-      ),
+      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Icon(selected ? on : off, color: color, size: 26),
+        const SizedBox(height: 3),
+        Text(tr(key), maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(12, w: selected ? FontWeight.w800 : FontWeight.w600, c: color)),
+      ]),
     );
   }
 }

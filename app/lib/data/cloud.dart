@@ -112,6 +112,13 @@ Future<void> set(String col, String id, Rec row) async {
   _check(r);
 }
 
+Future<void> setUser(Rec row) async {
+  final r = await http
+      .patch(_uri('/users/$user'), headers: {'Content-Type': 'application/json'}, body: jsonEncode({'fields': _fields(row)}))
+      .timeout(_timeout);
+  _check(r);
+}
+
 Future<void> delete(String col, String id) async {
   final r = await http.delete(_uri('${_colPath(col)}/$id')).timeout(_timeout);
   if (r.statusCode != 404) _check(r);
