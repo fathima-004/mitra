@@ -51,7 +51,18 @@ Future<NewsResult> governmentNews() async {
   try {
     final res = await http.get(Uri.parse(pibFeed), headers: {'User-Agent': 'Mitra/1.0'}).timeout(const Duration(seconds: 10));
     if (res.statusCode != 200) throw Exception(res.statusCode);
-    final items = parseFeed(utf8.decode(res.bodyBytes));
+    var items = parseFeed(utf8.decode(res.bodyBytes));
+    // The feed only has the latest ~20 releases. Keep scheme news seen before, so it doesn't vanish
+    // the next day (newest first, at most 30 kept).
+    final old = prefs.getString('news');
+    if (old != null) {
+      final seen = {for (final n in items) n.link};
+      final kept = [
+        for (final x in (jsonDecode(old) as Map<String, dynamic>)['items'] as List)
+          if (x is Map && x['relevant'] == true && !seen.contains(x['link'])) News.fromJson(Map<String, dynamic>.from(x)),
+      ];
+      items = [...items, ...kept.take(30)];
+    }
     final now = DateTime.now();
     await prefs.setString('news', jsonEncode({'at': now.toIso8601String(), 'items': items.map((n) => n.toJson()).toList()}));
     return NewsResult(items, now, false);
