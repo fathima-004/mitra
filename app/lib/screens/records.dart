@@ -100,7 +100,7 @@ class _RecordsScreenState extends State<RecordsScreen> {
             days.putIfAbsent(e.date, () => []).add(e);
           }
           return Scaffold(
-            appBar: AppBar(title: Text(tr('records'), style: ts(19, w: FontWeight.w800)), actions: const [InfoButton('info_records')]),
+            appBar: AppBar(title: Text(tr('records'), style: ts(19, w: FontWeight.w800)), actions: const [InfoButton('info_records'), LangSwitch(), SizedBox(width: 8)]),
             body: RefreshIndicator(
               onRefresh: repo.syncNow,
               color: K.green,
