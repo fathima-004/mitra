@@ -38,7 +38,7 @@ purchases = [
     {"id": "u4", "date": f"{MONTH}-02", "item": "Maida", "item_ml": "മൈദ", "qty": 20, "unit": "kg", "amount": 880, "gst": 42},
     {"id": "u5", "date": f"{MONTH}-03", "item": "Chicken", "item_ml": "ചിക്കൻ", "qty": 24, "unit": "kg", "amount": 4800, "gst": 0},
     {"id": "u6", "date": f"{MONTH}-10", "item": "Chicken", "item_ml": "ചിക്കൻ", "qty": 24, "unit": "kg", "amount": 4900, "gst": 0},
-    {"id": "u7", "date": f"{MONTH}-17", "item": "Chicken", "item_ml": "ചിക്കൻ", "qty": 22, "unit": "kg", "amount": 4500, "gst": 0},
+    {"id": "u7", "date": f"{MONTH}-17", "item": "Chicken", "item_ml": "ചിക്കൻ", "qty": 22, "unit": "kg", "amount": 4700, "gst": 0},
     {"id": "u8", "date": f"{MONTH}-05", "item": "Spices + masala", "item_ml": "മസാല", "qty": 1, "unit": "lot", "amount": 1300, "gst": 62},
     {"id": "u9", "date": f"{MONTH}-05", "item": "Packaging boxes + covers", "item_ml": "പാക്കിംഗ്", "qty": 1, "unit": "lot", "amount": 1500, "gst": 160},
     {"id": "u10", "date": f"{MONTH}-12", "item": "Pickle bottles", "item_ml": "കുപ്പി", "qty": 40, "unit": "pcs", "amount": 800, "gst": 96},

@@ -19,6 +19,7 @@
         <h2 id="goal-title"></h2>
         <span class="chip" id="goal-chip"></span>
       </div>
+      <span class="hero-art" id="goal-art"></span>
       <div class="big-number" id="goal-saved">₹0</div>
       <div class="en" id="goal-of"></div>
       <div class="bar" aria-hidden="true"><i id="goal-bar" style="width:0"></i></div>
@@ -71,6 +72,7 @@
     import { avgMonthlyProfit, worstMonth, fyStart, yearTurnover } from './js/calc.js';
     import { goalPlan, emiCheck, gstStatus, gstPaid } from './js/money.js';
     import { ml, en, label, rupees, esc, icon, topbar, renderNav, countTo } from './js/app.js';
+    import { autoArt } from './js/art.js';
 
     const $ = (id) => document.getElementById(id);
     const limits = await fetch('data/limits.json').then((r) => r.json());
@@ -108,6 +110,7 @@
       countTo($('goal-saved'), goal.saved);
       $('goal-of').textContent = `${ml('goal_saved')} · ${en('goal_saved')} / ${rupees(goal.target)}`;
       $('goal-bar').style.width = `${g.pct}%`;
+      $('goal-art').innerHTML = autoArt(g.pct, { width: 150 });
       countTo($('goal-left'), g.left);
       if (g.left === 0) $('goal-ready').innerHTML = `<span class="ml">${ml('goal_done')}</span>`;
       else if (!g.ready) $('goal-ready').innerHTML = `<span class="en">${en('goal_no_plan')}</span>`;
@@ -184,8 +187,10 @@
       renderEmi();
     });
 
-    for (const col of Object.keys(d)) listen(col, (rows) => { d[col] = rows; render(); });
+    let ready = false; // draw only once every collection has loaded, so numbers never flash wrong
+    for (const col of Object.keys(d)) listen(col, (rows) => { d[col] = rows; if (ready) render(); });
     for (const col of Object.keys(d)) d[col] = await get(col);
+    ready = true;
     render();
   </script>
 </body>

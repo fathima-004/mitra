@@ -27,7 +27,7 @@
       </div>
     </section>
 
-    <section class="card" id="tips-card" hidden>
+    <section class="card noticed" id="tips-card" hidden>
       <h2 id="tips-title"></h2>
       <div id="tips"></div>
     </section>
@@ -52,6 +52,7 @@
     import { get, listen } from './js/data.js';
     import { monthProfit, breakdown, thisMonth, avgMonthlyProfit } from './js/calc.js';
     import { ml, en, label, rupees, esc, icon, topbar, renderNav, countTo } from './js/app.js';
+    import { insights, insightHTML } from './js/insights.js';
 
     const $ = (id) => document.getElementById(id);
     renderNav();
@@ -59,7 +60,7 @@
     $('month-title').innerHTML = label('month_profit');
     $('in-label').textContent = `${ml('income')} · ${en('income')}`;
     $('out-label').textContent = `${ml('spending')} · ${en('spending')}`;
-    $('tips-title').innerHTML = `<span style="display:flex;gap:8px;align-items:center">${icon('sparkle', 20)}<span>${label('tips_title')}</span></span>`;
+    $('tips-title').innerHTML = `<span style="display:flex;gap:8px;align-items:center">${icon('sparkle', 20)}<span>${label('noticed_title')}</span></span>`;
     $('chart-title').innerHTML = label('chart_title');
     $('best-title').innerHTML = label('best_title');
     $('spend-title').innerHTML = label('spend_title');
@@ -68,7 +69,7 @@
     const MONTHS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const mIndex = (month) => Number(month.slice(5, 7)) - 1;
 
-    const d = { products: [], bills: [], purchases: [], sales: [], history: [] };
+    const d = { products: [], bills: [], purchases: [], sales: [], history: [], goals: [] };
 
     function render() {
       const month = thisMonth();
@@ -133,15 +134,9 @@
         </div>`).join('') || `<p class="muted">${ml('nothing_yet')}</p>`;
 
       // Plain facts from her own numbers (no AI, no advice on loans)
-      const tips = [];
-      const star = byProduct[0];
-      if (star?.income) tips.push(['star', `${star.product.name_ml} — ${rupees(star.income)}`, `${star.product.name_en} ${en('tip_star')}`, 'tone-gold']);
-      if (bySpend[0]) tips.push(['wallet', `${bySpend[0].label_ml} — ${rupees(bySpend[0].amount)}`, `${bySpend[0].label_en} ${en('tip_spend')}`, 'tone-rose']);
-      if (avg > 0) tips.push([onTrack ? 'up' : 'down', `${ml('usual_month')}: ${reached}% ${ml(onTrack ? 'on_track' : 'behind')}`, `${reached}% ${en('of_usual')} (${rupees(avg)}) · ${en(onTrack ? 'on_track' : 'behind')}`, onTrack ? 'tone-leaf' : 'tone-gold']);
-      $('tips-card').hidden = !tips.length;
-      $('tips').innerHTML = tips.map(([ic, a, b, tone]) => `
-        <div class="item"><span class="badge ${tone}" style="width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none">${icon(ic === 'star' ? 'sparkle' : ic, 20)}</span>
-        <div class="grow"><span class="ml">${esc(a)}</span><span class="en">${esc(b)}</span></div></div>`).join('');
+      const list = insights(d);
+      $('tips-card').hidden = !list.length;
+      $('tips').innerHTML = list.map(insightHTML).join('');
     }
 
     // Tap or hover a bar to see its exact value
@@ -162,8 +157,10 @@
     $('chart').addEventListener('focusin', (e) => showTip(e.target.closest('.col')));
     $('chart').addEventListener('focusout', () => showTip(null));
 
-    for (const col of Object.keys(d)) listen(col, (rows) => { d[col] = rows; render(); });
+    let ready = false; // draw only once every collection has loaded, so numbers never flash wrong
+    for (const col of Object.keys(d)) listen(col, (rows) => { d[col] = rows; if (ready) render(); });
     for (const col of Object.keys(d)) d[col] = await get(col);
+    ready = true;
     render();
   </script>
 </body>
