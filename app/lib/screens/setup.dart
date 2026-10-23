@@ -151,8 +151,11 @@ class _Products extends StatelessWidget {
     if (saved == true && context.mounted) toast(context, 'saved');
   }
 
+  // Listens to the data itself: this widget is const, so a rebuild of the page above would skip it.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ListenableBuilder(listenable: repo, builder: (context, _) => _list(context));
+
+  Widget _list(BuildContext context) {
     final products = repo['products'];
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       const _Help('products_help'),
@@ -237,8 +240,11 @@ class _Bills extends StatelessWidget {
     if (saved == true && context.mounted) toast(context, 'saved');
   }
 
+  // Listens to the data itself: this widget is const, so a rebuild of the page above would skip it.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ListenableBuilder(listenable: repo, builder: (context, _) => _list(context));
+
+  Widget _list(BuildContext context) {
     final month = thisMonth();
     final bills = repo['bills'].where((b) => b['month'] == month).toList();
     final total = bills.fold<num>(0, (s, b) => s + (b['amount'] as num? ?? 0));
@@ -315,8 +321,11 @@ class _Purchases extends StatelessWidget {
     if (saved == true && context.mounted) toast(context, 'saved');
   }
 
+  // Listens to the data itself: this widget is const, so a rebuild of the page above would skip it.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ListenableBuilder(listenable: repo, builder: (context, _) => _list(context));
+
+  Widget _list(BuildContext context) {
     final month = thisMonth();
     final list = repo['purchases'].where((p) => monthOf(p['date']) == month).toList()
       ..sort((a, b) => (b['date'] as String).compareTo(a['date'] as String));

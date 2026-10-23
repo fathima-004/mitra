@@ -227,11 +227,18 @@ class BigButton extends StatelessWidget {
               constraints: const BoxConstraints(minHeight: 58),
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
               alignment: Alignment.center,
+              // One text, so a long label wraps onto a second line instead of being cut off.
               child: Row(mainAxisSize: MainAxisSize.min, children: [
                 if (icon != null) ...[Icon(icon, color: fg, size: 20), const SizedBox(width: 8)],
-                Text(T.ml(keyName), style: TextStyle(fontFamily: 'Malayalam', color: fg, fontWeight: FontWeight.w800, fontSize: 17)),
-                const SizedBox(width: 8),
-                Text(T.en(keyName), style: TextStyle(color: fg.withValues(alpha: .8), fontWeight: FontWeight.w600, fontSize: 14)),
+                Flexible(
+                  child: Text.rich(
+                    TextSpan(children: [
+                      TextSpan(text: T.ml(keyName), style: TextStyle(fontFamily: 'Malayalam', color: fg, fontWeight: FontWeight.w800, fontSize: 17)),
+                      TextSpan(text: '  ${T.en(keyName)}', style: TextStyle(color: fg.withValues(alpha: .8), fontWeight: FontWeight.w600, fontSize: 14)),
+                    ]),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
               ]),
             ),
           ),

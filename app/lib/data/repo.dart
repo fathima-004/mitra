@@ -200,7 +200,7 @@ class Repo extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void>? _ticking;
   Future<void> _tick() {
-    if (!_active || _disposed) return Future.value();
+    if (!cloudConfigured || !_active || _disposed) return Future.value();
     return _ticking ??= _check().whenComplete(() => _ticking = null);
   }
 
