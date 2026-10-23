@@ -43,6 +43,7 @@ class HomeScreen extends StatelessWidget {
                     ]),
                   ),
                   if (cloudConfigured) _LiveDot(online: repo.online),
+                  const LangSwitch(),
                   _Bell(count: tips.length, onTap: () => showTips(context, tips)),
                 ]),
                 const SizedBox(height: 18),

@@ -93,10 +93,38 @@ class Page2 extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: tint ?? K.bg,
           title: Text(title, style: ts(19, w: FontWeight.w800)),
-          actions: [...actions, if (info != null) InfoButton(info!), const SizedBox(width: 6)],
+          actions: [...actions, if (info != null) InfoButton(info!), const LangSwitch(), const SizedBox(width: 8)],
         ),
         body: ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 28), children: children),
         bottomNavigationBar: bottom == null ? null : SafeArea(child: Padding(padding: const EdgeInsets.fromLTRB(16, 0, 16, 12), child: bottom)),
+      );
+}
+
+/// One tap between Malayalam and English. Shows the language you'd switch to.
+class LangSwitch extends StatelessWidget {
+  const LangSwitch({super.key});
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: Material(
+          color: Colors.white,
+          shape: const StadiumBorder(side: BorderSide(color: K.line, width: 1.4)),
+          child: InkWell(
+            customBorder: const StadiumBorder(),
+            onTap: () => L.set(L.ml ? 'en' : 'ml'),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                const Icon(Icons.translate_rounded, size: 17, color: K.green),
+                const SizedBox(width: 5),
+                Text(L.ml ? 'EN' : 'മല',
+                    style: TextStyle(
+                        fontFamily: L.ml ? 'Jakarta' : 'Malayalam', fontSize: 14, fontWeight: FontWeight.w800, color: K.green)),
+              ]),
+            ),
+          ),
+        ),
       );
 }
 

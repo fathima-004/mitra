@@ -58,7 +58,7 @@ class MoreScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: Text(tr('more'), style: ts(19, w: FontWeight.w800))),
+        appBar: AppBar(title: Text(tr('more'), style: ts(19, w: FontWeight.w800)), actions: const [LangSwitch(), SizedBox(width: 8)]),
         body: ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 24), children: [
           for (final group in _groups) ...[
             Box(

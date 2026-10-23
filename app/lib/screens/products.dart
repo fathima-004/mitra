@@ -68,7 +68,7 @@ class ProductsScreen extends StatelessWidget {
   Widget build(BuildContext context) => ListenableBuilder(
         listenable: repo,
         builder: (context, _) => Scaffold(
-          appBar: AppBar(title: Text(tr('my_products'), style: ts(19, w: FontWeight.w800)), actions: const [InfoButton('info_products')]),
+          appBar: AppBar(title: Text(tr('my_products'), style: ts(19, w: FontWeight.w800)), actions: const [InfoButton('info_products'), LangSwitch(), SizedBox(width: 8)]),
           body: ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 24), children: [
             for (final p in repo['products'])
               Padding(
