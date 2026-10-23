@@ -238,14 +238,14 @@ class _GstScreenState extends State<GstScreen> {
               }),
             ),
           SizedBox(
-            width: 92,
+            width: 110,
             child: TextField(
               controller: custom,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[\d.]')), LengthLimitingTextInputFormatter(5)],
               style: money(15, w: FontWeight.w700),
               onChanged: (v) => setState(() => rate = num.tryParse(v) ?? 0),
-              decoration: const InputDecoration(hintText: '..', suffixText: '%', isDense: true),
+              decoration: InputDecoration(hintText: tr('other_rate'), hintStyle: ts(14, c: K.muted), suffixText: '%', isDense: true),
             ),
           ),
         ]),
