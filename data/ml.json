@@ -187,5 +187,14 @@
  "call_skip": { "ml": "എഴുതിയത് മാത്രം കാണുക", "en": "Show the words only" },
  "call_see": { "ml": "അവളുടെ മിത്ര കാണുക", "en": "See her new account" },
  "joined_by_call": { "ml": "", "en": "Joined by phone call" },
- "joined_by_app": { "ml": "", "en": "Joined in the app · SMS code checked" }
+ "joined_by_app": { "ml": "", "en": "Joined in the app · SMS code checked" },
+ "call_title": { "ml": "മിത്രയുമായി ഫോണിൽ", "en": "Mitra on the phone" },
+ "call_menu_title": { "ml": "കോളിൽ അമർത്താവുന്നത്", "en": "On the call, press" },
+ "call_key1": { "ml": "ഇന്ന് വിറ്റത് പറയാൻ", "en": "Tell what you sold today" },
+ "call_key2": { "ml": "ഈ മാസത്തെ ലാഭം കേൾക്കാൻ", "en": "Hear this month's profit" },
+ "call_key3": { "ml": "സർക്കാർ പദ്ധതികൾ", "en": "Government schemes" },
+ "call_key4": { "ml": "ഒന്ന് സംസാരിക്കാൻ ഒരാൾ", "en": "Someone to talk to" },
+ "call_key9": { "ml": "മിത്ര ടീമിലെ ഒരാളോട് സംസാരിക്കാൻ", "en": "Talk to a person from Mitra" },
+ "call_try": { "ml": "ഇങ്ങനെ പറഞ്ഞു നോക്കൂ", "en": "Try saying" },
+ "call_try_sub": { "ml": "മിത്ര തിരികെ വായിക്കും. ശരിയാണെങ്കിൽ 1 അമർത്തുക, ഉടനെ ആപ്പിൽ വരും.", "en": "Mitra reads it back. Press 1 if right, and it shows up in the app straight away." }
 }

@@ -1,0 +1,882 @@
+{
+ "_note": "EXAMPLE data for the demo user Sheela. Not a real person.",
+ "user": {
+  "name": "Sheela",
+  "name_ml": "ഷീല",
+  "place": "Kozhikode",
+  "place_ml": "കോഴിക്കോട്",
+  "lang": "ml"
+ },
+ "products": [
+  {
+   "id": "p1",
+   "name_ml": "ബിരിയാണി",
+   "name_en": "Biriyani",
+   "price": 100
+  },
+  {
+   "id": "p2",
+   "name_ml": "ചപ്പാത്തി",
+   "name_en": "Chapathi",
+   "price": 8
+  },
+  {
+   "id": "p3",
+   "name_ml": "പൊറോട്ട",
+   "name_en": "Parotta",
+   "price": 12
+  },
+  {
+   "id": "p4",
+   "name_ml": "അച്ചാർ കുപ്പി",
+   "name_en": "Pickle bottle",
+   "price": 120
+  }
+ ],
+ "bills": [
+  {
+   "id": "b1",
+   "month": "2026-10",
+   "type": "gas",
+   "label_ml": "ഗ്യാസ്",
+   "label_en": "Gas",
+   "amount": 1800
+  },
+  {
+   "id": "b2",
+   "month": "2026-10",
+   "type": "electricity",
+   "label_ml": "കറന്റ്",
+   "label_en": "Electricity",
+   "amount": 650
+  },
+  {
+   "id": "b3",
+   "month": "2026-10",
+   "type": "transport",
+   "label_ml": "യാത്ര",
+   "label_en": "Transport",
+   "amount": 900
+  },
+  {
+   "id": "b4",
+   "month": "2026-10",
+   "type": "phone",
+   "label_ml": "ഫോൺ",
+   "label_en": "Phone",
+   "amount": 299
+  },
+  {
+   "id": "b5",
+   "month": "2026-10",
+   "type": "emi",
+   "label_ml": "മിക്സി ഇഎംഐ",
+   "label_en": "Mixer EMI",
+   "amount": 1200,
+   "due_day": 5
+  }
+ ],
+ "purchases": [
+  {
+   "id": "u1",
+   "date": "2026-10-01",
+   "item": "Rice",
+   "item_ml": "അരി",
+   "qty": 25,
+   "unit": "kg",
+   "amount": 1450,
+   "gst": 0
+  },
+  {
+   "id": "u2",
+   "date": "2026-10-01",
+   "item": "Cooking oil",
+   "item_ml": "എണ്ണ",
+   "qty": 5,
+   "unit": "L",
+   "amount": 900,
+   "gst": 43
+  },
+  {
+   "id": "u3",
+   "date": "2026-10-02",
+   "item": "Wheat flour (atta)",
+   "item_ml": "ആട്ട",
+   "qty": 20,
+   "unit": "kg",
+   "amount": 960,
+   "gst": 46
+  },
+  {
+   "id": "u4",
+   "date": "2026-10-02",
+   "item": "Maida",
+   "item_ml": "മൈദ",
+   "qty": 20,
+   "unit": "kg",
+   "amount": 880,
+   "gst": 42
+  },
+  {
+   "id": "u5",
+   "date": "2026-10-03",
+   "item": "Chicken",
+   "item_ml": "ചിക്കൻ",
+   "qty": 24,
+   "unit": "kg",
+   "amount": 4800,
+   "gst": 0
+  },
+  {
+   "id": "u6",
+   "date": "2026-10-10",
+   "item": "Chicken",
+   "item_ml": "ചിക്കൻ",
+   "qty": 24,
+   "unit": "kg",
+   "amount": 4900,
+   "gst": 0
+  },
+  {
+   "id": "u7",
+   "date": "2026-10-17",
+   "item": "Chicken",
+   "item_ml": "ചിക്കൻ",
+   "qty": 22,
+   "unit": "kg",
+   "amount": 4700,
+   "gst": 0
+  },
+  {
+   "id": "u8",
+   "date": "2026-10-05",
+   "item": "Spices + masala",
+   "item_ml": "മസാല",
+   "qty": 1,
+   "unit": "lot",
+   "amount": 1300,
+   "gst": 62
+  },
+  {
+   "id": "u9",
+   "date": "2026-10-05",
+   "item": "Packaging boxes + covers",
+   "item_ml": "പാക്കിംഗ്",
+   "qty": 1,
+   "unit": "lot",
+   "amount": 1500,
+   "gst": 160
+  },
+  {
+   "id": "u10",
+   "date": "2026-10-12",
+   "item": "Pickle bottles",
+   "item_ml": "കുപ്പി",
+   "qty": 40,
+   "unit": "pcs",
+   "amount": 800,
+   "gst": 96
+  },
+  {
+   "id": "u11",
+   "date": "2026-10-15",
+   "item": "Rice",
+   "item_ml": "അരി",
+   "qty": 10,
+   "unit": "kg",
+   "amount": 600,
+   "gst": 0
+  }
+ ],
+ "sales": [
+  {
+   "id": "s1",
+   "date": "2026-10-01",
+   "product": "p1",
+   "qty": 9,
+   "via": "app"
+  },
+  {
+   "id": "s2",
+   "date": "2026-10-01",
+   "product": "p2",
+   "qty": 34,
+   "via": "app"
+  },
+  {
+   "id": "s3",
+   "date": "2026-10-01",
+   "product": "p3",
+   "qty": 32,
+   "via": "app"
+  },
+  {
+   "id": "s4",
+   "date": "2026-10-01",
+   "product": "p4",
+   "qty": 2,
+   "via": "app"
+  },
+  {
+   "id": "s5",
+   "date": "2026-10-02",
+   "product": "p1",
+   "qty": 7,
+   "via": "app"
+  },
+  {
+   "id": "s6",
+   "date": "2026-10-02",
+   "product": "p2",
+   "qty": 32,
+   "via": "app"
+  },
+  {
+   "id": "s7",
+   "date": "2026-10-02",
+   "product": "p3",
+   "qty": 23,
+   "via": "app"
+  },
+  {
+   "id": "s8",
+   "date": "2026-10-02",
+   "product": "p4",
+   "qty": 1,
+   "via": "app"
+  },
+  {
+   "id": "s9",
+   "date": "2026-10-03",
+   "product": "p1",
+   "qty": 11,
+   "via": "app"
+  },
+  {
+   "id": "s10",
+   "date": "2026-10-03",
+   "product": "p2",
+   "qty": 31,
+   "via": "app"
+  },
+  {
+   "id": "s11",
+   "date": "2026-10-03",
+   "product": "p3",
+   "qty": 26,
+   "via": "app"
+  },
+  {
+   "id": "s12",
+   "date": "2026-10-04",
+   "product": "p1",
+   "qty": 9,
+   "via": "app"
+  },
+  {
+   "id": "s13",
+   "date": "2026-10-04",
+   "product": "p2",
+   "qty": 56,
+   "via": "app"
+  },
+  {
+   "id": "s14",
+   "date": "2026-10-04",
+   "product": "p3",
+   "qty": 43,
+   "via": "app"
+  },
+  {
+   "id": "s15",
+   "date": "2026-10-05",
+   "product": "p1",
+   "qty": 8,
+   "via": "app"
+  },
+  {
+   "id": "s16",
+   "date": "2026-10-05",
+   "product": "p2",
+   "qty": 32,
+   "via": "app"
+  },
+  {
+   "id": "s17",
+   "date": "2026-10-05",
+   "product": "p3",
+   "qty": 33,
+   "via": "app"
+  },
+  {
+   "id": "s18",
+   "date": "2026-10-06",
+   "product": "p1",
+   "qty": 13,
+   "via": "app"
+  },
+  {
+   "id": "s19",
+   "date": "2026-10-06",
+   "product": "p2",
+   "qty": 48,
+   "via": "app"
+  },
+  {
+   "id": "s20",
+   "date": "2026-10-06",
+   "product": "p3",
+   "qty": 23,
+   "via": "app"
+  },
+  {
+   "id": "s21",
+   "date": "2026-10-07",
+   "product": "p1",
+   "qty": 12,
+   "via": "app"
+  },
+  {
+   "id": "s22",
+   "date": "2026-10-07",
+   "product": "p2",
+   "qty": 50,
+   "via": "app"
+  },
+  {
+   "id": "s23",
+   "date": "2026-10-07",
+   "product": "p3",
+   "qty": 21,
+   "via": "app"
+  },
+  {
+   "id": "s24",
+   "date": "2026-10-07",
+   "product": "p4",
+   "qty": 2,
+   "via": "app"
+  },
+  {
+   "id": "s25",
+   "date": "2026-10-08",
+   "product": "p1",
+   "qty": 11,
+   "via": "app"
+  },
+  {
+   "id": "s26",
+   "date": "2026-10-08",
+   "product": "p2",
+   "qty": 42,
+   "via": "app"
+  },
+  {
+   "id": "s27",
+   "date": "2026-10-08",
+   "product": "p3",
+   "qty": 21,
+   "via": "app"
+  },
+  {
+   "id": "s28",
+   "date": "2026-10-09",
+   "product": "p1",
+   "qty": 7,
+   "via": "app"
+  },
+  {
+   "id": "s29",
+   "date": "2026-10-09",
+   "product": "p2",
+   "qty": 47,
+   "via": "app"
+  },
+  {
+   "id": "s30",
+   "date": "2026-10-09",
+   "product": "p3",
+   "qty": 24,
+   "via": "app"
+  },
+  {
+   "id": "s31",
+   "date": "2026-10-09",
+   "product": "p4",
+   "qty": 1,
+   "via": "app"
+  },
+  {
+   "id": "s32",
+   "date": "2026-10-10",
+   "product": "p1",
+   "qty": 10,
+   "via": "app"
+  },
+  {
+   "id": "s33",
+   "date": "2026-10-10",
+   "product": "p2",
+   "qty": 34,
+   "via": "app"
+  },
+  {
+   "id": "s34",
+   "date": "2026-10-10",
+   "product": "p3",
+   "qty": 23,
+   "via": "app"
+  },
+  {
+   "id": "s35",
+   "date": "2026-10-10",
+   "product": "p4",
+   "qty": 2,
+   "via": "app"
+  },
+  {
+   "id": "s36",
+   "date": "2026-10-11",
+   "product": "p1",
+   "qty": 12,
+   "via": "app"
+  },
+  {
+   "id": "s37",
+   "date": "2026-10-11",
+   "product": "p2",
+   "qty": 61,
+   "via": "app"
+  },
+  {
+   "id": "s38",
+   "date": "2026-10-11",
+   "product": "p3",
+   "qty": 32,
+   "via": "app"
+  },
+  {
+   "id": "s39",
+   "date": "2026-10-12",
+   "product": "p1",
+   "qty": 11,
+   "via": "app"
+  },
+  {
+   "id": "s40",
+   "date": "2026-10-12",
+   "product": "p2",
+   "qty": 48,
+   "via": "app"
+  },
+  {
+   "id": "s41",
+   "date": "2026-10-12",
+   "product": "p3",
+   "qty": 26,
+   "via": "app"
+  },
+  {
+   "id": "s42",
+   "date": "2026-10-12",
+   "product": "p4",
+   "qty": 1,
+   "via": "app"
+  },
+  {
+   "id": "s43",
+   "date": "2026-10-13",
+   "product": "p1",
+   "qty": 7,
+   "via": "app"
+  },
+  {
+   "id": "s44",
+   "date": "2026-10-13",
+   "product": "p2",
+   "qty": 47,
+   "via": "app"
+  },
+  {
+   "id": "s45",
+   "date": "2026-10-13",
+   "product": "p3",
+   "qty": 22,
+   "via": "app"
+  },
+  {
+   "id": "s46",
+   "date": "2026-10-13",
+   "product": "p4",
+   "qty": 2,
+   "via": "app"
+  },
+  {
+   "id": "s47",
+   "date": "2026-10-14",
+   "product": "p1",
+   "qty": 7,
+   "via": "app"
+  },
+  {
+   "id": "s48",
+   "date": "2026-10-14",
+   "product": "p2",
+   "qty": 49,
+   "via": "app"
+  },
+  {
+   "id": "s49",
+   "date": "2026-10-14",
+   "product": "p3",
+   "qty": 26,
+   "via": "app"
+  },
+  {
+   "id": "s50",
+   "date": "2026-10-14",
+   "product": "p4",
+   "qty": 1,
+   "via": "app"
+  },
+  {
+   "id": "s51",
+   "date": "2026-10-15",
+   "product": "p1",
+   "qty": 12,
+   "via": "app"
+  },
+  {
+   "id": "s52",
+   "date": "2026-10-15",
+   "product": "p2",
+   "qty": 47,
+   "via": "app"
+  },
+  {
+   "id": "s53",
+   "date": "2026-10-15",
+   "product": "p3",
+   "qty": 33,
+   "via": "app"
+  },
+  {
+   "id": "s54",
+   "date": "2026-10-15",
+   "product": "p4",
+   "qty": 1,
+   "via": "app"
+  },
+  {
+   "id": "s55",
+   "date": "2026-10-16",
+   "product": "p1",
+   "qty": 10,
+   "via": "app"
+  },
+  {
+   "id": "s56",
+   "date": "2026-10-16",
+   "product": "p2",
+   "qty": 48,
+   "via": "app"
+  },
+  {
+   "id": "s57",
+   "date": "2026-10-16",
+   "product": "p3",
+   "qty": 34,
+   "via": "app"
+  },
+  {
+   "id": "s58",
+   "date": "2026-10-16",
+   "product": "p4",
+   "qty": 1,
+   "via": "app"
+  },
+  {
+   "id": "s59",
+   "date": "2026-10-17",
+   "product": "p1",
+   "qty": 9,
+   "via": "app"
+  },
+  {
+   "id": "s60",
+   "date": "2026-10-17",
+   "product": "p2",
+   "qty": 37,
+   "via": "app"
+  },
+  {
+   "id": "s61",
+   "date": "2026-10-17",
+   "product": "p3",
+   "qty": 25,
+   "via": "app"
+  },
+  {
+   "id": "s62",
+   "date": "2026-10-17",
+   "product": "p4",
+   "qty": 2,
+   "via": "app"
+  },
+  {
+   "id": "s63",
+   "date": "2026-10-18",
+   "product": "p1",
+   "qty": 17,
+   "via": "app"
+  },
+  {
+   "id": "s64",
+   "date": "2026-10-18",
+   "product": "p2",
+   "qty": 48,
+   "via": "app"
+  },
+  {
+   "id": "s65",
+   "date": "2026-10-18",
+   "product": "p3",
+   "qty": 29,
+   "via": "app"
+  },
+  {
+   "id": "s66",
+   "date": "2026-10-18",
+   "product": "p4",
+   "qty": 3,
+   "via": "app"
+  },
+  {
+   "id": "s67",
+   "date": "2026-10-19",
+   "product": "p1",
+   "qty": 9,
+   "via": "app"
+  },
+  {
+   "id": "s68",
+   "date": "2026-10-19",
+   "product": "p2",
+   "qty": 46,
+   "via": "app"
+  },
+  {
+   "id": "s69",
+   "date": "2026-10-19",
+   "product": "p3",
+   "qty": 35,
+   "via": "app"
+  },
+  {
+   "id": "s70",
+   "date": "2026-10-19",
+   "product": "p4",
+   "qty": 1,
+   "via": "app"
+  },
+  {
+   "id": "s71",
+   "date": "2026-10-20",
+   "product": "p1",
+   "qty": 12,
+   "via": "app"
+  },
+  {
+   "id": "s72",
+   "date": "2026-10-20",
+   "product": "p2",
+   "qty": 44,
+   "via": "app"
+  },
+  {
+   "id": "s73",
+   "date": "2026-10-20",
+   "product": "p3",
+   "qty": 29,
+   "via": "app"
+  },
+  {
+   "id": "s74",
+   "date": "2026-10-20",
+   "product": "p4",
+   "qty": 2,
+   "via": "app"
+  },
+  {
+   "id": "s75",
+   "date": "2026-10-21",
+   "product": "p1",
+   "qty": 7,
+   "via": "app"
+  },
+  {
+   "id": "s76",
+   "date": "2026-10-21",
+   "product": "p2",
+   "qty": 33,
+   "via": "app"
+  },
+  {
+   "id": "s77",
+   "date": "2026-10-21",
+   "product": "p3",
+   "qty": 33,
+   "via": "app"
+  },
+  {
+   "id": "s78",
+   "date": "2026-10-22",
+   "product": "p1",
+   "qty": 13,
+   "via": "app"
+  },
+  {
+   "id": "s79",
+   "date": "2026-10-22",
+   "product": "p2",
+   "qty": 40,
+   "via": "app"
+  },
+  {
+   "id": "s80",
+   "date": "2026-10-22",
+   "product": "p3",
+   "qty": 24,
+   "via": "app"
+  },
+  {
+   "id": "s81",
+   "date": "2026-10-22",
+   "product": "p4",
+   "qty": 1,
+   "via": "app"
+  }
+ ],
+ "history": [
+  {
+   "id": "2026-04",
+   "month": "2026-04",
+   "income": 41200,
+   "spending": 27100,
+   "gst_paid": 410
+  },
+  {
+   "id": "2026-05",
+   "month": "2026-05",
+   "income": 43800,
+   "spending": 28300,
+   "gst_paid": 430
+  },
+  {
+   "id": "2026-06",
+   "month": "2026-06",
+   "income": 31500,
+   "spending": 25900,
+   "gst_paid": 380
+  },
+  {
+   "id": "2026-07",
+   "month": "2026-07",
+   "income": 38900,
+   "spending": 26800,
+   "gst_paid": 420
+  },
+  {
+   "id": "2026-08",
+   "month": "2026-08",
+   "income": 46100,
+   "spending": 29400,
+   "gst_paid": 450
+  },
+  {
+   "id": "2026-09",
+   "month": "2026-09",
+   "income": 47300,
+   "spending": 29900,
+   "gst_paid": 460
+  }
+ ],
+ "goals": [
+  {
+   "id": "g1",
+   "name_ml": "ഓട്ടോ",
+   "name_en": "Auto rickshaw (down payment)",
+   "target": 40000,
+   "saved": 24000,
+   "monthly": 5000
+  }
+ ],
+ "bulk_requests": [
+  {
+   "id": "r1",
+   "user": "demo1",
+   "name": "Sheela",
+   "month": "2026-11",
+   "item": "Rice",
+   "item_ml": "അരി",
+   "qty": 30,
+   "unit": "kg",
+   "place": "Kozhikode"
+  },
+  {
+   "id": "r2",
+   "user": "demo2",
+   "name": "Ramla",
+   "month": "2026-11",
+   "item": "Rice",
+   "item_ml": "അരി",
+   "qty": 25,
+   "unit": "kg",
+   "place": "Kozhikode"
+  },
+  {
+   "id": "r3",
+   "user": "demo3",
+   "name": "Bindu",
+   "month": "2026-11",
+   "item": "Rice",
+   "item_ml": "അരി",
+   "qty": 25,
+   "unit": "kg",
+   "place": "Kozhikode"
+  },
+  {
+   "id": "r4",
+   "user": "demo4",
+   "name": "Safiya",
+   "month": "2026-11",
+   "item": "Rice",
+   "item_ml": "അരി",
+   "qty": 30,
+   "unit": "kg",
+   "place": "Kozhikode"
+  },
+  {
+   "id": "r5",
+   "user": "demo2",
+   "name": "Ramla",
+   "month": "2026-11",
+   "item": "Cooking oil",
+   "item_ml": "എണ്ണ",
+   "qty": 10,
+   "unit": "L",
+   "place": "Kozhikode"
+  },
+  {
+   "id": "r6",
+   "user": "demo5",
+   "name": "Lissy",
+   "month": "2026-11",
+   "item": "Cooking oil",
+   "item_ml": "എണ്ണ",
+   "qty": 5,
+   "unit": "L",
+   "place": "Kozhikode"
+  }
+ ]
+}

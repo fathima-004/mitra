@@ -1,0 +1,14 @@
+{
+  "_note": "GST registration limits used by money.html. A person must confirm each value on the official source and fill in checked_by + date_checked. Until then the page shows 'not yet checked'.",
+  "gst": {
+    "goods": 4000000,
+    "services": 2000000,
+    "use": "services",
+    "use_why": "Cooked food sold from home may count as a service (restaurant-style supply), which has the lower limit. Using the lower one is the safe side.",
+    "state": "Kerala",
+    "source": "https://www.gst.gov.in/",
+    "source_2": "https://cbic-gst.gov.in/",
+    "checked_by": "",
+    "date_checked": ""
+  }
+}
