@@ -1,0 +1,4 @@
+{
+  "type": "module",
+  "description": "Lets the Netlify Functions (Node) import calc.js and parse.js, the same files the browser uses."
+}

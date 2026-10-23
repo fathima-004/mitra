@@ -46,3 +46,13 @@ If there's no time, we keep it as the replay plus a pitch line. No change is nee
 
 **24 Oct ~00:30, both: work swapped (PLAN.md §2a, docs/team-rules.md "Team")**
 Fathima → phone call (Exotel, Twilio as backup) + content + pitch. Hiba → Flutter app (`app/`) + Firebase/Netlify. For Hiba: the Flutter app's state and how to build it are in `docs/fathima-status.md`. The APK hasn't been built yet (network errors on Fathima's laptop), and the Firestore link is still to do. For Fathima: Hiba's call code is in `netlify/functions/` (voice, menu, ping) and `call.html` / `js/call.js` / `js/parse.js`.
+
+---
+
+**24 Oct, Hiba → Fathima: the Twilio call flow is finished, on branch `hiba/twilio-call-flow` (not on main)**
+I built it before I saw the swap, so it's on a branch for you to merge or drop, since these files are yours now. It's the full Twilio backup your plan keeps: `voice`, `menu`, `sales`, `keypad`, `confirm`, `profit`, `parse`, `call-me`, plus `netlify/lib/` (shared TwiML, Firestore save with `via:"call"`, word lists then gemini/groq/claude). Every step is tested with fake Twilio requests, and the steps plus env vars are in `docs/backend.md` on the branch. Parts you can reuse for Exotel: `netlify/lib/understand.mjs` (parse + AI backup), `netlify/lib/store.mjs` (Firestore + India-time dates), and the `js/parse.js` upgrade (reads `data/synonyms.json`, personal words, Malayalam suffixes like "ബിരിയാണിയും").
+For your content files:
+1. **`data/synonyms.json`** shape that the branch reads: `{ "products": { "p1": ["biriyani", "ബിരിയാണി"] }, "numbers": { "ഇരുപത്തിരണ്ട്": 22 } }`.
+2. **`data/schemes.json`**: key 3 and my schemes page read `title_ml` / `title_en`. Nothing is invented while the file is missing.
+3. **Tele-MANAS 14416**: please check it on the official site and record the URL and date.
+4. **Call voice clips**: `audio/` only has `join/` so far.
