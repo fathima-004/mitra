@@ -436,8 +436,7 @@ input:focus, select:focus { border-color: var(--brand); outline: none; box-shado
 .quick button[aria-pressed="true"] { background: var(--brand-soft); border-color: var(--brand); color: var(--brand); }
 
 .emi-result:empty { display: none; }
-.emi-result { margin-top: 12px; display: grid; gap: 10px; animation: rise-in .3s var(--ease) both; }
-@keyframes rise-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.emi-result { margin-top: 12px; display: grid; gap: 10px; animation: rise .3s var(--ease) both; }
 .verdict { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: var(--radius-sm); }
 .verdict svg { flex: none; }
 .verdict .ml { font-size: 1.1rem; font-weight: 800; }
@@ -465,6 +464,40 @@ input:focus, select:focus { border-color: var(--brand); outline: none; box-shado
 .disclaimer p + p { margin-top: 6px; }
 .disclaimer .warn { color: #8a6410; font-weight: 700; display: inline-flex; gap: 4px; align-items: center; }
 .disclaimer a { color: var(--brand); font-weight: 700; }
+
+/* ---------- Illustrations, goal road, Mitra noticed ---------- */
+.hero .palm { position: absolute; right: -18px; bottom: -6px; width: 170px; color: rgba(255, 255, 255, .07); pointer-events: none; }
+.hero .palm svg { width: 100%; height: auto; display: block; }
+.hero-art { position: absolute; right: 14px; top: 58px; pointer-events: none; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .25)); }
+.hero-art svg { width: 128px; height: auto; display: block; }
+@media (max-width: 400px) { .hero-art svg { width: 100px; } }
+
+.goal-strip { display: block; text-decoration: none; color: inherit; padding-bottom: 12px; }
+.goal-strip .ml b { font-family: var(--num); color: var(--brand); margin-left: 4px; }
+.goal-strip .road { position: relative; height: 74px; margin-top: 4px; }
+.goal-strip .track { position: absolute; left: 0; right: 90px; bottom: 6px; height: 6px; border-radius: 99px;
+  background: repeating-linear-gradient(90deg, var(--line) 0 10px, transparent 10px 16px); }
+.goal-strip .track i { display: block; height: 100%; border-radius: 99px; background: var(--gold-line); transition: width 1s var(--ease); }
+.goal-strip .car { position: absolute; bottom: 6px; left: 0; transition: left 1.2s var(--ease); }
+.goal-strip .car svg { display: block; }
+.goal-strip .flag { position: absolute; right: 0; bottom: 0; width: 84px; text-align: right; display: grid; font-size: .72rem; color: var(--muted); }
+.goal-strip .flag b { font-family: var(--num); font-size: 1rem; color: var(--ink); }
+.goal-strip .flag svg { justify-self: end; margin-bottom: 2px; }
+
+.noticed .insight { align-items: flex-start; }
+.noticed .insight .badge { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; flex: none; }
+.noticed .insight .ml { font-weight: 600; font-size: .95rem; line-height: 1.5; }
+.noticed .insight .en { margin-top: 3px; line-height: 1.4; }
+.noticed .more { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; color: var(--brand); font-weight: 700; font-size: .88rem; text-decoration: none; font-family: var(--num); }
+
+.product-btn { min-height: 160px; }
+.product-btn .food { display: grid; place-items: center; width: 70px; height: 70px; border-radius: 20px; background: var(--bg); margin-bottom: 2px; }
+.product-btn:nth-child(4n+1) .food { background: var(--gold-soft); }
+.product-btn:nth-child(4n+2) .food { background: var(--amber-soft); }
+.product-btn:nth-child(4n+3) .food { background: #fdebd8; }
+.product-btn:nth-child(4n+4) .food { background: #fde7ea; }
+.today-items span { display: inline-flex; align-items: center; gap: 6px; }
+.today-items svg { flex: none; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }

@@ -129,5 +129,7 @@
  "gst_disclaimer": { "ml": "ഇത് ഒരു മാർഗനിർദേശം മാത്രം. കുടുംബശ്രീ എം.ഇ.സി.യോടോ ടാക്സ് കൺസൾട്ടന്റിനോടോ ഉറപ്പാക്കുക.", "en": "Guidance only. Confirm with your Kudumbashree MEC or a tax consultant." },
  "not_checked": { "ml": "പരിധി ഔദ്യോഗിക സൈറ്റിൽ ഇനിയും ഉറപ്പാക്കിയിട്ടില്ല", "en": "Limit not yet checked on the official site" },
  "checked_on": { "ml": "ഉറപ്പാക്കിയത്", "en": "Checked on" },
- "months_word": { "ml": "മാസം", "en": "months" }
+ "months_word": { "ml": "മാസം", "en": "months" },
+ "noticed_title": { "ml": "മിത്ര ശ്രദ്ധിച്ചത്", "en": "Mitra noticed" },
+ "see_all": { "ml": "എല്ലാം കാണുക", "en": "See all" }
 }

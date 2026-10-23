@@ -35,6 +35,7 @@
     import { get, add, remove, listen } from './js/data.js';
     import { today, salesIncome } from './js/calc.js';
     import { ml, en, label, rupees, esc, icon, topbar, renderNav, toast } from './js/app.js';
+    import { foodArt } from './js/art.js';
 
     const $ = (id) => document.getElementById(id);
     renderNav();
@@ -56,6 +57,7 @@
       $('products').innerHTML = products.map((p) => {
         const qty = daySales.filter((s) => s.product === p.id).reduce((n, s) => n + s.qty, 0);
         return `<button class="product-btn" data-product="${esc(p.id)}">
+          <span class="food">${foodArt(p, 54)}</span>
           <span><span class="ml">${esc(p.name_ml)}</span><span class="en">${esc(p.name_en)}</span></span>
           <span class="foot"><span class="price">${rupees(p.price)}</span>${qty ? `<span class="pill green">${qty}</span>` : ''}</span>
         </button>`;

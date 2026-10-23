@@ -22,6 +22,7 @@
     </header>
 
     <a class="card hero" href="profit.html" id="month-card" aria-live="polite">
+      <span class="palm" id="palm"></span>
       <div class="label-row">
         <h2 id="month-title"></h2>
         <span class="chip live" id="live"></span>
@@ -31,6 +32,18 @@
       <div class="split">
         <div><div class="k"><span class="dot in"></span><span id="in-label"></span></div><div class="v" id="month-in">₹0</div></div>
         <div><div class="k"><span class="dot out"></span><span id="out-label"></span></div><div class="v" id="month-out">₹0</div></div>
+      </div>
+    </a>
+
+    <a class="card goal-strip" href="money.html" id="goal-strip" hidden>
+      <div class="goal-text">
+        <span class="ml" id="goal-name"></span>
+        <span class="en" id="goal-sub"></span>
+      </div>
+      <div class="road">
+        <span class="car" id="goal-car"></span>
+        <span class="flag" id="goal-flag"></span>
+        <span class="track"><i id="goal-track"></i></span>
       </div>
     </a>
 
@@ -54,6 +67,12 @@
       </button>
     </section>
 
+    <section class="card noticed" id="noticed-card" hidden>
+      <h2 id="noticed-title"></h2>
+      <div id="noticed"></div>
+      <a class="more" href="profit.html" id="noticed-more"></a>
+    </section>
+
     <h2 class="section-title" id="all-title"></h2>
     <nav class="tiles" id="menu" aria-label="Sections"></nav>
 
@@ -64,6 +83,10 @@
     import { listen, get, getUser, loadDemo } from './js/data.js';
     import { monthProfit, thisMonth, today, salesIncome } from './js/calc.js';
     import { ml, en, label, rupees, esc, icon, renderNav, toast, countTo } from './js/app.js';
+    import { autoArt, foodArt, palmArt } from './js/art.js';
+    import { insights, insightHTML } from './js/insights.js';
+    import { goalPlan } from './js/money.js';
+    import { avgMonthlyProfit } from './js/calc.js';
 
     const $ = (id) => document.getElementById(id);
     renderNav();
@@ -83,6 +106,9 @@
     $('call-me-label').innerHTML = `<span class="ml">${ml('call_me')}</span><span class="en">${en('call_me')}</span>`;
     $('call-hint').textContent = ml('call_me_hint');
     $('all-title').innerHTML = label('everything');
+    $('palm').innerHTML = palmArt;
+    $('noticed-title').innerHTML = `<span style="display:flex;gap:8px;align-items:center">${icon('sparkle', 20)}<span>${label('noticed_title')}</span></span>`;
+    $('noticed-more').innerHTML = `${ml('see_all')} · ${en('see_all')} ${icon('arrow', 16)}`;
     $('reset').innerHTML = `${icon('reset', 16)} ${ml('reset_demo')} · ${en('reset_demo')}`;
 
     const MENU = [
@@ -102,6 +128,8 @@
     let products = await get('products');
     let bills = await get('bills');
     let purchases = await get('purchases');
+    let history = await get('history');
+    let goals = await get('goals');
     let seen = null; // sale ids already shown, to spot new ones from the call
 
     function render(sales) {
@@ -114,7 +142,7 @@
 
       $('today-list').innerHTML = products.map((p) => {
         const qty = todays.filter((s) => s.product === p.id).reduce((n, s) => n + s.qty, 0);
-        return qty ? `<span><b>${qty}</b> ${esc(p.name_ml)}</span>` : '';
+        return qty ? `<span>${foodArt(p, 26)}<b>${qty}</b> ${esc(p.name_ml)}</span>` : '';
       }).join('');
 
       const m = monthProfit(sales, products, bills, purchases, thisMonth());
@@ -124,6 +152,25 @@
       countTo($('month-out'), m.spending);
       // Gold bar = share of income she keeps as profit
       $('kept-bar').style.width = `${m.income > 0 ? Math.max(0, Math.min(100, (m.profit / m.income) * 100)) : 0}%`;
+
+      const FLAG = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M5 21V4" stroke="#17231f" stroke-width="2" stroke-linecap="round"/><path d="M5 4h13l-3 4 3 4H5z" fill="#c9971f"/></svg>';
+      // Savings goal on the road: the auto drives towards the flag as she saves
+      const goal = goals[0];
+      $('goal-strip').hidden = !goal;
+      if (goal) {
+        const g = goalPlan(goal, avgMonthlyProfit(history, 3));
+        $('goal-name').innerHTML = `${esc(goal.name_ml)} <b>${g.pct}%</b>`;
+        $('goal-sub').textContent = `${esc(goal.name_en.split(' (')[0])} · ${rupees(goal.saved)} / ${rupees(goal.target)}`;
+        $('goal-car').innerHTML = autoArt(g.pct, { width: 92 });
+        $('goal-car').style.left = `calc(${g.pct}% * .78)`;
+        $('goal-track').style.width = `${g.pct}%`;
+        $('goal-flag').innerHTML = `${FLAG}<b>${rupees(g.left)}</b><span>${ml('goal_left')}</span>`;
+      }
+
+      // A few things Mitra noticed in her numbers
+      const list = insights({ sales, products, bills, purchases, history, goals }).slice(0, 2);
+      $('noticed-card').hidden = !list.length;
+      $('noticed').innerHTML = list.map(insightHTML).join('');
 
       // Highlight sales that just arrived from a phone call
       const fresh = seen ? sales.filter((s) => !seen.has(s.id)) : [];
@@ -140,6 +187,8 @@
     listen('products', async (p) => { products = p; render(await get('sales')); });
     listen('bills', async (b) => { bills = b; render(await get('sales')); });
     listen('purchases', async (p) => { purchases = p; render(await get('sales')); });
+    listen('history', async (h) => { history = h; render(await get('sales')); });
+    listen('goals', async (g) => { goals = g; render(await get('sales')); });
 
     // "Call me": Hiba's backend rings the demo phone (PLAN.md §5, call-me function).
     $('call-me').addEventListener('click', async () => {
@@ -162,6 +211,7 @@
       await loadDemo();
       seen = null;
       products = await get('products'); bills = await get('bills'); purchases = await get('purchases');
+      history = await get('history'); goals = await get('goals');
       render(await get('sales'));
       toast('reset_done', 'reset');
     });
