@@ -1,4 +1,6 @@
 // Shared helpers for every app screen (Fathima). Text, money format, nav, toast.
+import { icon } from './icons.js';
+export { icon };
 
 const strings = await fetch('data/ml.json').then((r) => r.json()).catch(() => ({}));
 
@@ -6,7 +8,7 @@ const strings = await fetch('data/ml.json').then((r) => r.json()).catch(() => ({
 export const ml = (key) => strings[key]?.ml ?? strings[key]?.en ?? key;
 export const en = (key) => strings[key]?.en ?? key;
 
-// Two-line label: Malayalam big, English small under it.
+// Two-line label: Malayalam first, English smaller under it.
 export const label = (key) => `<span class="ml">${ml(key)}</span><span class="en">${en(key)}</span>`;
 
 // Escape text the user typed before putting it into HTML.
@@ -16,7 +18,7 @@ export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
 // Page header with a back button and a two-line title.
 export function topbar(key) {
   return `<header class="topbar">
-    <a class="back" href="index.html" aria-label="${en('back')}">←</a>
+    <a class="back" href="index.html" aria-label="${en('back')}">${icon('back')}</a>
     <h1>${label(key)}</h1>
   </header>`;
 }
@@ -24,34 +26,37 @@ export function topbar(key) {
 const inr = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 });
 export const rupees = (n) => `${n < 0 ? '−' : ''}₹${inr.format(Math.abs(Math.round(n)))}`;
 
-const NAV = [
-  { key: 'nav_home', href: 'index.html', icon: '🏠' },
-  { key: 'nav_daily', href: 'daily.html', icon: '🧾' },
-  { key: 'nav_profit', href: 'profit.html', icon: '📈' },
-  { key: 'nav_money', href: 'money.html', icon: '🪙' },
-  { key: 'nav_call', href: 'call.html', icon: '📞' },
-];
-
 // Installable app + offline support on every page that uses app.js.
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+
+const NAV = [
+  { key: 'nav_home', href: 'index.html', icon: 'home' },
+  { key: 'nav_daily', href: 'daily.html', icon: 'receipt' },
+  { key: 'nav_profit', href: 'profit.html', icon: 'trend' },
+  { key: 'nav_money', href: 'money.html', icon: 'wallet' },
+  { key: 'nav_call', href: 'call.html', icon: 'phone' },
+];
 
 export function renderNav() {
   const here = location.pathname.split('/').pop() || 'index.html';
   const nav = document.createElement('nav');
   nav.className = 'bottom-nav';
+  nav.setAttribute('aria-label', 'Main');
   nav.innerHTML = NAV.map((n) => `
     <a href="${n.href}" class="${n.href === here ? 'on' : ''}" ${n.href === here ? 'aria-current="page"' : ''}>
-      <span class="icon" aria-hidden="true">${n.icon}</span>
+      ${icon(n.icon, 22)}
       <span class="ml">${ml(n.key)}</span>
     </a>`).join('');
   document.body.append(nav);
 }
 
-export function toast(text) {
+// Short message at the bottom. `key` is a ml.json key (shown in Malayalam · English) or plain text.
+export function toast(keyOrText, iconName = 'check') {
+  const text = ml(keyOrText) === keyOrText ? keyOrText : `${ml(keyOrText)} · ${en(keyOrText)}`;
   const el = document.createElement('div');
   el.className = 'toast';
   el.setAttribute('role', 'status');
-  el.textContent = text;
+  el.innerHTML = `${icon(iconName, 18)}<span>${esc(text)}</span>`;
   document.body.append(el);
   setTimeout(() => el.remove(), 3200);
 }
