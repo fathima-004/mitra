@@ -99,6 +99,7 @@ users/demo1/bills/{id}         { month:"2026-10", type:"gas"|"rent"|"emi"|..., a
 users/demo1/purchases/{id}     { date, item, qty, unit, amount, gst? }
 users/demo1/sales/{id}         { date:"2026-10-23", product:"p1", qty, via:"app"|"call"|"web-call" }
 users/demo1/goals/{id}         { name_ml, name_en, target, saved, monthly }
+users/demo1/history/{month}    { month:"2026-09", income, spending, gst_paid }   // finished months as totals
 users/demo1/words/{id}         { word, product }        // personal words learned on calls
 calls/{callSid}                { state, pending:[{product,qty}], updatedAt }   // call session
 bulk_requests/{id}             { user, month, item, qty, unit, place }
@@ -107,6 +108,7 @@ bulk_requests/{id}             { user, month, item, qty, unit, place }
 ### `js/data.js` (Hiba)
 ```js
 export const USER = 'demo1';
+export async function getUser()             // users/demo1 → { name, name_ml, place, place_ml, lang }
 export async function get(col)              // users/demo1/{col} → array
 export async function add(col, obj)         // → id
 export async function update(col, id, obj)
@@ -119,8 +121,13 @@ export async function getBulk(), addBulk(obj)
 
 ### `js/calc.js` (Hiba) — shared by app screens and the call
 ```js
-monthIncome(sales, products, month)   monthSpending(bills, purchases, month)
-monthProfit(...)  breakdown(...)  avgMonthlyProfit(..., months=3)  yearTurnover(sales, products, fyStart)
+today()  thisMonth()  monthOf(isoDate)  fyStart()                       // dates as "YYYY-MM-DD" / "YYYY-MM"
+salesIncome(sales, products)
+monthIncome(sales, products, month)    monthSpending(bills, purchases, month)
+monthProfit(sales, products, bills, purchases, month)  → { income, spending, profit }
+breakdown(sales, products, bills, purchases, month)    → { byProduct:[{product, qty, income}], bySpend:[{label_ml, label_en, amount}] }
+avgMonthlyProfit(history, months=3)    worstMonth(history)
+yearTurnover(sales, products, history, fyStart())
 ```
 
 ### `js/money.js` (Fathima)
