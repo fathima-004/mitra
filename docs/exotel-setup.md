@@ -1,10 +1,12 @@
 # Exotel call flow for Mitra (keypad first)
 
 What she hears:
-1. "Namaskaram! I'm Mitra. What did you sell today? Biriyani 1, chapathi 2, parotta 3, pickle 4." (Malayalam clip)
-2. She presses **1** → "How many biriyani? Type the number, then #." (Malayalam clip)
+1. "Hello, this is Mitra. What did you sell today? For Biriyani, press 1. For Chapathi, press 2 …"
+2. She presses **1** → "How many Biriyani did you sell? Type the number, then press hash."
 3. She types **12 #** → the sale is saved to Firestore with `via:"call"` → **the app updates live**
-4. "Saved. 12 Biriyani. This month's profit is … rupees. Thank you." (Exotel's voice, English numbers)
+4. "Saved. 12 Biriyani. This month's profit is … rupees. Thank you."
+
+Prompts are in English (Exotel's voice). To use the Malayalam clips instead, add `CALL_LANG` = `ml` in Netlify.
 
 Replace `<site>` with the Netlify site name. If you set `EXOTEL_HOOK_KEY` in Netlify, add `&key=<that value>` to every URL below.
 
@@ -21,6 +23,17 @@ Replace `<site>` with the Netlify site name. If you set `EXOTEL_HOOK_KEY` in Net
 | `EXOTEL_HOOK_KEY` | optional: any random word, protects the URLs |
 
 After adding or changing any of these: Deploys → Trigger deploy → Deploy site.
+
+## 1b. Connect Firebase (so the call can save sales)
+1. console.firebase.google.com → the Mitra project (create one if there is none; Firestore Database → Create database, region `asia-south1`).
+2. ⚙ Project settings → **Service accounts** → **Generate new private key** → a `.json` file downloads. Keep it private, never commit it.
+3. Open the file in Notepad. In Netlify add three variables (tick "secret" for the key):
+   - `FIREBASE_PROJECT_ID` = the `project_id` value
+   - `FIREBASE_CLIENT_EMAIL` = the `client_email` value
+   - `FIREBASE_PRIVATE_KEY` = the whole `private_key` value, from `-----BEGIN PRIVATE KEY-----` to `-----END PRIVATE KEY-----
+` (without the quotes)
+   (Or paste the whole file as `FIREBASE_SERVICE_ACCOUNT`, but Netlify Functions only allow about 4 KB of variables in total, so the three separate ones are safer.)
+4. Trigger a deploy. The app side also needs the project's web config (Hiba: `js/data.js` and the Flutter `--dart-define` values in `app/lib/config.dart`).
 
 ## 2. Build the flow in Exotel App Bazaar
 Create a new app named **Mitra** and add these boxes in order:
