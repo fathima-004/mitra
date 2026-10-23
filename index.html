@@ -77,6 +77,7 @@
     <nav class="tiles" id="menu" aria-label="Sections"></nav>
 
     <button class="btn small" id="reset" type="button"></button>
+    <a class="btn small" id="join-link" href="join.html"></a>
   </main>
 
   <script type="module">
@@ -109,6 +110,7 @@
     $('palm').innerHTML = palmArt;
     $('noticed-title').innerHTML = `<span style="display:flex;gap:8px;align-items:center">${icon('sparkle', 20)}<span>${label('noticed_title')}</span></span>`;
     $('noticed-more').innerHTML = `${ml('see_all')} · ${en('see_all')} ${icon('arrow', 16)}`;
+    $('join-link').innerHTML = `${icon('users', 16)} ${ml('join_link')} · ${en('join_link')}`;
     $('reset').innerHTML = `${icon('reset', 16)} ${ml('reset_demo')} · ${en('reset_demo')}`;
 
     const MENU = [

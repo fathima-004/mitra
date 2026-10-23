@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="ml">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d6b5c">
+  <title>Mitra · Join</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="join">
+  <main>
+    <div class="steps" id="dots" aria-hidden="true"></div>
+
+    <!-- 1. Welcome -->
+    <section class="step" data-step="0">
+      <div class="card hero welcome">
+        <span class="palm" id="palm"></span>
+        <div class="logo">മിത്ര <span>Mitra</span></div>
+        <p class="tag"><span class="ml" data-t="join_tag"></span><span class="en" data-e="join_tag"></span></p>
+        <div class="welcome-art" id="welcome-art"></div>
+      </div>
+      <div class="card">
+        <div class="item"><span class="badge tone-teal" data-i="phone"></span><div class="grow"><span class="ml" data-t="join_b1"></span><span class="en" data-e="join_b1"></span></div></div>
+        <div class="item"><span class="badge tone-gold" data-i="trend"></span><div class="grow"><span class="ml" data-t="join_b2"></span><span class="en" data-e="join_b2"></span></div></div>
+        <div class="item"><span class="badge tone-rose" data-i="heart"></span><div class="grow"><span class="ml" data-t="join_b3"></span><span class="en" data-e="join_b3"></span></div></div>
+      </div>
+      <button class="btn primary" data-next><span class="ml" data-t="join_start"></span><span class="en" data-e="join_start"></span></button>
+      <p class="note center"><span class="ml" data-t="join_basic"></span><span class="en" data-e="join_basic"></span></p>
+    </section>
+
+    <!-- 2. Phone number + code -->
+    <section class="step" data-step="1" hidden>
+      <h1><span class="ml" data-t="join_phone"></span><span class="en" data-e="join_phone"></span></h1>
+      <div class="card form">
+        <label class="field"><span class="ml" data-t="join_phone_label"></span>
+          <span class="phone-input"><span>+91</span><input id="phone" type="tel" inputmode="numeric" maxlength="10" placeholder="98765 43210" autocomplete="tel-national"></span>
+        </label>
+        <button class="btn primary" id="send-code"><span class="ml" data-t="join_send"></span><span class="en" data-e="join_send"></span></button>
+        <div id="otp-wrap" hidden>
+          <label class="field"><span class="ml" data-t="join_code"></span><span class="en" data-e="join_code"></span></label>
+          <div class="otp" id="otp">
+            <input inputmode="numeric" maxlength="1" aria-label="1"><input inputmode="numeric" maxlength="1" aria-label="2"><input inputmode="numeric" maxlength="1" aria-label="3"><input inputmode="numeric" maxlength="1" aria-label="4">
+          </div>
+          <p class="note demo-note"><span data-i="sparkle"></span><span data-e="join_demo_code"></span></p>
+          <button class="btn primary" id="verify" disabled><span class="ml" data-t="join_verify"></span><span class="en" data-e="join_verify"></span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. About her -->
+    <section class="step" data-step="2" hidden>
+      <h1><span class="ml" data-t="join_about"></span><span class="en" data-e="join_about"></span></h1>
+      <div class="card form">
+        <label class="field"><span><span class="ml" data-t="join_name"></span><span class="en" data-e="join_name"></span></span>
+          <input id="name" placeholder="ഷീല / Sheela" autocomplete="given-name"></label>
+        <label class="field"><span><span class="ml" data-t="join_district"></span><span class="en" data-e="join_district"></span></span>
+          <select id="district"></select></label>
+        <div class="field"><span><span class="ml" data-t="join_lang"></span><span class="en" data-e="join_lang"></span></span>
+          <div class="choice" id="lang">
+            <button type="button" aria-pressed="true" data-v="ml">മലയാളം</button>
+            <button type="button" aria-pressed="false" data-v="en">English</button>
+          </div>
+        </div>
+      </div>
+      <button class="btn primary" data-next id="about-next" disabled><span class="ml" data-t="join_next"></span><span class="en" data-e="join_next"></span></button>
+    </section>
+
+    <!-- 4. What she sells -->
+    <section class="step" data-step="3" hidden>
+      <h1><span class="ml" data-t="join_sell"></span><span class="en" data-e="join_sell"></span></h1>
+      <div class="choice wrap" id="kind"></div>
+      <p class="note" style="margin-top:6px"><span class="ml" data-t="join_pick"></span><span class="en" data-e="join_pick"></span></p>
+      <div class="pick-grid" id="presets"></div>
+      <button class="btn primary" data-next id="sell-next" disabled><span class="ml" data-t="join_next"></span><span class="en" data-e="join_next"></span></button>
+    </section>
+
+    <!-- 5. Saving for -->
+    <section class="step" data-step="4" hidden>
+      <h1><span class="ml" data-t="join_goal"></span><span class="en" data-e="join_goal"></span></h1>
+      <div class="pick-grid goals" id="goals"></div>
+      <div class="card form" id="goal-amount-card" hidden>
+        <div class="goal-preview" id="goal-preview"></div>
+        <label class="field"><span><span class="ml" data-t="join_goal_amount"></span><span class="en" data-e="join_goal_amount"></span></span>
+          <input id="goal-amount" type="number" inputmode="numeric" min="0" step="500"></label>
+      </div>
+      <button class="btn primary" data-next><span class="ml" data-t="join_next"></span><span class="en" data-e="join_next"></span></button>
+      <button class="btn small" data-next data-skip-goal><span data-t="join_skip"></span> · <span data-e="join_skip"></span></button>
+    </section>
+
+    <!-- 6. Ready -->
+    <section class="step" data-step="5" hidden>
+      <div class="card hero done">
+        <span class="palm" id="palm2"></span>
+        <div class="tick" data-i="check"></div>
+        <h1 id="welcome-name"></h1>
+        <p class="tag"><span class="ml" data-t="join_ready"></span><span class="en" data-e="join_ready"></span></p>
+      </div>
+      <div class="card" id="summary"></div>
+      <div class="card next-steps">
+        <h2><span class="ml" data-t="join_how"></span><span class="en" data-e="join_how"></span></h2>
+        <div class="item"><span class="rank first">1</span><div class="grow"><span class="ml" data-t="join_how1"></span><span class="en" data-e="join_how1"></span></div></div>
+        <div class="item"><span class="rank">2</span><div class="grow"><span class="ml" data-t="join_how2"></span><span class="en" data-e="join_how2"></span></div></div>
+        <div class="item"><span class="rank">3</span><div class="grow"><span class="ml" data-t="join_how3"></span><span class="en" data-e="join_how3"></span></div></div>
+      </div>
+      <a class="btn primary" href="index.html"><span class="ml" data-t="join_open"></span><span class="en" data-e="join_open"></span></a>
+      <p class="note center"><span data-e="join_demo_end"></span></p>
+    </section>
+
+    <button class="btn small" id="back" hidden></button>
+  </main>
+
+  <script type="module">
+    import { ml, en, esc, icon, rupees } from './js/app.js';
+    import { foodArt, autoArt, palmArt } from './js/art.js';
+
+    const $ = (id) => document.getElementById(id);
+    for (const el of document.querySelectorAll('[data-t]')) el.textContent = ml(el.dataset.t);
+    for (const el of document.querySelectorAll('[data-e]')) el.textContent = en(el.dataset.e);
+    for (const el of document.querySelectorAll('[data-i]')) el.innerHTML = icon(el.dataset.i, el.classList.contains('tick') ? 40 : 22);
+    $('palm').innerHTML = palmArt;
+    $('palm2').innerHTML = palmArt;
+    $('welcome-art').innerHTML = ['Biriyani', 'Chapathi', 'Pickle'].map((n) => foodArt({ name_en: n }, 64)).join('') + autoArt(100, { width: 110 });
+    $('back').innerHTML = `${icon('back', 16)} ${ml('back')} · ${en('back')}`;
+
+    // EXAMPLE presets to tap instead of typing. Prices are only starting points; she edits them.
+    const KINDS = {
+      food: { ml: 'ഭക്ഷണം', en: 'Food', items: [
+        ['ബിരിയാണി', 'Biriyani', 100], ['ചപ്പാത്തി', 'Chapathi', 8], ['പൊറോട്ട', 'Parotta', 12],
+        ['അച്ചാർ കുപ്പി', 'Pickle bottle', 120], ['ഊണ്', 'Meals', 70], ['അപ്പം', 'Appam', 10]] },
+      snacks: { ml: 'അച്ചാർ, പലഹാരം', en: 'Pickles & snacks', items: [
+        ['അച്ചാർ കുപ്പി', 'Pickle bottle', 120], ['ചിപ്സ് പാക്കറ്റ്', 'Chips packet', 60], ['ഉണ്ണിയപ്പം', 'Unniyappam (dozen)', 80], ['അവലോസ് പൊടി', 'Avalose podi', 90]] },
+      tailoring: { ml: 'തയ്യൽ', en: 'Tailoring', items: [
+        ['ബ്ലൗസ് തയ്യൽ', 'Blouse stitching', 350], ['ചുരിദാർ', 'Churidar', 450], ['ആൾട്ടറേഷൻ', 'Alteration', 100], ['സ്കൂൾ യൂണിഫോം', 'School uniform', 300]] },
+    };
+    const GOALS = [
+      ['auto', 'ഓട്ടോ', 'Auto rickshaw', 40000], ['sewing', 'തയ്യൽ മെഷീൻ', 'Sewing machine', 12000],
+      ['school', 'കുട്ടികളുടെ പഠനം', "Children's studies", 25000], ['house', 'വീട് നന്നാക്കൽ', 'House repair', 50000],
+    ];
+    const DISTRICTS = [
+      ['തിരുവനന്തപുരം', 'Thiruvananthapuram'], ['കൊല്ലം', 'Kollam'], ['പത്തനംതിട്ട', 'Pathanamthitta'], ['ആലപ്പുഴ', 'Alappuzha'],
+      ['കോട്ടയം', 'Kottayam'], ['ഇടുക്കി', 'Idukki'], ['എറണാകുളം', 'Ernakulam'], ['തൃശ്ശൂർ', 'Thrissur'], ['പാലക്കാട്', 'Palakkad'],
+      ['മലപ്പുറം', 'Malappuram'], ['കോഴിക്കോട്', 'Kozhikode'], ['വയനാട്', 'Wayanad'], ['കണ്ണൂർ', 'Kannur'], ['കാസർഗോഡ്', 'Kasaragod'],
+    ];
+    $('district').innerHTML = DISTRICTS.map(([m, e]) => `<option value="${e}"${e === 'Kozhikode' ? ' selected' : ''}>${m} · ${e}</option>`).join('');
+
+    const me = { kind: 'food', picked: new Map(), goal: null, lang: 'ml' };
+
+    // Steps
+    const steps = [...document.querySelectorAll('.step')];
+    let at = 0;
+    $('dots').innerHTML = steps.map(() => '<i></i>').join('');
+    function go(n) {
+      at = Math.max(0, Math.min(steps.length - 1, n));
+      steps.forEach((s, i) => { s.hidden = i !== at; });
+      [...$('dots').children].forEach((d, i) => d.classList.toggle('on', i <= at));
+      $('back').hidden = at === 0 || at === steps.length - 1;
+      if (at === steps.length - 1) renderDone();
+      scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    document.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-next]');
+      if (!b) return;
+      if (b.hasAttribute('data-skip-goal')) me.goal = null;
+      go(at + 1);
+    });
+    $('back').addEventListener('click', () => go(at - 1));
+
+    // Phone + demo code (no SMS is sent in the demo)
+    $('phone').addEventListener('input', (e) => { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10); });
+    const boxes = [...$('otp').children];
+    $('send-code').addEventListener('click', () => {
+      if ($('phone').value.length !== 10) { $('phone').focus(); $('phone').classList.add('shake'); setTimeout(() => $('phone').classList.remove('shake'), 500); return; }
+      $('otp-wrap').hidden = false;
+      $('send-code').hidden = true;
+      // Demo: the code "arrives" and fills itself in, like SMS autofill on Android
+      [...'1234'].forEach((c, i) => setTimeout(() => { boxes[i].value = c; boxes[i].classList.add('bump'); checkOtp(); }, 700 + i * 220));
+    });
+    boxes.forEach((b, i) => b.addEventListener('input', () => { b.value = b.value.replace(/\D/g, ''); if (b.value && boxes[i + 1]) boxes[i + 1].focus(); checkOtp(); }));
+    const checkOtp = () => { $('verify').disabled = boxes.map((b) => b.value).join('').length !== 4; };
+    $('verify').addEventListener('click', () => go(2));
+
+    // About her
+    const aboutOk = () => { $('about-next').disabled = !$('name').value.trim(); };
+    $('name').addEventListener('input', aboutOk);
+    $('lang').addEventListener('click', (e) => {
+      const b = e.target.closest('button'); if (!b) return;
+      me.lang = b.dataset.v;
+      for (const x of $('lang').children) x.setAttribute('aria-pressed', String(x === b));
+    });
+
+    // What she sells
+    function renderKinds() {
+      $('kind').innerHTML = Object.entries(KINDS).map(([k, v]) =>
+        `<button type="button" data-k="${k}" aria-pressed="${k === me.kind}">${v.ml}<span class="en">${v.en}</span></button>`).join('');
+      $('presets').innerHTML = KINDS[me.kind].items.map(([m, e, price]) => {
+        const on = me.picked.has(e);
+        const pic = me.kind === 'tailoring' ? `<span class="pic-icon">${icon('box', 26)}</span>` : foodArt({ name_en: e, name_ml: m }, 48);
+        return `<div class="pick${on ? ' on' : ''}" data-key="${esc(e)}">
+          <button type="button" class="pick-main" aria-pressed="${on}">${pic}<span><span class="ml">${m}</span><span class="en">${e}</span></span><span class="tickmark">${icon('check', 16)}</span></button>
+          ${on ? `<label class="price-edit">₹<input type="number" inputmode="numeric" min="0" value="${me.picked.get(e).price}" aria-label="${e} price"></label>` : ''}
+        </div>`;
+      }).join('');
+      $('sell-next').disabled = me.picked.size === 0;
+    }
+    $('kind').addEventListener('click', (e) => {
+      const b = e.target.closest('button'); if (!b) return;
+      me.kind = b.dataset.k; me.picked.clear(); renderKinds();
+    });
+    $('presets').addEventListener('click', (e) => {
+      const b = e.target.closest('.pick-main'); if (!b) return;
+      const key = b.parentElement.dataset.key;
+      const item = KINDS[me.kind].items.find((x) => x[1] === key);
+      if (me.picked.has(key)) me.picked.delete(key); else me.picked.set(key, { ml: item[0], en: item[1], price: item[2] });
+      renderKinds();
+    });
+    $('presets').addEventListener('input', (e) => {
+      const key = e.target.closest('.pick')?.dataset.key;
+      if (key && me.picked.has(key)) me.picked.get(key).price = Number(e.target.value) || 0;
+    });
+
+    // Saving for
+    $('goals').innerHTML = GOALS.map(([k, m, e]) =>
+      `<button type="button" class="pick-main goal-btn" data-g="${k}" aria-pressed="false"><span class="ml">${m}</span><span class="en">${e}</span></button>`).join('');
+    $('goals').addEventListener('click', (e) => {
+      const b = e.target.closest('button'); if (!b) return;
+      const g = GOALS.find((x) => x[0] === b.dataset.g);
+      me.goal = { key: g[0], ml: g[1], en: g[2], target: g[3] };
+      for (const x of $('goals').children) x.setAttribute('aria-pressed', String(x === b));
+      $('goal-amount-card').hidden = false;
+      $('goal-amount').value = g[3];
+      $('goal-preview').innerHTML = (g[0] === 'auto' ? autoArt(0, { width: 130 }) : '') +
+        `<p class="note"><span class="ml">${ml('join_goal_fill')}</span><span class="en">${en('join_goal_fill')}</span></p>`;
+    });
+    $('goal-amount').addEventListener('input', (e) => { if (me.goal) me.goal.target = Number(e.target.value) || 0; });
+
+    function renderDone() {
+      const name = $('name').value.trim() || 'Sheela';
+      const d = DISTRICTS.find((x) => x[1] === $('district').value);
+      $('welcome-name').innerHTML = `<span class="ml">${ml('join_welcome')}, ${esc(name)}!</span><span class="en">${en('join_welcome')}, ${esc(name)}!</span>`;
+      const rows = [
+        ['phone', `+91 ${esc($('phone').value)}`, ''],
+        ['pin', d[0], d[1]],
+        ['box', [...me.picked.values()].map((p) => esc(p.ml)).join(', '), [...me.picked.values()].map((p) => `${esc(p.en)} ${rupees(p.price)}`).join(' · ')],
+      ];
+      if (me.goal) rows.push(['wallet', `${esc(me.goal.ml)} · ${rupees(me.goal.target)}`, esc(me.goal.en)]);
+      $('summary').innerHTML = rows.map(([ic, a, b]) =>
+        `<div class="item"><span class="badge tone-teal" style="width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none">${icon(ic, 20)}</span><div class="grow"><span class="ml">${a}</span>${b ? `<span class="en">${b}</span>` : ''}</div></div>`).join('');
+    }
+
+    renderKinds();
+    go(0);
+  </script>
+</body>
+</html>
