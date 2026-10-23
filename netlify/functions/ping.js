@@ -14,6 +14,8 @@ exports.handler = async (event) => {
     body.settings = Object.fromEntries(NAMES.map((n) => [n, Boolean(process.env[n])]));
     const key = process.env.FIREBASE_PRIVATE_KEY ?? '';
     body.privateKeyLooksRight = key ? key.includes('BEGIN PRIVATE KEY') && key.includes('END PRIVATE KEY') : null;
+    body.privateKeyLength = key.length; // a real key is about 1700 characters; the private_key_id is 40
+    body.deployedAt = process.env.DEPLOY_ID ?? null;
     const store = db();
     if (!store) body.firestore = 'not connected (Firebase settings missing or wrong)';
     else {
