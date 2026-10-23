@@ -121,6 +121,49 @@ input, select {
 
 .note { font-size: .85rem; color: var(--muted); }
 
+/* Tabs (setup page) */
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; background: var(--line); padding: 4px; border-radius: 16px; }
+.tabs button {
+  border: 0; border-radius: 12px; padding: 8px 4px; min-height: 56px; font: inherit; font-size: .9rem;
+  background: transparent; color: var(--muted); cursor: pointer;
+}
+.tabs button[aria-selected="true"] { background: var(--card); color: var(--brand); box-shadow: var(--shadow); }
+
+.form { display: grid; gap: 12px; }
+.form .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* List rows with an action button on the right */
+.item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.item:last-child { border-bottom: 0; }
+.item .grow { flex: 1; min-width: 0; }
+.item .amount { font-weight: 700; font-family: 'Noto Sans', system-ui, sans-serif; white-space: nowrap; }
+.icon-btn {
+  width: 44px; height: 44px; border-radius: 50%; border: 0; cursor: pointer; flex: none;
+  background: var(--bg); color: var(--muted); font-size: 1.1rem;
+}
+.icon-btn.danger { color: var(--red); background: var(--red-soft); }
+
+/* Daily: one big button per product */
+.product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.product-btn {
+  border: 0; border-radius: var(--radius); background: var(--card); box-shadow: var(--shadow);
+  min-height: 120px; padding: 14px; font: inherit; cursor: pointer; text-align: left;
+  display: flex; flex-direction: column; justify-content: space-between; gap: 6px; color: var(--ink);
+}
+.product-btn .price { color: var(--brand); font-weight: 700; font-family: 'Noto Sans', system-ui, sans-serif; }
+.product-btn .count { align-self: flex-end; }
+
+/* Keypad sheet */
+.sheet-backdrop { position: fixed; inset: 0; background: rgba(43, 33, 24, .45); z-index: 30; display: flex; align-items: flex-end; justify-content: center; }
+.sheet { background: var(--bg); width: 100%; max-width: 560px; border-radius: 24px 24px 0 0; padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); display: grid; gap: 12px; }
+.sheet .qty-display { font-size: 3rem; font-weight: 700; text-align: center; font-family: 'Noto Sans', system-ui, sans-serif; background: var(--card); border-radius: var(--radius); padding: 6px; }
+.keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.keypad button {
+  min-height: 64px; border: 0; border-radius: 16px; background: var(--card); box-shadow: var(--shadow);
+  font: inherit; font-size: 1.6rem; font-weight: 700; cursor: pointer; font-family: 'Noto Sans', system-ui, sans-serif;
+}
+.keypad button.ok { background: var(--green); color: #fff; }
+
 @media (min-width: 900px) {
   main { max-width: 760px; }
   .tiles { grid-template-columns: repeat(3, 1fr); }

@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="ml">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#c2410c">
+  <title>Mitra · Products & bills</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main>
+    <div id="top"></div>
+
+    <div class="tabs" role="tablist" id="tabs"></div>
+
+    <!-- Products -->
+    <section class="card" id="panel-products" role="tabpanel">
+      <p class="note" data-help="products_help"></p>
+      <div id="product-list"></div>
+      <form class="form" id="product-form" style="margin-top:12px">
+        <input type="hidden" name="pid">
+        <label class="field"><span data-label="name_ml"></span><input name="name_ml" required></label>
+        <label class="field"><span data-label="name_en"></span><input name="name_en"></label>
+        <label class="field"><span data-label="price"></span><input name="price" type="number" inputmode="numeric" min="1" required></label>
+        <div class="two">
+          <button class="btn" type="reset" data-btn="cancel"></button>
+          <button class="btn primary" type="submit" data-btn="save"></button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Monthly bills -->
+    <section class="card" id="panel-bills" role="tabpanel" hidden>
+      <p class="note" data-help="bills_help"></p>
+      <div id="bill-list"></div>
+      <form class="form" id="bill-form" style="margin-top:12px">
+        <label class="field"><span data-label="bill_type"></span><select name="type" id="bill-type"></select></label>
+        <label class="field" id="bill-other" hidden><span data-label="name_en"></span><input name="label_en"></label>
+        <label class="field"><span data-label="amount"></span><input name="amount" type="number" inputmode="numeric" min="1" required></label>
+        <label class="field" id="due-field" hidden><span data-label="due_day"></span><input name="due_day" type="number" inputmode="numeric" min="1" max="31"></label>
+        <button class="btn primary" type="submit" data-btn="add"></button>
+      </form>
+    </section>
+
+    <!-- Stock purchases -->
+    <section class="card" id="panel-purchases" role="tabpanel" hidden>
+      <p class="note" data-help="purchases_help"></p>
+      <div id="purchase-list"></div>
+      <form class="form" id="purchase-form" style="margin-top:12px">
+        <label class="field"><span data-label="item"></span><input name="item" required></label>
+        <div class="two">
+          <label class="field"><span data-label="qty"></span><input name="qty" type="number" inputmode="decimal" min="0" step="any" required></label>
+          <label class="field"><span data-label="unit"></span>
+            <select name="unit"><option>kg</option><option>L</option><option>pcs</option><option>packet</option><option>lot</option></select>
+          </label>
+        </div>
+        <div class="two">
+          <label class="field"><span data-label="amount"></span><input name="amount" type="number" inputmode="numeric" min="1" required></label>
+          <label class="field"><span data-label="date"></span><input name="date" type="date" required></label>
+        </div>
+        <label class="field"><span data-label="gst_on_bill"></span><input name="gst" type="number" inputmode="numeric" min="0" placeholder="0"></label>
+        <button class="btn primary" type="submit" data-btn="add"></button>
+      </form>
+    </section>
+  </main>
+
+  <script type="module">
+    import { get, add, update, remove, listen } from './js/data.js';
+    import { thisMonth, today, monthOf } from './js/calc.js';
+    import { ml, en, label, rupees, esc, topbar, renderNav, toast } from './js/app.js';
+
+    const $ = (id) => document.getElementById(id);
+    renderNav();
+    $('top').innerHTML = topbar('setup_title');
+    document.querySelectorAll('[data-label]').forEach((el) => { el.innerHTML = label(el.dataset.label); });
+    document.querySelectorAll('[data-help]').forEach((el) => { el.innerHTML = `${ml(el.dataset.help)}<br>${en(el.dataset.help)}`; });
+    document.querySelectorAll('[data-btn]').forEach((el) => { el.innerHTML = label(el.dataset.btn); });
+
+    const say = (key) => toast(`${ml(key)} · ${en(key)}`);
+    const delBtn = (col, id) => `<button class="icon-btn danger" data-del="${col}" data-id="${esc(id)}" aria-label="${en('delete')}">✕</button>`;
+
+    // Tabs
+    const TABS = ['products', 'bills', 'purchases'];
+    $('tabs').innerHTML = TABS.map((t, i) =>
+      `<button role="tab" id="tab-${t}" aria-controls="panel-${t}" aria-selected="${i === 0}">${label('tab_' + t)}</button>`).join('');
+    function showTab(t) {
+      for (const x of TABS) {
+        $('tab-' + x).setAttribute('aria-selected', String(x === t));
+        $('panel-' + x).hidden = x !== t;
+      }
+      history.replaceState(null, '', '#' + t);
+    }
+    $('tabs').addEventListener('click', (e) => { const b = e.target.closest('[role=tab]'); if (b) showTab(b.id.slice(4)); });
+    showTab(TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'products');
+
+    // Delete buttons in any list
+    document.addEventListener('click', async (e) => {
+      const b = e.target.closest('[data-del]');
+      if (!b) return;
+      await remove(b.dataset.del, b.dataset.id);
+      say('deleted');
+    });
+
+    // ---------- Products ----------
+    const pForm = $('product-form');
+    listen('products', (products) => {
+      $('product-list').innerHTML = products.map((p) => `
+        <div class="item">
+          <div class="grow"><span class="ml">${esc(p.name_ml)}</span><span class="en">${esc(p.name_en)}</span></div>
+          <span class="amount">${rupees(p.price)}</span>
+          <button class="icon-btn" data-edit="${esc(p.id)}" aria-label="${en('edit')}">✎</button>
+          ${delBtn('products', p.id)}
+        </div>`).join('') || `<p class="muted">${ml('nothing_yet')}</p>`;
+      $('product-list').querySelectorAll('[data-edit]').forEach((b) => b.addEventListener('click', () => {
+        const p = products.find((x) => x.id === b.dataset.edit);
+        pForm.pid.value = p.id; pForm.name_ml.value = p.name_ml; pForm.name_en.value = p.name_en ?? ''; pForm.price.value = p.price;
+        pForm.name_ml.focus();
+      }));
+    });
+    pForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const obj = { name_ml: pForm.name_ml.value.trim(), name_en: pForm.name_en.value.trim() || pForm.name_ml.value.trim(), price: Number(pForm.price.value) };
+      if (!obj.name_ml || !(obj.price > 0)) return say('fill_all');
+      if (pForm.pid.value) await update('products', pForm.pid.value, obj);
+      else await add('products', obj);
+      pForm.reset(); pForm.pid.value = '';
+      say('saved');
+    });
+
+    // ---------- Monthly bills ----------
+    const BILL_TYPES = ['gas', 'electricity', 'rent', 'transport', 'phone', 'packaging', 'emi', 'other'];
+    const bForm = $('bill-form');
+    $('bill-type').innerHTML = BILL_TYPES.map((t) => `<option value="${t}">${ml('bill_' + t)} · ${en('bill_' + t)}</option>`).join('');
+    $('bill-type').addEventListener('change', () => {
+      $('due-field').hidden = bForm.type.value !== 'emi';
+      $('bill-other').hidden = bForm.type.value !== 'other';
+    });
+    listen('bills', (bills) => {
+      const month = thisMonth();
+      const mine = bills.filter((b) => b.month === month);
+      const total = mine.reduce((s, b) => s + b.amount, 0);
+      $('bill-list').innerHTML = mine.map((b) => `
+        <div class="item">
+          <div class="grow">
+            <span class="ml">${esc(b.label_ml ?? ml('bill_' + b.type))}</span>
+            <span class="en">${esc(b.label_en ?? en('bill_' + b.type))}${b.due_day ? ` · ${en('due_day')}: ${b.due_day}` : ''}</span>
+          </div>
+          <span class="amount">${rupees(b.amount)}</span>
+          ${delBtn('bills', b.id)}
+        </div>`).join('') +
+        (mine.length ? `<div class="row"><span>${label('total')}</span><span class="amount">${rupees(total)}</span></div>` : `<p class="muted">${ml('nothing_yet')}</p>`);
+    });
+    bForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const type = bForm.type.value;
+      const amount = Number(bForm.amount.value);
+      if (!(amount > 0)) return say('fill_all');
+      const other = bForm.label_en.value.trim();
+      const obj = {
+        month: thisMonth(), type, amount,
+        label_ml: type === 'other' && other ? other : ml('bill_' + type),
+        label_en: type === 'other' && other ? other : en('bill_' + type),
+      };
+      if (type === 'emi' && bForm.due_day.value) obj.due_day = Number(bForm.due_day.value);
+      await add('bills', obj);
+      bForm.reset(); $('due-field').hidden = true; $('bill-other').hidden = true;
+      say('saved');
+    });
+
+    // ---------- Stock purchases ----------
+    const uForm = $('purchase-form');
+    uForm.date.value = today();
+    listen('purchases', (purchases) => {
+      const month = thisMonth();
+      const mine = purchases.filter((p) => monthOf(p.date) === month).sort((a, b) => b.date.localeCompare(a.date));
+      const total = mine.reduce((s, p) => s + p.amount, 0);
+      const gst = mine.reduce((s, p) => s + (p.gst ?? 0), 0);
+      $('purchase-list').innerHTML = mine.map((p) => `
+        <div class="item">
+          <div class="grow">
+            <span class="ml">${esc(p.item_ml ?? p.item)}</span>
+            <span class="en">${esc(p.item)} · ${esc(p.qty)} ${esc(p.unit)} · ${esc(p.date.slice(8))}/${esc(p.date.slice(5, 7))}${p.gst ? ` · GST ${rupees(p.gst)}` : ''}</span>
+          </div>
+          <span class="amount">${rupees(p.amount)}</span>
+          ${delBtn('purchases', p.id)}
+        </div>`).join('') +
+        (mine.length ? `<div class="row"><span>${label('total')}</span><span class="amount">${rupees(total)}</span></div>
+          <div class="row"><span class="muted">GST</span><span class="amount muted">${rupees(gst)}</span></div>` : `<p class="muted">${ml('nothing_yet')}</p>`);
+    });
+    uForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const obj = {
+        date: uForm.date.value, item: uForm.item.value.trim(), qty: Number(uForm.qty.value),
+        unit: uForm.unit.value, amount: Number(uForm.amount.value), gst: Number(uForm.gst.value || 0),
+      };
+      if (!obj.item || !(obj.amount > 0) || !obj.date) return say('fill_all');
+      await add('purchases', obj);
+      uForm.reset(); uForm.date.value = today();
+      say('saved');
+    });
+  </script>
+</body>
+</html>

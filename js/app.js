@@ -9,6 +9,18 @@ export const en = (key) => strings[key]?.en ?? key;
 // Two-line label: Malayalam big, English small under it.
 export const label = (key) => `<span class="ml">${ml(key)}</span><span class="en">${en(key)}</span>`;
 
+// Escape text the user typed before putting it into HTML.
+export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
+  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+// Page header with a back button and a two-line title.
+export function topbar(key) {
+  return `<header class="topbar">
+    <a class="back" href="index.html" aria-label="${en('back')}">←</a>
+    <h1>${label(key)}</h1>
+  </header>`;
+}
+
 const inr = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 });
 export const rupees = (n) => `${n < 0 ? '−' : ''}₹${inr.format(Math.abs(Math.round(n)))}`;
 
