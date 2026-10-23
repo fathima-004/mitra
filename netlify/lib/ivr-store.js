@@ -35,6 +35,18 @@ function firestoreStore(fs) {
       await col(name).doc(id).delete();
       await touch();
     },
+    // Her language (users/demo1.lang), shared with the app's language switch.
+    async setLang(lang) {
+      await fs.collection('users').doc(USER).set({ lang, changedAt: new Date().toISOString() }, { merge: true });
+    },
+    // The spoken prompt for one step of the call (Malayalam audio), fetched by Exotel right after.
+    async setAudio(sid, seq, mp3) {
+      await fs.collection('call_audio').doc(sid).set({ seq, mp3: mp3.toString('base64'), at: new Date().toISOString() });
+    },
+    async getAudio(sid) {
+      const d = await fs.collection('call_audio').doc(sid).get();
+      return d.exists ? Buffer.from(d.data().mp3, 'base64') : null;
+    },
     async getCall(sid) {
       const d = await fs.collection('calls').doc(sid).get();
       return d.exists ? d.data() : null;
@@ -50,11 +62,22 @@ function memoryStore() {
   const data = { bulk_requests: structuredClone(demo.bulk_requests ?? []) };
   for (const c of ['products', 'bills', 'purchases', 'sales', 'history', 'goals']) data[c] = structuredClone(demo[c] ?? []);
   const calls = new Map();
+  const audio = new Map();
+  const user = structuredClone(demo.user);
   return {
     kind: 'memory',
     data,
     async user() {
-      return demo.user;
+      return structuredClone(user);
+    },
+    async setLang(lang) {
+      user.lang = lang;
+    },
+    async setAudio(sid, seq, mp3) {
+      audio.set(sid, mp3);
+    },
+    async getAudio(sid) {
+      return audio.get(sid) ?? null;
     },
     async list(name) {
       return structuredClone(data[name] ?? []);
