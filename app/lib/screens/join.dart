@@ -428,6 +428,7 @@ class _JoinScreenState extends State<JoinScreen> {
       Bi.k('join_pick', size: 13.5, weight: FontWeight.w500),
       _gap(10),
       GridView.count(
+        padding: EdgeInsets.zero, // no extra safe-area gap inside the page list
         crossAxisCount: 2,
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
@@ -497,6 +498,7 @@ class _JoinScreenState extends State<JoinScreen> {
   Widget _goal() => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         _title('join_goal'),
         GridView.count(
+          padding: EdgeInsets.zero, // no extra safe-area gap inside the page list
           crossAxisCount: 2,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),

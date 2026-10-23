@@ -1,6 +1,7 @@
 // Every screen opens on a small phone without layout errors, and the setup forms save real rows.
 // Run: flutter test
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mitra/main.dart';
@@ -8,6 +9,7 @@ import 'package:mitra/screens/more.dart';
 import 'package:mitra/screens/setup.dart';
 import 'package:mitra/strings.dart';
 import 'package:mitra/theme.dart';
+import 'package:mitra/widgets/common.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> show(WidgetTester tester, Widget page) async {
@@ -75,18 +77,19 @@ void main() {
   testWidgets('setup: adding a product saves it', (tester) async {
     await show(tester, const SetupScreen());
     final before = repo['products'].length;
-    await tester.ensureVisible(find.text(T.ml('add')));
+    await tester.ensureVisible(find.text('${T.ml('add')}  ${T.en('add')}', findRichText: true));
     await tester.pump();
-    await tester.tap(find.text(T.ml('add')));
+    await tester.tap(find.text('${T.ml('add')}  ${T.en('add')}', findRichText: true));
     await settle(tester);
     final fields = find.byType(TextField);
     await tester.enterText(fields.at(0), 'ഇഡ്ഡലി');
     await tester.enterText(fields.at(1), 'Idli');
     await tester.enterText(fields.at(2), '10');
-    await tester.tap(find.text(T.ml('save')));
+    await tester.tap(find.text('${T.ml('save')}  ${T.en('save')}', findRichText: true));
     await settle(tester);
     expect(repo['products'].length, before + 1);
     expect(repo['products'].last['price'], 10);
+    expect(find.text('Idli'), findsOneWidget, reason: 'the new product must show in the list straight away');
   });
 
   testWidgets('setup: adding a bill saves it for this month', (tester) async {
@@ -94,16 +97,17 @@ void main() {
     await tester.tap(find.text(T.ml('tab_bills')));
     await settle(tester);
     final before = repo['bills'].length;
-    await tester.ensureVisible(find.text(T.ml('add')));
+    await tester.ensureVisible(find.text('${T.ml('add')}  ${T.en('add')}', findRichText: true));
     await tester.pump();
-    await tester.tap(find.text(T.ml('add')));
+    await tester.tap(find.text('${T.ml('add')}  ${T.en('add')}', findRichText: true));
     await settle(tester);
     await tester.enterText(find.byType(TextField).at(0), '500');
-    await tester.tap(find.text(T.ml('save')));
+    await tester.tap(find.text('${T.ml('save')}  ${T.en('save')}', findRichText: true));
     await settle(tester);
     expect(repo['bills'].length, before + 1);
     expect(repo['bills'].last['type'], 'gas');
     expect(repo['bills'].last['amount'], 500);
+    expect(find.text('₹500'), findsOneWidget, reason: 'the new bill must show in the list straight away');
   });
 
   testWidgets('schemes and support say "being checked" until checked content exists', (tester) async {
@@ -117,7 +121,7 @@ void main() {
     await show(tester, const BulkScreen());
     expect(find.textContaining('women buying together'), findsWidgets);
     final before = repo.bulk.length;
-    final join = find.text(T.ml('add'));
+    final join = find.text('${T.ml('add')}  ${T.en('add')}', findRichText: true);
     if (join.evaluate().isNotEmpty) {
       await tester.ensureVisible(join.first);
       await tester.pump();
@@ -128,5 +132,12 @@ void main() {
       await settle(tester);
       expect(repo.bulk.length, before + 1);
     }
+  });
+
+  testWidgets('a long button label wraps instead of being cut off', (tester) async {
+    await show(tester, const Scaffold(body: Padding(padding: EdgeInsets.all(16), child: BigButton('call_see'))));
+    final text = tester.renderObject<RenderParagraph>(find.byType(RichText).first);
+    expect(text.didExceedMaxLines, isFalse);
+    expect(tester.takeException(), isNull);
   });
 }

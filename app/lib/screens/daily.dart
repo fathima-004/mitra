@@ -44,68 +44,74 @@ class _DailyScreenState extends State<DailyScreen> {
         Rec? product(String id) => repo['products'].where((p) => p['id'] == id).firstOrNull;
         return SafeArea(
           bottom: false,
-          child: ListView(padding: const EdgeInsets.fromLTRB(16, 12, 16, 120), children: [
-            const TopBar('daily_title'),
-            const SizedBox(height: 16),
-            MCard(
-              onTap: _pickDay,
-              child: Row(children: [
-                Expanded(child: Bi.k('sold_on', size: 15, weight: FontWeight.w700)),
-                Text('${day.day} ${monthsMl[day.month - 1]} ${day.year}', style: const TextStyle(fontFamily: 'Malayalam', fontWeight: FontWeight.w700)),
-                const SizedBox(width: 8),
-                const Icon(Icons.calendar_month_rounded, color: C.brand),
-              ]),
-            ),
-            const SizedBox(height: 16),
-            Padding(padding: const EdgeInsets.only(left: 4, bottom: 10), child: Bi.k('tap_product', size: 15, weight: FontWeight.w700)),
-            GridView.count(
-              crossAxisCount: 2,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
-              childAspectRatio: .95,
-              children: [
-                for (final (i, p) in repo['products'].indexed)
-                  _ProductTile(
-                    product: p,
-                    tint: _tints[i % _tints.length],
-                    qty: daySales.where((s) => s['product'] == p['id']).fold<num>(0, (n, s) => n + s['qty']),
-                    onTap: () => _sell(p),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            MCard(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Bi.k('entries', size: 15, weight: FontWeight.w700),
-                const SizedBox(height: 4),
-                Money(salesIncome(daySales, repo['products']), style: numStyle(34)),
-                if (daySales.isEmpty)
-                  Padding(padding: const EdgeInsets.only(top: 8), child: Bi.k('no_sales_today', size: 15, weight: FontWeight.w500))
-                else
-                  Rows([
-                    for (final s in daySales.reversed)
-                      Row(children: [
-                        FoodArt(product(s['product']), size: 36),
-                        const SizedBox(width: 10),
-                        Expanded(
-                            child: Bi('${product(s['product'])?['name_ml'] ?? s['product']} × ${s['qty']}',
-                                '${product(s['product'])?['name_en'] ?? ''}${s['via'] == 'call' || s['via'] == 'web-call' ? ' · ${T.en('via_call')}' : ''}',
-                                size: 15)),
-                        if (s['via'] == 'call' || s['via'] == 'web-call') const Icon(Icons.call_rounded, size: 16, color: C.brand),
-                        const SizedBox(width: 8),
-                        Text(rupees(s['qty'] * (product(s['product'])?['price'] ?? 0)), style: numStyle(15, weight: FontWeight.w700)),
-                        IconButton(
-                          tooltip: T.en('undo'),
-                          icon: const Icon(Icons.undo_rounded, color: C.red, size: 20),
-                          onPressed: () => repo.remove('sales', s['id']),
-                        ),
-                      ]),
-                  ]),
-              ]),
-            ),
-          ]),
+          // Swipe down to check Firestore now (PLAN.md §11: if the live update fails, refresh).
+          child: RefreshIndicator(
+            onRefresh: repo.syncNow,
+            color: C.brand,
+            child: ListView(physics: const AlwaysScrollableScrollPhysics(), padding: const EdgeInsets.fromLTRB(16, 12, 16, 120), children: [
+              const TopBar('daily_title'),
+              const SizedBox(height: 16),
+              MCard(
+                onTap: _pickDay,
+                child: Row(children: [
+                  Expanded(child: Bi.k('sold_on', size: 15, weight: FontWeight.w700)),
+                  Text('${day.day} ${monthsMl[day.month - 1]} ${day.year}', style: const TextStyle(fontFamily: 'Malayalam', fontWeight: FontWeight.w700)),
+                  const SizedBox(width: 8),
+                  const Icon(Icons.calendar_month_rounded, color: C.brand),
+                ]),
+              ),
+              const SizedBox(height: 16),
+              Padding(padding: const EdgeInsets.only(left: 4, bottom: 10), child: Bi.k('tap_product', size: 15, weight: FontWeight.w700)),
+              GridView.count(
+                padding: EdgeInsets.zero, // no extra safe-area gap inside the page list
+                crossAxisCount: 2,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
+                childAspectRatio: .95,
+                children: [
+                  for (final (i, p) in repo['products'].indexed)
+                    _ProductTile(
+                      product: p,
+                      tint: _tints[i % _tints.length],
+                      qty: daySales.where((s) => s['product'] == p['id']).fold<num>(0, (n, s) => n + s['qty']),
+                      onTap: () => _sell(p),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              MCard(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Bi.k('entries', size: 15, weight: FontWeight.w700),
+                  const SizedBox(height: 4),
+                  Money(salesIncome(daySales, repo['products']), style: numStyle(34)),
+                  if (daySales.isEmpty)
+                    Padding(padding: const EdgeInsets.only(top: 8), child: Bi.k('no_sales_today', size: 15, weight: FontWeight.w500))
+                  else
+                    Rows([
+                      for (final s in daySales.reversed)
+                        Row(children: [
+                          FoodArt(product(s['product']), size: 36),
+                          const SizedBox(width: 10),
+                          Expanded(
+                              child: Bi('${product(s['product'])?['name_ml'] ?? s['product']} × ${s['qty']}',
+                                  '${product(s['product'])?['name_en'] ?? ''}${s['via'] == 'call' || s['via'] == 'web-call' ? ' · ${T.en('via_call')}' : ''}',
+                                  size: 15)),
+                          if (s['via'] == 'call' || s['via'] == 'web-call') const Icon(Icons.call_rounded, size: 16, color: C.brand),
+                          const SizedBox(width: 8),
+                          Text(rupees(s['qty'] * (product(s['product'])?['price'] ?? 0)), style: numStyle(15, weight: FontWeight.w700)),
+                          IconButton(
+                            tooltip: T.en('undo'),
+                            icon: const Icon(Icons.undo_rounded, color: C.red, size: 20),
+                            onPressed: () => repo.remove('sales', s['id']),
+                          ),
+                        ]),
+                    ]),
+                ]),
+              ),
+            ]),
+          ),
         );
       },
     );
@@ -196,6 +202,7 @@ class _KeypadState extends State<_Keypad> {
         Text(rupees(qty * (p['price'] as num)), style: numStyle(16, color: C.muted, weight: FontWeight.w600)),
         const SizedBox(height: 12),
         GridView.count(
+          padding: EdgeInsets.zero, // no extra safe-area gap inside the page list
           crossAxisCount: 3,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -213,9 +220,7 @@ class _KeypadState extends State<_Keypad> {
                         borderRadius: BorderRadius.circular(16),
                         onTap: () => _tap(k),
                         child: Center(
-                            child: k == '⌫'
-                                ? const Icon(Icons.backspace_outlined, color: C.ink)
-                                : Text(k, style: numStyle(26, weight: FontWeight.w700))),
+                            child: k == '⌫' ? const Icon(Icons.backspace_outlined, color: C.ink) : Text(k, style: numStyle(26, weight: FontWeight.w700))),
                       ),
                     ),
           ],

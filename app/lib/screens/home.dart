@@ -33,141 +33,146 @@ class HomeScreen extends StatelessWidget {
 
         return SafeArea(
           bottom: false,
-          child: ListView(padding: const EdgeInsets.fromLTRB(16, 12, 16, 120), children: [
-            // Hello
-            Row(children: [
-              Container(
-                width: 54,
-                height: 54,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: const LinearGradient(colors: [C.goldLight, C.gold]),
-                  border: Border.all(color: Colors.white, width: 3),
+          // Swipe down to check Firestore now (PLAN.md §11: if the live update fails, refresh).
+          child: RefreshIndicator(
+            onRefresh: repo.syncNow,
+            color: C.brand,
+            child: ListView(physics: const AlwaysScrollableScrollPhysics(), padding: const EdgeInsets.fromLTRB(16, 12, 16, 120), children: [
+              // Hello
+              Row(children: [
+                Container(
+                  width: 54,
+                  height: 54,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: const LinearGradient(colors: [C.goldLight, C.gold]),
+                    border: Border.all(color: Colors.white, width: 3),
+                  ),
+                  child: Text('${user['name_ml'] ?? 'M'}'.characters.first,
+                      style: const TextStyle(fontFamily: 'Malayalam', fontSize: 20, fontWeight: FontWeight.w800, color: C.brandDeep)),
                 ),
-                child: Text('${user['name_ml'] ?? 'M'}'.characters.first,
-                    style: const TextStyle(fontFamily: 'Malayalam', fontSize: 20, fontWeight: FontWeight.w800, color: C.brandDeep)),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Bi('${T.ml('hello')}, ${user['name_ml'] ?? ''}', '${T.en('hello')}, ${user['name'] ?? ''}', size: 21, weight: FontWeight.w800),
-                  Row(children: [
-                    const Icon(Icons.location_on_outlined, size: 14, color: C.muted),
-                    const SizedBox(width: 3),
-                    Text('${user['place_ml'] ?? ''} · ${user['place'] ?? ''}', style: const TextStyle(fontSize: 13, color: C.muted)),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Bi('${T.ml('hello')}, ${user['name_ml'] ?? ''}', '${T.en('hello')}, ${user['name'] ?? ''}', size: 21, weight: FontWeight.w800),
+                    Row(children: [
+                      const Icon(Icons.location_on_outlined, size: 14, color: C.muted),
+                      const SizedBox(width: 3),
+                      Text('${user['place_ml'] ?? ''} · ${user['place'] ?? ''}', style: const TextStyle(fontSize: 13, color: C.muted)),
+                    ]),
                   ]),
-                ]),
-              ),
-              const Text('MITRA', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: 2, color: C.brand, fontSize: 13)),
-            ]),
-            const SizedBox(height: 16),
-
-            // This month's profit
-            HeroCard(
-              onTap: () => shell?.go(3),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Expanded(child: Bi.k('month_profit', size: 15, color: Colors.white, enColor: Colors.white70, weight: FontWeight.w700)),
-                  const _LiveChip(),
-                ]),
-                const SizedBox(height: 8),
-                Money(m.profit, style: numStyle(46, color: m.profit >= 0 ? Colors.white : const Color(0xFFFFD2C7))),
-                const SizedBox(height: 12),
-                HBar(m.income > 0 ? m.profit / m.income : 0, gradient: goldBar, track: const Color(0x26FFFFFF), height: 8),
-                const SizedBox(height: 14),
-                Row(children: [
-                  Expanded(child: _Split('income', m.income, C.mint)),
-                  const SizedBox(width: 10),
-                  Expanded(child: _Split('spending', m.spending, C.goldLight)),
-                ]),
+                ),
+                const Text('MITRA', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: 2, color: C.brand, fontSize: 13)),
               ]),
-            ),
-            const SizedBox(height: 14),
+              const SizedBox(height: 16),
 
-            // Savings goal on the road
-            if (repo['goals'].isNotEmpty) _GoalRoad(repo['goals'].first, onTap: () => shell?.go(4)),
-            if (repo['goals'].isNotEmpty) const SizedBox(height: 14),
-
-            // Today's sales
-            MCard(
-              onTap: () => shell?.go(1),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Row(children: [
-                  const Badge2(Icons.receipt_long_rounded, bg: C.goldSoft, fg: Color(0xFF9A6F0E), size: 50),
-                  const SizedBox(width: 14),
-                  Expanded(
-                      child: Bi(T.ml('today_sales'),
-                          todays.isEmpty ? T.en('no_sales_today') : '${todays.fold<num>(0, (n, s) => n + s['qty'])} ${T.en('items_sold')}',
-                          size: 16, weight: FontWeight.w700)),
-                  Money(salesIncome(todays, repo['products']), style: numStyle(28)),
-                ]),
-                if (todays.isNotEmpty) ...[
+              // This month's profit
+              HeroCard(
+                onTap: () => shell?.go(3),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Expanded(child: Bi.k('month_profit', size: 15, color: Colors.white, enColor: Colors.white70, weight: FontWeight.w700)),
+                    const _LiveChip(),
+                  ]),
+                  const SizedBox(height: 8),
+                  Money(m.profit, style: numStyle(46, color: m.profit >= 0 ? Colors.white : const Color(0xFFFFD2C7))),
                   const SizedBox(height: 12),
-                  Wrap(spacing: 8, runSpacing: 8, children: [
-                    for (final p in repo['products'])
-                      if (todays.any((s) => s['product'] == p['id']))
-                        Container(
-                          padding: const EdgeInsets.fromLTRB(6, 4, 12, 4),
-                          decoration: BoxDecoration(color: C.bg, borderRadius: BorderRadius.circular(99), border: Border.all(color: C.line)),
-                          child: Row(mainAxisSize: MainAxisSize.min, children: [
-                            FoodArt(p, size: 26),
-                            const SizedBox(width: 6),
-                            Text('${todays.where((s) => s['product'] == p['id']).fold<num>(0, (n, s) => n + s['qty'])} ',
-                                style: const TextStyle(fontWeight: FontWeight.w800, color: C.brand)),
-                            Text(p['name_ml'], style: const TextStyle(fontFamily: 'Malayalam', fontWeight: FontWeight.w600)),
-                          ]),
-                        ),
+                  HBar(m.income > 0 ? m.profit / m.income : 0, gradient: goldBar, track: const Color(0x26FFFFFF), height: 8),
+                  const SizedBox(height: 14),
+                  Row(children: [
+                    Expanded(child: _Split('income', m.income, C.mint)),
+                    const SizedBox(width: 10),
+                    Expanded(child: _Split('spending', m.spending, C.goldLight)),
                   ]),
-                ],
-              ]),
-            ),
-            const SizedBox(height: 14),
+                ]),
+              ),
+              const SizedBox(height: 14),
 
-            // Mitra, call me
-            const CallMeCard(),
-            const SizedBox(height: 14),
+              // Savings goal on the road
+              if (repo['goals'].isNotEmpty) _GoalRoad(repo['goals'].first, onTap: () => shell?.go(4)),
+              if (repo['goals'].isNotEmpty) const SizedBox(height: 14),
 
-            // Everything else: products and bills, schemes, buy together, support
-            const _Tiles(),
-            const SizedBox(height: 14),
-
-            // Mitra noticed
-            if (list.isNotEmpty)
+              // Today's sales
               MCard(
+                onTap: () => shell?.go(1),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  const IconTitle(Icons.auto_awesome_rounded, 'noticed_title'),
-                  Rows([for (final i in list) InsightTile(i)]),
+                  Row(children: [
+                    const Badge2(Icons.receipt_long_rounded, bg: C.goldSoft, fg: Color(0xFF9A6F0E), size: 50),
+                    const SizedBox(width: 14),
+                    Expanded(
+                        child: Bi(T.ml('today_sales'),
+                            todays.isEmpty ? T.en('no_sales_today') : '${todays.fold<num>(0, (n, s) => n + s['qty'])} ${T.en('items_sold')}',
+                            size: 16, weight: FontWeight.w700)),
+                    Money(salesIncome(todays, repo['products']), style: numStyle(28)),
+                  ]),
+                  if (todays.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    Wrap(spacing: 8, runSpacing: 8, children: [
+                      for (final p in repo['products'])
+                        if (todays.any((s) => s['product'] == p['id']))
+                          Container(
+                            padding: const EdgeInsets.fromLTRB(6, 4, 12, 4),
+                            decoration: BoxDecoration(color: C.bg, borderRadius: BorderRadius.circular(99), border: Border.all(color: C.line)),
+                            child: Row(mainAxisSize: MainAxisSize.min, children: [
+                              FoodArt(p, size: 26),
+                              const SizedBox(width: 6),
+                              Text('${todays.where((s) => s['product'] == p['id']).fold<num>(0, (n, s) => n + s['qty'])} ',
+                                  style: const TextStyle(fontWeight: FontWeight.w800, color: C.brand)),
+                              Text(p['name_ml'], style: const TextStyle(fontFamily: 'Malayalam', fontWeight: FontWeight.w600)),
+                            ]),
+                          ),
+                    ]),
+                  ],
+                ]),
+              ),
+              const SizedBox(height: 14),
+
+              // Mitra, call me
+              const CallMeCard(),
+              const SizedBox(height: 14),
+
+              // Everything else: products and bills, schemes, buy together, support
+              const _Tiles(),
+              const SizedBox(height: 14),
+
+              // Mitra noticed
+              if (list.isNotEmpty)
+                MCard(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    const IconTitle(Icons.auto_awesome_rounded, 'noticed_title'),
+                    Rows([for (final i in list) InsightTile(i)]),
+                    TextButton.icon(
+                      onPressed: () => shell?.go(3),
+                      icon: const Icon(Icons.arrow_forward_rounded, size: 16),
+                      label: Text('${T.ml('see_all')} · ${T.en('see_all')}'),
+                    ),
+                  ]),
+                ),
+              const SizedBox(height: 18),
+
+              Center(
+                child: Wrap(alignment: WrapAlignment.center, children: [
                   TextButton.icon(
-                    onPressed: () => shell?.go(3),
-                    icon: const Icon(Icons.arrow_forward_rounded, size: 16),
-                    label: Text('${T.ml('see_all')} · ${T.en('see_all')}'),
+                    onPressed: () async {
+                      await repo.loadDemo();
+                      if (context.mounted) toast(context, 'reset_done', icon: Icons.restart_alt_rounded);
+                    },
+                    icon: const Icon(Icons.restart_alt_rounded, size: 16, color: C.muted),
+                    label: Text('${T.ml('reset_demo')} · ${T.en('reset_demo')}', style: const TextStyle(color: C.muted)),
+                  ),
+                  TextButton.icon(
+                    onPressed: () async {
+                      (await SharedPreferences.getInstance()).setBool('joined', false);
+                      if (context.mounted) Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const JoinScreen()));
+                    },
+                    icon: const Icon(Icons.group_outlined, size: 16, color: C.muted),
+                    label: Text('${T.ml('join_link')} · ${T.en('join_link')}', style: const TextStyle(color: C.muted)),
                   ),
                 ]),
               ),
-            const SizedBox(height: 18),
-
-            Center(
-              child: Wrap(alignment: WrapAlignment.center, children: [
-                TextButton.icon(
-                  onPressed: () async {
-                    await repo.loadDemo();
-                    if (context.mounted) toast(context, 'reset_done', icon: Icons.restart_alt_rounded);
-                  },
-                  icon: const Icon(Icons.restart_alt_rounded, size: 16, color: C.muted),
-                  label: Text('${T.ml('reset_demo')} · ${T.en('reset_demo')}', style: const TextStyle(color: C.muted)),
-                ),
-                TextButton.icon(
-                  onPressed: () async {
-                    (await SharedPreferences.getInstance()).setBool('joined', false);
-                    if (context.mounted) Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const JoinScreen()));
-                  },
-                  icon: const Icon(Icons.group_outlined, size: 16, color: C.muted),
-                  label: Text('${T.ml('join_link')} · ${T.en('join_link')}', style: const TextStyle(color: C.muted)),
-                ),
-              ]),
-            ),
-          ]),
+            ]),
+          ),
         );
       },
     );
@@ -176,8 +181,11 @@ class HomeScreen extends StatelessWidget {
 
 class _LiveChip extends StatelessWidget {
   const _LiveChip();
+  // Listens itself: this chip is const, so Home rebuilding would skip it.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ListenableBuilder(listenable: repo, builder: (context, _) => _chip());
+
+  Widget _chip() {
     // Green "Live" when the Firestore link works (or the app is phone-only by design), grey when it is down.
     final live = !cloudConfigured || repo.online;
     final color = live ? C.mint : Colors.white60;
@@ -205,6 +213,7 @@ class _Tiles extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => GridView.count(
+        padding: EdgeInsets.zero, // no extra safe-area gap inside the page list
         crossAxisCount: 2,
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
@@ -240,8 +249,10 @@ class _Split extends StatelessWidget {
           Row(children: [
             Container(width: 7, height: 7, decoration: BoxDecoration(color: dot, shape: BoxShape.circle)),
             const SizedBox(width: 6),
-            Flexible(child: Text('${T.ml(keyName)} · ${T.en(keyName)}', overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontFamily: 'Jakarta', fontFamilyFallback: fonts, color: Colors.white70, fontSize: 12))),
+            Flexible(
+                child: Text('${T.ml(keyName)} · ${T.en(keyName)}',
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontFamily: 'Jakarta', fontFamilyFallback: fonts, color: Colors.white70, fontSize: 12))),
           ]),
           const SizedBox(height: 2),
           Money(value, style: numStyle(18, color: Colors.white)),
