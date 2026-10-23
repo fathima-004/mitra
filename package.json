@@ -1,0 +1,12 @@
+{
+  "name": "mitra",
+  "private": true,
+  "description": "Mitra: phone-call sales log and monthly profit for women micro-entrepreneurs",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.7.0",
+    "twilio": "^5.3.0"
+  }
+}
