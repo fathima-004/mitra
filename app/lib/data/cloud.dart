@@ -25,16 +25,18 @@ Map<String, dynamic> _enc(Object? v) {
   if (v is int) return {'integerValue': '$v'};
   if (v is num) return {'doubleValue': v};
   if (v is String) return {'stringValue': v};
-  if (v is List)
+  if (v is List) {
     return {
       'arrayValue': {
         'values': [for (final x in v) _enc(x)]
       }
     };
-  if (v is Map)
+  }
+  if (v is Map) {
     return {
       'mapValue': {'fields': _fields(Map<String, dynamic>.from(v))}
     };
+  }
   return {'stringValue': '$v'};
 }
 
