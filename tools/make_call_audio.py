@@ -2,7 +2,7 @@
 
 Run from the repo root:  python tools/make_call_audio.py      (needs: pip install edge-tts imageio-ffmpeg)
 Clips are 8 kHz mono WAV, the format Exotel recommends for phone audio.
-Clips follow the products in data/demo.json, so re-run this if her products change.
+Clips follow the products in web/data/demo.json, so re-run this if her products change.
   ex-main.wav        greeting + "sales 1, profit 2, talk to someone 3"
   ex-menu.wav        "what did you sell? biriyani 1, chapathi 2, ..."
   ex-qty-<id>.wav    "how many <product>? type the number, then #"
@@ -18,7 +18,7 @@ import edge_tts
 import imageio_ffmpeg
 
 VOICE = "ml-IN-SobhanaNeural"
-OUT = "audio/exotel"
+OUT = "web/audio/exotel"
 NUM_ML = ["ഒന്ന്", "രണ്ട്", "മൂന്ന്", "നാല്", "അഞ്ച്", "ആറ്", "ഏഴ്", "എട്ട്", "ഒൻപത്"]
 FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
 
@@ -35,7 +35,7 @@ async def main():
     os.makedirs(OUT, exist_ok=True)
     for old in os.listdir(OUT):
         os.remove(os.path.join(OUT, old))
-    products = json.load(open("data/demo.json", encoding="utf-8"))["products"][:9]
+    products = json.load(open("web/data/demo.json", encoding="utf-8"))["products"][:9]
     await save("നമസ്കാരം! ഞാൻ മിത്ര. ഇന്ന് വിറ്റത് പറയാൻ ഒന്ന് അമർത്തുക. ഈ മാസത്തെ ലാഭം അറിയാൻ രണ്ട്. "
                "ആരോടെങ്കിലും ഒന്ന് സംസാരിക്കാൻ മൂന്ന്.", "ex-main")
     options = " ".join(f"{p['name_ml']} ആണെങ്കിൽ {NUM_ML[i]}." for i, p in enumerate(products))

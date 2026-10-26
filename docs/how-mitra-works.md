@@ -4,7 +4,7 @@ Notes so either of us can pick up any part. Last updated 24 Oct.
 
 Three ways in, all using the same Firestore data (user `demo1`, Sheela):
 - the Android app (Flutter, `app/`)
-- the web app (root folder, plain HTML/JS, also on Netlify)
+- the web app (`web/`, plain HTML/JS, also on Netlify)
 - a phone call on Exotel, handled by Netlify functions in `netlify/`
 
 A sale saved on a call shows up in the app within a few seconds.
@@ -41,12 +41,12 @@ Every change from a call is saved with `via:"call"` and stamps `changedAt`.
 `schemes.json` has 4 non-loan schemes, each checked on the official site (source + date in the file). Anything past `open_until` or marked as a loan is hidden. The app also shows PIB scheme news from the RSS feed, with loan news filtered out.
 
 ## Data
-See PLAN.md §5. Profit for a month = that month's sales income minus that month's bills and purchases. Dart (`app/lib/logic/`) and JS (`js/calc.js`, `money.js`) do the same maths, and `test/logic_test.dart` checks they match.
+See PLAN.md §5. Profit for a month = that month's sales income minus that month's bills and purchases. Dart (`app/lib/logic/`) and JS (`web/js/calc.js`, `money.js`) do the same maths, and `test/logic_test.dart` checks they match.
 
 ## Run and test
 ```
 python tools/serve.py          # web app on localhost:8080
-python tools/sync_app_assets.py   # after changing data/ or audio/
+python tools/sync_app_assets.py   # after changing web/data or web/audio
 cd app
 flutter run --release
 flutter analyze
@@ -59,7 +59,7 @@ Netlify deploys on every push to main. Keys only go in Netlify env vars.
 ## Still to do
 - Put the Firebase web config and site URL into the builds. Until then "Call me" says it's unavailable.
 - Merge `hiba/exotel-full-call` (Fathima's files).
-- `js/parse.js` on main doesn't get Malayalam endings like "ബിരിയാണിയും". The fix is on `hiba/twilio-call-flow`.
+- `web/js/parse.js` on main doesn't get Malayalam endings like "ബിരിയാണിയും". The fix is on `hiba/twilio-call-flow`.
 - `exotel-save` says "Saved" even when Firebase isn't connected.
 - Twilio `voice`/`menu` on main are still placeholders.
 - GST limits in `limits.json` need checking on gst.gov.in.

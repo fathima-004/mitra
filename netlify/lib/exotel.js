@@ -1,6 +1,6 @@
 // Helpers shared by the Exotel call functions. Owner: Fathima (call agent).
 // Exotel calls our URLs with GET and URL-encoded call details (CallSid, CallFrom, digits, ...).
-const demo = require('../../data/demo.json');
+const demo = require('../../web/data/demo.json');
 const { db } = require('./firestore');
 
 const USER = 'demo1';
@@ -28,7 +28,7 @@ const json = (body, statusCode = 200) => ({
 });
 const forbidden = json({ error: 'forbidden' }, 403);
 
-// Public URL of a Malayalam clip (.wav) in audio/exotel/ (served by Netlify from the repo).
+// Public URL of a Malayalam clip (.wav) in web/audio/exotel/ (served by Netlify from web/).
 const audio = (event, name) => `https://${event.headers.host}/audio/exotel/${name}.wav`;
 
 // Her products in menu order (Firestore, else the demo file).

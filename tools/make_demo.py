@@ -1,4 +1,4 @@
-"""Generate data/demo.json: one realistic month for Sheela, a home food seller in Kozhikode.
+"""Generate web/data/demo.json: one realistic month for Sheela, a home food seller in Kozhikode.
 
 Run from the repo root:  python tools/make_demo.py
 Numbers are an EXAMPLE, not a real person. Replace with real numbers from the women we spoke to.
@@ -92,7 +92,7 @@ demo = {
     ],
 }
 
-with open("data/demo.json", "w", encoding="utf-8") as f:
+with open("web/data/demo.json", "w", encoding="utf-8") as f:
     json.dump(demo, f, ensure_ascii=False, indent=1)
 
 income = sum(s["qty"] * next(p["price"] for p in products if p["id"] == s["product"]) for s in sales)

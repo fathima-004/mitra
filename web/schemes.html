@@ -20,7 +20,7 @@
     // Non-loan schemes she can join now. Each entry was checked on the official page, with the source URL and
     // date stored next to it; entries without both, marked as loans, or past their last date to
     // apply (open_until) are not shown. Same list as the Flutter app and the phone call:
-    // data/schemes.json if the team adds one, else app/assets/data/schemes.json. Owner: Hiba.
+    // web/data/schemes.json (copied into the app by tools/sync_app_assets.py). Owner: Hiba.
     import { ml, en, esc, topbar, renderNav } from './js/app.js';
     import { today } from './js/calc.js';
 
@@ -34,7 +34,7 @@
       && (r.open_until == null || String(r.open_until) >= today());
 
     async function load() {
-      for (const url of ['data/schemes.json', 'app/assets/data/schemes.json']) {
+      for (const url of ['data/schemes.json']) {
         try {
           const res = await fetch(url);
           if (!res.ok) continue;

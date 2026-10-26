@@ -33,7 +33,7 @@ After adding or changing any of these: Deploys → Trigger deploy → Deploy sit
    - `FIREBASE_PRIVATE_KEY` = the whole `private_key` value, from `-----BEGIN PRIVATE KEY-----` to `-----END PRIVATE KEY-----
 ` (without the quotes)
    (Or paste the whole file as `FIREBASE_SERVICE_ACCOUNT`, but Netlify Functions only allow about 4 KB of variables in total, so the three separate ones are safer.)
-4. Trigger a deploy. The app side also needs the project's web config (Hiba: `js/data.js` and the Flutter `--dart-define` values in `app/lib/config.dart`).
+4. Trigger a deploy. The app side also needs the project's web config (Hiba: `web/js/data.js` and the Flutter `--dart-define` values in `app/lib/config.dart`).
 
 ## 2. Build the flow in Exotel App Bazaar
 One straight line of boxes (Gathers set to "Configure parameters dynamically by providing a URL"):
@@ -53,7 +53,7 @@ One straight line of boxes (Gathers set to "Configure parameters dynamically by 
 - 2 → G2 speaks this month's profit, then the call ends
 - 3 → G2 plays the support message (Tele-MANAS), then the call ends
 
-Fixed sentences are Malayalam clips (`audio/exotel/*.wav`); sentences with numbers are in English. `CALL_LANG=en` in Netlify makes everything English.
+Fixed sentences are Malayalam clips (`web/audio/exotel/*.wav`); sentences with numbers are in English. `CALL_LANG=en` in Netlify makes everything English.
 
 ## 3. Use the flow
 - **She calls in:** ExoPhones → your number → set its flow to **Mitra**.
@@ -70,6 +70,6 @@ Fixed sentences are Malayalam clips (`audio/exotel/*.wav`); sentences with numbe
 - `netlify/functions/exotel-save.js`: saves the sale (one per call, id from CallSid, so retries don't double-count)
 - `netlify/functions/call-me.js`: rings the demo phone via Exotel `Calls/connect`
 - `netlify/lib/exotel.js`, `netlify/lib/firestore.js`: shared helpers
-- `audio/exotel/*.mp3`: Malayalam prompts, made with `python tools/make_call_audio.py`
+- `web/audio/exotel/*.wav`: Malayalam prompts, made with `python tools/make_call_audio.py`
 
 Speech ("innu 12 biriyani poyi") is the next step: a Record applet → our function transcribes and parses → read back → keypad confirm. The keypad flow above is the safe demo path.

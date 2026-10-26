@@ -1,5 +1,7 @@
 ﻿# Requests between teammates
 
+> 26 Oct: the website moved into `web/`. Paths below like `js/…`, `data/…`, `audio/…`, `*.html` are now `web/js/…`, `web/data/…` and so on.
+
 Write: date/time, who, file, what you need changed.
 
 ---

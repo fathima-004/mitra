@@ -1,5 +1,7 @@
 # Mitra — full hackathon plan (v2: real phone call agent)
 
+> 26 Oct: the website moved into `web/`. Paths below like `js/…`, `data/…`, `audio/…`, `*.html` are now `web/js/…`, `web/data/…` and so on.
+
 MakeHerHack 2026, CITTIC CUSAT. About 16 hours of building. Two people, one repo: https://github.com/fathima-004/mitra
 
 ---

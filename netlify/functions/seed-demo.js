@@ -1,8 +1,8 @@
-// One-time: copy Sheela's example month (data/demo.json) into Firestore, in the same layout as
+// One-time: copy Sheela's example month (web/data/demo.json) into Firestore, in the same layout as
 // seedRemote() in js/data.js. Owner: Fathima (call agent).
 // POST /.netlify/functions/seed-demo — writes only if users/demo1 does not exist yet, so it never
 // overwrites data. To reload the demo later, use "Reset demo" in the app.
-const demo = require('../../data/demo.json');
+const demo = require('../../web/data/demo.json');
 const { db } = require('../lib/firestore');
 
 const USER = 'demo1';

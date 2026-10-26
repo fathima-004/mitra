@@ -1,6 +1,7 @@
 """Local dev server that never lets the browser cache files, so every change shows up on refresh.
-Run from the repo root:  python tools/serve.py   → http://localhost:8080 (and http://<laptop-ip>:8080 on the phone)
+Serves web/ (what Netlify publishes). Run from the repo root:  python tools/serve.py   → http://localhost:8080 (and http://<laptop-ip>:8080 on the phone)
 """
+import functools
 import http.server
 import socketserver
 
@@ -15,6 +16,6 @@ class NoCache(http.server.SimpleHTTPRequestHandler):
 
 
 socketserver.ThreadingTCPServer.allow_reuse_address = True
-with socketserver.ThreadingTCPServer(("0.0.0.0", 8080), NoCache) as httpd:
+with socketserver.ThreadingTCPServer(("0.0.0.0", 8080), functools.partial(NoCache, directory="web")) as httpd:
     print("Mitra dev server on http://localhost:8080")
     httpd.serve_forever()

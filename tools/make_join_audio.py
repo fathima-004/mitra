@@ -1,4 +1,4 @@
-"""Record the join-by-call demo (data/join_call.json) as Malayalam voice clips in audio/join/.
+"""Record the join-by-call demo (web/data/join_call.json) as Malayalam voice clips in web/audio/join/.
 
 Run from the repo root:  python tools/make_join_audio.py      (needs: pip install edge-tts)
 Mitra speaks with ml-IN-SobhanaNeural. Her replies use the same voice, a little lower and slower,
@@ -11,12 +11,12 @@ import os
 import edge_tts
 
 VOICE = "ml-IN-SobhanaNeural"
-OUT = "audio/join"
+OUT = "web/audio/join"
 
 
 async def main():
     os.makedirs(OUT, exist_ok=True)
-    lines = json.load(open("data/join_call.json", encoding="utf-8"))["lines"]
+    lines = json.load(open("web/data/join_call.json", encoding="utf-8"))["lines"]
     for line in lines:
         if "id" not in line:
             continue
